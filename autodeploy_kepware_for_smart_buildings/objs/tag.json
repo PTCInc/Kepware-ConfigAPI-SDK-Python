@@ -1,0 +1,8 @@
+{
+	"common.ALLTYPES_NAME": "AI0",
+	"servermain.TAG_ADDRESS": "AnalogInput.0.PresentValue",
+	"servermain.TAG_DATA_TYPE": 8,
+	"servermain.TAG_READ_WRITE_ACCESS": 1,
+	"servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+	"servermain.TAG_SCALING_TYPE": 0
+}
