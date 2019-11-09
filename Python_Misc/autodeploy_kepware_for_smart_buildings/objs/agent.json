@@ -1,0 +1,28 @@
+{
+	"common.ALLTYPES_NAME": "b121fmKepware",
+	"iot_gateway.AGENTTYPES_TYPE": "MQTT Client",
+	"iot_gateway.AGENTTYPES_ENABLED": true,
+	"iot_gateway.MQTT_CLIENT_URL": "ssl://SmartBuildingsIoTHub121.azure-devices.net:8883",
+	"iot_gateway.MQTT_CLIENT_TOPIC": "devices/KepwareGateway/messages/events/",
+	"iot_gateway.MQTT_CLIENT_QOS": 1,
+	"iot_gateway.AGENTTYPES_RATE_MS": 10000,
+	"iot_gateway.AGENTTYPES_PUBLISH_FORMAT": 0,
+	"iot_gateway.AGENTTYPES_MAX_EVENTS": 1,
+	"iot_gateway.AGENTTYPES_TIMEOUT_S": 5,
+	"iot_gateway.AGENTTYPES_MESSAGE_FORMAT": 1,
+	"iot_gateway.AGENTTYPES_STANDARD_TEMPLATE": "timestamp: |SERVERTIMESTAMP|\r\nvalues: |VALUES|\r\n",
+	"iot_gateway.AGENTTYPES_EXPANSION_OF_VALUES": "id: |TAGNAME|\r\nv: |TAGVALUE|\r\nq: |TAGQUALITY|\r\nt: |TAGTIMESTAMP|\r\n",
+	"iot_gateway.AGENTTYPES_ADVANCED_TEMPLATE": "|#each VALUES|\r\n{\"gwy\": \"B121Kepware\", \"name\": \"|TAGNAME|\", \"value\": |VALUE|, \"status\": |QUALITY|, \"value timestamp\": |TIMESTAMP|, \"publish timestamp\": \"|SERVERDATE|\"  } |#unless @last|,|/unless|\r\n|/each|\r\n\r\n",
+	"iot_gateway.MQTT_CLIENT_CLIENT_ID": "KepwareGateway",
+	"iot_gateway.MQTT_CLIENT_USERNAME": "SmartBuildingsIoTHub121.azure-devices.net/KepwareGateway",
+	"iot_gateway.MQTT_CLIENT_PASSWORD": "5e3ce384700e2b29e8bc9ac4dc0048db3aa867ff9078f3e587c7eb5b143ed4d76e570130b95fe3566e7fb67ece202134b454dee20afe242506328eb5ca8c2e9c53291e8d80d14200f8c1140a7e0e90fc9c788d8aa19b93edb642faac550e815d57246a0292ca16c6436824a4aca7ca53d6b53a9bb207cf57412a8660696eaee14bb0e584c16fc66ff7bd931eab214796987826f8f8f491583aba9d047318205b4db693f2fb260f9fc433bff6b7610c2168e927ce497bd6dc",
+	"iot_gateway.MQTT_TLS_VERSION": 0,
+	"iot_gateway.MQTT_CLIENT_CERTIFICATE": false,
+	"iot_gateway.MQTT_CLIENT_ENABLE_LAST_WILL": false,
+	"iot_gateway.MQTT_CLIENT_LAST_WILL_TOPIC": "",
+	"iot_gateway.MQTT_CLIENT_LAST_WILL_MESSAGE": "",
+	"iot_gateway.MQTT_CLIENT_ENABLE_WRITE_TOPIC": false,
+	"iot_gateway.MQTT_CLIENT_WRITE_TOPIC": "iotgateway/write"
+}
+				
+		

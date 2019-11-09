@@ -1,0 +1,5 @@
+{
+	"common.ALLTYPES_NAME": "Device1",
+	"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "BACnet/IP",
+	"servermain.DEVICE_ID_STRING": "1.100"
+}

@@ -1,0 +1,8 @@
+{
+	"common.ALLTYPES_NAME": "System__ActiveTagCount",
+	"iot_gateway.IOT_ITEM_SERVER_TAG": "_System._ActiveTagCount",
+	"iot_gateway.IOT_ITEM_USE_SCAN_RATE": true,
+	"iot_gateway.IOT_ITEM_SCAN_RATE_MS": 1000,
+	"iot_gateway.IOT_ITEM_SEND_EVERY_SCAN": false,
+	"iot_gateway.IOT_ITEM_ENABLED": true
+}
