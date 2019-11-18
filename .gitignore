@@ -1,7 +1,6 @@
 # Custom
 #*.gitignore
 _test.py
-test.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
