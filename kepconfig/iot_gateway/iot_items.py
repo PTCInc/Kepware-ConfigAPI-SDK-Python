@@ -23,7 +23,8 @@ def _create_url(tag = None):
     if tag == None:
         return IOT_ITEMS_ROOT
     else: 
-        return '{}/{}'.format(IOT_ITEMS_ROOT,tag)
+        normalized_tag = helper._address_dedecimal(tag)
+        return '{}/{}'.format(IOT_ITEMS_ROOT,normalized_tag)
 
 
 def add_iot_item(server, DATA, agent, agent_type):

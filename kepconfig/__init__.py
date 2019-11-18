@@ -29,3 +29,9 @@ def path_split(path):
         else:
             path_obj['tag_path'] = path_list[2].split('.')
     return path_obj
+
+def _address_dedecimal(tag_address):
+    if tag_address[0] is '_':
+        tag_address = tag_address[1::]
+    updated = tag_address.replace('.','_')
+    return updated
