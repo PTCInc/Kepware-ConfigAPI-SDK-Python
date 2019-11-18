@@ -4,14 +4,14 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# Simple Example - Simple example on how to manage a connection and 
-# exectute various calls for the conenctivity parts of the Kepware
+# Simple Connectivity Example - Simple example on how to manage a connection and 
+# exectute various calls for the conenctivity components of the Kepware
 # configuration API
 
 
 
-import kepconfig
-import kepconfig.connectivity
+from kepconfig import connection
+from kepconfig.connectivity import channel, device, tag
 import json
 import time
 
@@ -21,18 +21,24 @@ dev_name = 'Device1'
 
 # This creates a server reference that is used to target all modifications of 
 # the Kepware configuration
-server = kepconfig.connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
+server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
 
 
 # Add a Channel using the "Simulator Driver"
-channel_data = {"common.ALLTYPES_NAME": ch_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
-print(kepconfig.connectivity.channel.add_channel(server,channel_data))
+channel_data = {
+    "common.ALLTYPES_NAME": ch_name,
+    "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"
+    }
+print("{} - {}".format("Adding Channel", channel.add_channel(server,channel_data)))
 
 # Add a Device to the created Channel
-device_data = {"common.ALLTYPES_NAME": dev_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
-print(kepconfig.connectivity.device.add_device(server,ch_name,device_data))
+device_data = {
+    "common.ALLTYPES_NAME": dev_name,
+    "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"
+    }
+print("{} - {}".format("Adding Device", device.add_device(server,ch_name,device_data)))
 
-# Add a collection of Tags and Tag Group objects
+# Add a collection of Tags and Tag Group objects.
 all_tags_data = {
     "tags": [
         {
@@ -63,7 +69,7 @@ all_tags_data = {
         }
     ]
 }
-print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
+print("{} - {}".format("Adding Tags and Tag Groups", tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data)))
 
 # Add tag to an existing tag group
 tag_info = [
@@ -77,34 +83,38 @@ tag_info = [
     }
 ]
 tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-print(kepconfig.connectivity.tag.add_tag(server, tag_path, tag_info))
+print("{} - {}".format("Adding Tags to Existing Tag Group", tag.add_tag(server, tag_path, tag_info)))
 
 #
 # Examples of reading properties for various objects (channels, devices, tags, etc)
 #
 
 # Get Channel
-print(kepconfig.connectivity.channel.get_channel(server,ch_name))
+print("{} - {}".format("Read Channel Properties", channel.get_channel(server,ch_name)))
 
 # Get Device
 device_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-print(kepconfig.connectivity.device.get_device(server, device_path))
+print("{} - {}".format("Read Device Properties", device.get_device(server, device_path)))
 
 # Get Tag
 tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-print(kepconfig.connectivity.tag.get_tag(server, tag_path))
+print("{} - {}".format("Read Tag Properties", tag.get_tag(server, tag_path)))
 
 # Get Tag Group
 tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-print(kepconfig.connectivity.tag.get_tag_group(server, tag_group_path))
+print("{} - {}".format("Read Tag Group Properties", tag.get_tag_group(server, tag_group_path)))
 
 
 # Channel Modify - Modify the description of the Channel that was created. "Force" will force the 
-# update to the Kepware Server, if not provided in the JSON data.
+# update to the Kepware Server, if "FORCE_UPDATE" not provided in the JSON data.
 channel_data = {
 }
 channel_data['common.ALLTYPES_DESCRIPTION'] = 'This is the test channel created'
-print (kepconfig.connectivity.channel.modify_channel(server, channel_data, channel=ch_name, force=True))
+print("{} - {}".format("Modifying Channel 'Description' Property", channel.modify_channel(server, channel_data, channel=ch_name, force=True)))
+
+# If Modify function calls do not provide "FORCE_UPDATE" and the "Force" input is "False" 
+# the API will first read the "PROJECT_ID" then use the ID when executing the modification.
+print("{} - {}".format("Modifying Channel 'Description' Property", channel.modify_channel(server, channel_data, channel=ch_name, force=True)))
 
 
 #
@@ -113,15 +123,14 @@ print (kepconfig.connectivity.channel.modify_channel(server, channel_data, chann
 
 # Delete Tag
 tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-print(kepconfig.connectivity.tag.del_tag(server, tag_path))
+print("{} - {}".format("Delete Tag", tag.del_tag(server, tag_path)))
 
 # Delete Tag Group
 tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-print(kepconfig.connectivity.tag.del_tag_group(server, tag_group_path))
+print("{} - {}".format("Delete Tag Group", tag.del_tag_group(server, tag_group_path)))
 
 # Delete Device
-# device_path = '{}.{}'.format(ch_name, dev_name)
-print(kepconfig.connectivity.device.del_device(server, device_path))
+print("{} - {}".format("Delete Device", device.del_device(server, device_path)))
 
 # Delete Channel
-print(kepconfig.connectivity.channel.del_channel(server,ch_name))
+print("{} - {}".format("Delete Channel", channel.del_channel(server,ch_name)))
