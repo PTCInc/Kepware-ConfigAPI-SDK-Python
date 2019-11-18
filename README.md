@@ -8,10 +8,20 @@ The client libraries are supported on Python 3.6 or later.
 
 ## Features
 
-SDK allows for *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware objects:
+SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware  configuration objects:
 
 - **Connectivity** *(Channel, Devices, Tags, Tag Groups)*
 - **IoT Gateway** *(Agents, IoT Items)*
+
+Methods to read the following logs:
+
+- **Event Log**
+- **API Transaction Log**
+
+Additionally the following *Services* are implemented:
+
+- **TagGeneration** *(not supported by all drivers)*
+- **ReinitializeRuntime** *(Thingworx Kepware Edge only)*
 
 ## Limitations
 
