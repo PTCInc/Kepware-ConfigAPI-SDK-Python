@@ -1,0 +1,28 @@
+{
+	"common.ALLTYPES_NAME": "AgentMQTT",
+	"iot_gateway.AGENTTYPES_TYPE": "MQTT Client",
+	"iot_gateway.AGENTTYPES_ENABLED": true,
+	"iot_gateway.MQTT_CLIENT_URL": "tcp://localhost:1883",
+	"iot_gateway.MQTT_CLIENT_TOPIC": "iotgateway",
+	"iot_gateway.MQTT_CLIENT_QOS": 1,
+	"iot_gateway.AGENTTYPES_RATE_MS": 10000,
+	"iot_gateway.AGENTTYPES_PUBLISH_FORMAT": 0,
+	"iot_gateway.AGENTTYPES_MAX_EVENTS": 1000,
+	"iot_gateway.AGENTTYPES_TIMEOUT_S": 5,
+	"iot_gateway.AGENTTYPES_MESSAGE_FORMAT": 0,
+	"iot_gateway.AGENTTYPES_STANDARD_TEMPLATE": "timestamp: |SERVERTIMESTAMP|\r\nvalues: |VALUES|\r\n",
+	"iot_gateway.AGENTTYPES_EXPANSION_OF_VALUES": "id: |TAGNAME|\r\nv: |TAGVALUE|\r\nq: |TAGQUALITY|\r\nt: |TAGTIMESTAMP|\r\n",
+	"iot_gateway.AGENTTYPES_ADVANCED_TEMPLATE": "{\r\n \"timestamp\": |SERVERTIMESTAMP|,\r\n  \"values\": [\r\n   |#each VALUES|\r\n    {\"id\": \"|TAGNAME|\", \"v\": |VALUE|, \"q\": |QUALITY|, \"t\": |TIMESTAMP| } |#unless @last|,|/unless|\r\n   |/each|\r\n  ]\r\n}",
+	"iot_gateway.MQTT_CLIENT_CLIENT_ID": "",
+	"iot_gateway.MQTT_CLIENT_USERNAME": "",
+	"iot_gateway.MQTT_CLIENT_PASSWORD": "",
+	"iot_gateway.MQTT_TLS_VERSION": 0,
+	"iot_gateway.MQTT_CLIENT_CERTIFICATE": false,
+	"iot_gateway.MQTT_CLIENT_ENABLE_LAST_WILL": false,
+	"iot_gateway.MQTT_CLIENT_LAST_WILL_TOPIC": "",
+	"iot_gateway.MQTT_CLIENT_LAST_WILL_MESSAGE": "",
+	"iot_gateway.MQTT_CLIENT_ENABLE_WRITE_TOPIC": false,
+	"iot_gateway.MQTT_CLIENT_WRITE_TOPIC": "iotgateway/write"
+}
+				
+		
