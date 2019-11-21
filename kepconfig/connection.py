@@ -14,7 +14,7 @@ import codecs
 import datetime
 from urllib import request, parse, error
 from base64 import b64encode
-# import socket
+import socket
 
 
 class server:
@@ -155,14 +155,11 @@ class server:
     def __connect(self,request_obj):
         try:
             with request.urlopen(request_obj) as server:
-    ##            response = codecs.decode(server.read(),'utf-8-sig')
                 if request_obj.method == 'GET':
                     return json.loads(codecs.decode(server.read(),'utf-8-sig'))
                 else:
                     return 'HTTP Code: {} - {}'.format(server.code,server.reason)
-                #return 'HTTP Code: ' + str(server.code) + ' - ' + server.reason
         except error.HTTPError as err:
-            # return 'HTTP Code: ' + str(err.code) + '\n' + codecs.decode(err.read(),'utf-8-sig')
             return 'HTTP Code: {}\n{}'.format(err.code, codecs.decode(err.read(),'utf-8-sig'))
         except error.URLError as err:
             return 'URLError: {} URL: {}'.format(err.reason, request_obj.get_full_url())
@@ -172,6 +169,14 @@ class server:
     def __url_validate(self, url):
         parsed_url = parse.urlparse(url)
         updated_path = parse.quote(parsed_url.path)
+
+        # If host is "localhost", force using the IPv4 loopback adapter IP address in all calls
+        # This is done to remove reties that will happen when the host resolution uses IPv6 intially
+        # Kepware currently doesn't support IPv6 and is not listening on this interface
+        if parsed_url.hostname.lower() == 'localhost':
+            ip = socket.gethostbyname(parsed_url.hostname)
+            parsed_url = parsed_url._replace(netloc='{}:{}'.format(ip, parsed_url.port))
+        
         return parsed_url._replace(path=updated_path).geturl()
 
     # Function used to build the basic authentication string
@@ -183,6 +188,7 @@ class server:
         authstr = b64encode(b':'.join((username, password))).strip().decode('ascii')
         return authstr
     
+    # Create parameters for log queries
     def __create_query(self, start = None, end = None, limit = None):
         query = {}
         if start != None and isinstance(start, datetime.datetime):
