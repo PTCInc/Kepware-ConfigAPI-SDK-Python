@@ -9,7 +9,6 @@
 # configuration API
 
 
-
 from kepconfig import connection
 from kepconfig.connectivity import channel, device, tag
 import json
@@ -23,6 +22,12 @@ dev_name = 'Device1'
 # the Kepware configuration
 server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
 
+# HTTP server reference examples. Uses the OS/systems trusted CA certificate store for cert validation as it uses the 
+# "create_default_context()" function as described here: 
+# https://docs.python.org/3/library/ssl.html#ssl.create_default_context
+# https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_default_certs
+# https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_default_verify_paths
+serverHTTPS = connection.server(host = '127.0.0.1', port = 57512, user = 'Administrator', pw = '', https=True)
 
 # Add a Channel using the "Simulator Driver"
 channel_data = {
