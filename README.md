@@ -8,7 +8,9 @@ The client libraries are supported on Python 3.6 or later.
 
 ## Features
 
-SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware  configuration objects:
+- Supports both HTTP and HTTPS connections with certificate validation options
+
+SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware configuration objects:
 
 - **Connectivity** *(Channel, Devices, Tags, Tag Groups)*
 - **IoT Gateway** *(Agents, IoT Items)*
@@ -21,11 +23,14 @@ Methods to read the following logs:
 Additionally the following *Services* are implemented:
 
 - **TagGeneration** *(not supported by all drivers)*
-- **ReinitializeRuntime** *(Thingworx Kepware Edge only)*
+- **ReinitializeRuntime** *(Thingworx Kepware Edge and Kepware Server 6.8+)*
 
-## Limitations
+## Known Limitations
 
-- Supports HTTP connections only
+- Project Properties are not defined
+- Other property configruation for more complex drivers are not explicitly defined
+- Other supported plug-ins (Datalogger, Scheduler, etc) are not defined
+- When using hostnames (not IP addresses) for connections, delays may occur under certain network configurations as the connection may attempt IPv6 connections first. IPv6 is not supported by Kepware servers at this time.
 
 ## Installation
 
@@ -39,7 +44,19 @@ Additionally the following *Services* are implemented:
 import kepconfig.connection
 
 server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
+
+# For HTTPS connections:
+server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '', https=True)
+
 ```
+
+For certificate validation, the SDK uses the OS/systems trusted CA certificate store. The connection leverages uses the "create_default_context()" function as part of urllib as described at the following links:
+
+- https://docs.python.org/3/library/ssl.html#ssl.create_default_context
+- https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_default_certs
+- https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_default_verify_paths
+
+For Windows OSes, the Kepware server's instance certificate can be loaded into the hosts "Trusted Root Certificate Authorities" store.
 
 ### Create an object
 

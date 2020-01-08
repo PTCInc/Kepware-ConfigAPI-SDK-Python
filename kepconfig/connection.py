@@ -15,6 +15,7 @@ import datetime
 from urllib import request, parse, error
 from base64 import b64encode
 import socket
+import ssl
 
 
 class server:
@@ -29,6 +30,10 @@ class server:
     "username" - username to conduct "Basic Authentication"
     "password" - password to conduct "Basic Authentication"
     "url" (STATIC) - base URL for the server connection
+    "SSL_on" - Identify to use HTTPS connection (Default: False)
+    "SSL_ignore_hostname" - During certificate validation ignore the hostname check
+    "SSL_trust_all_certs" (insecure) - During certificate validation trust any certificate - if True, 
+        will "set SSL_ignore_hostname" to true
 
     Methods:
 
@@ -44,15 +49,62 @@ class server:
 
 
 
-    def __init__(self,  host = None, port = None, user = None, pw = None):
+    def __init__(self,  host = None, port = None, user = None, pw = None, https = False):
         self.host = host
         self.port = port
         self.username = user
         self.password = pw
+        self.__ssl_context = ssl.create_default_context()
+        self.__SSL_on = https
     
     @property
     def url(self):
-        return  'http://{}:{}{}{}'.format(self.host, self.port, self.__root_url, self.__version_url)
+        if self.SSL_on:
+            proto = 'https'
+        else:
+            proto = 'http'
+        return  '{}://{}:{}{}{}'.format(proto, self.host, self.port, self.__root_url, self.__version_url)
+    
+    @property
+    def SSL_on(self):
+        return self.__SSL_on
+    
+    @SSL_on.setter
+    def SSL_on(self, val):
+        if isinstance(val, bool):
+            self.__SSL_on = val
+
+    @property
+    def SSL_ignore_hostname(self):
+        return not self.__ssl_context.check_hostname
+
+    @SSL_ignore_hostname.setter
+    def SSL_ignore_hostname(self, val):
+        if isinstance(val, bool):
+            if val == True:
+                self.__ssl_context.check_hostname = False
+            else:
+                self.__ssl_context.check_hostname = True
+
+    
+    @property
+    def SSL_trust_all_certs(self):
+        if self.__ssl_context.verify_mode == ssl.CERT_NONE:
+            return True
+        else:
+            return False
+
+    @SSL_trust_all_certs.setter
+    def SSL_trust_all_certs(self, val):
+        if isinstance(val, bool):
+            if val == True:
+                if self.__ssl_context.check_hostname == True:
+                    self.__ssl_context.check_hostname = False
+                self.__ssl_context.verify_mode = ssl.CERT_NONE
+            else:
+                self.__ssl_context.verify_mode = ssl.CERT_REQUIRED
+
+
 
 
     def reinitialize(self):
@@ -95,8 +147,6 @@ class server:
         data = json.dumps(DATA).encode('utf-8')
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, data, method='POST')
-        q.add_header("Authorization", "Basic %s" % self.__build_auth_str(self.username, self.password))
-        q.add_header("Content-Type", "application/json")
         return self.__connect(q)
 
     #Function used to del an object to Kepware (HTTP DELETE)
@@ -104,8 +154,6 @@ class server:
         '''Conducts an DELETE method at *url* to delete an object in the Kepware Configuration'''
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, method='DELETE')
-        q.add_header("Authorization", "Basic %s" % self.__build_auth_str(self.username, self.password))
-        q.add_header("Content-Type", "application/json")
         return self.__connect(q)
 
     #Function used to Update an object to Kepware (HTTP PUT)
@@ -119,8 +167,6 @@ class server:
         else:
             data = json.dumps(DATA).encode('utf-8')
             q = request.Request(url_obj, data, method='PUT')
-        q.add_header("Authorization", "Basic %s" % self.__build_auth_str(self.username, self.password))
-        q.add_header("Content-Type", "application/json")
         return self.__connect(q)
 
     #Function used to Read an object from Kepware (HTTP GET) and return the JSON response
@@ -128,8 +174,6 @@ class server:
         '''Conducts an GET method at *url* to retrieve an objects properties in the Kepware Configuration.'''
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, method='GET')
-        q.add_header("Authorization", "Basic %s" % self.__build_auth_str(self.username, self.password))
-        q.add_header("Content-Type", "application/json")
         return self.__connect(q)
     
     def _force_update_check(self, force, DATA):
@@ -140,11 +184,19 @@ class server:
             if 'PROJECT_ID' not in DATA:
                 if 'FORCE_UPDATE' in DATA:
                     if 'FORCE_UPDATE' == False:
+                        try:
+                            project_data = self._config_get(self.url + '/project')
+                            DATA['PROJECT_ID'] = project_data['PROJECT_ID']
+                        except:
+                            #NEED TO COVER ERROR CONDITION
+                            pass
+                else:
+                    try:
                         project_data = self._config_get(self.url + '/project')
                         DATA['PROJECT_ID'] = project_data['PROJECT_ID']
-                else:
-                    project_data = self._config_get(self.url + '/project')
-                    DATA['PROJECT_ID'] = project_data['PROJECT_ID']
+                    except:
+                        #NEED TO COVER ERROR CONDITION
+                        pass
         return DATA
 
 # 
@@ -153,8 +205,12 @@ class server:
 
 # General connect call to manage HTTP responses for all methods
     def __connect(self,request_obj):
+        # Fill appropriate header information
+        request_obj.add_header("Authorization", "Basic %s" % self.__build_auth_str(self.username, self.password))
+        request_obj.add_header("Content-Type", "application/json")
         try:
-            with request.urlopen(request_obj) as server:
+            # context is sent regardless of HTTP or HTTPS - seems to be ignored if HTTP URL
+            with request.urlopen(request_obj, context=self.__ssl_context) as server:
                 if request_obj.method == 'GET':
                     return json.loads(codecs.decode(server.read(),'utf-8-sig'))
                 else:
@@ -171,7 +227,7 @@ class server:
         updated_path = parse.quote(parsed_url.path)
 
         # If host is "localhost", force using the IPv4 loopback adapter IP address in all calls
-        # This is done to remove reties that will happen when the host resolution uses IPv6 intially
+        # This is done to remove retries that will happen when the host resolution uses IPv6 intially
         # Kepware currently doesn't support IPv6 and is not listening on this interface
         if parsed_url.hostname.lower() == 'localhost':
             ip = socket.gethostbyname(parsed_url.hostname)

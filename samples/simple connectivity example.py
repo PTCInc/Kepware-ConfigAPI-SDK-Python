@@ -29,6 +29,13 @@ server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrat
 # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_default_verify_paths
 serverHTTPS = connection.server(host = '127.0.0.1', port = 57512, user = 'Administrator', pw = '', https=True)
 
+# Disable Hostname check when validating certificate:
+serverHTTPS.SSL_ignore_hostname = True
+
+# Trust all certificates:
+# During certificate validation trust any certificate - if True, will "set SSL_ignore_hostname" to true
+serverHTTPS.SSL_trust_all_certs = True
+
 # Add a Channel using the "Simulator Driver"
 channel_data = {
     "common.ALLTYPES_NAME": ch_name,
