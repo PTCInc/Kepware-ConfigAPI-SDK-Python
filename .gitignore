@@ -1,6 +1,9 @@
 # Custom
 #*.gitignore
 _test.py
+_new.py
+*.pem
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
