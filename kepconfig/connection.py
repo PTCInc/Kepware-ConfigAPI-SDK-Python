@@ -14,8 +14,10 @@ import codecs
 import datetime
 from urllib import request, parse, error
 from base64 import b64encode
+from . import error as KepError
 import socket
 import ssl
+import sys
 
 
 class server:
@@ -124,7 +126,8 @@ class server:
         '''
         query = self.__create_query(start, end, limit)
         url = self.url + self.__trans_log_url + '?' + parse.urlencode(query)
-        return self._config_get(url)
+        r = self._config_get(url)
+        return r.payload
 
     def get_event_log(self, limit = None, start = None, end = None):
         ''' Get the Event Log from the Kepware instance.
@@ -137,7 +140,8 @@ class server:
         '''
         query = self.__create_query(start, end, limit)
         url = self.url + self.__event_log_url + '?' + parse.urlencode(query)
-        return self._config_get(url)
+        r = self._config_get(url)
+        return r.payload
 
     #Function used to Add an object to Kepware (HTTP POST)
     def _config_add(self, url, DATA):
@@ -147,14 +151,16 @@ class server:
         data = json.dumps(DATA).encode('utf-8')
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, data, method='POST')
-        return self.__connect(q)
+        r = self.__connect(q)
+        return r
 
     #Function used to del an object to Kepware (HTTP DELETE)
     def _config_del(self, url):
         '''Conducts an DELETE method at *url* to delete an object in the Kepware Configuration'''
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, method='DELETE')
-        return self.__connect(q)
+        r = self.__connect(q)
+        return r
 
     #Function used to Update an object to Kepware (HTTP PUT)
     def _config_update(self, url, DATA = None):
@@ -167,14 +173,17 @@ class server:
         else:
             data = json.dumps(DATA).encode('utf-8')
             q = request.Request(url_obj, data, method='PUT')
-        return self.__connect(q)
+        r = self.__connect(q)
+        return r
 
     #Function used to Read an object from Kepware (HTTP GET) and return the JSON response
     def _config_get(self, url):
         '''Conducts an GET method at *url* to retrieve an objects properties in the Kepware Configuration.'''
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, method='GET')
-        return self.__connect(q)
+        r = self.__connect(q)
+        return r
+
     
     def _force_update_check(self, force, DATA):
         if force == True:
@@ -186,14 +195,14 @@ class server:
                     if 'FORCE_UPDATE' == False:
                         try:
                             project_data = self._config_get(self.url + '/project')
-                            DATA['PROJECT_ID'] = project_data['PROJECT_ID']
+                            DATA['PROJECT_ID'] = project_data.payload['PROJECT_ID']
                         except:
                             #NEED TO COVER ERROR CONDITION
                             pass
                 else:
                     try:
                         project_data = self._config_get(self.url + '/project')
-                        DATA['PROJECT_ID'] = project_data['PROJECT_ID']
+                        DATA['PROJECT_ID'] = project_data.payload['PROJECT_ID']
                     except:
                         #NEED TO COVER ERROR CONDITION
                         pass
@@ -203,22 +212,40 @@ class server:
 # Supporting Functions
 #
 
-# General connect call to manage HTTP responses for all methods
+    # General connect call to manage HTTP responses for all methods
+    # Returns the response object for the method to handle as appropriate
+    # Raises Errors as found
     def __connect(self,request_obj):
         # Fill appropriate header information
+        data = _HttpDataAbstract()
         request_obj.add_header("Authorization", "Basic %s" % self.__build_auth_str(self.username, self.password))
         request_obj.add_header("Content-Type", "application/json")
         try:
             # context is sent regardless of HTTP or HTTPS - seems to be ignored if HTTP URL
             with request.urlopen(request_obj, context=self.__ssl_context) as server:
-                if request_obj.method == 'GET':
-                    return json.loads(codecs.decode(server.read(),'utf-8-sig'))
-                else:
-                    return 'HTTP Code: {} - {}'.format(server.code,server.reason)
+                try:
+                    payload = server.read()
+                    data.payload = json.loads(codecs.decode(payload,'utf-8-sig'))
+                except:
+                    pass
+                data.code = server.code
+                data.reason = server.reason
+                return data
+                # if request_obj.method == 'GET':
+                #     data.payload = json.loads(codecs.decode(server.read(),'utf-8-sig'))
+                #     data.code = server.code
+                #     data.reason = server.reason
+                #     return data
+                # else:
+                #     return server
+                    # return 'HTTP Code: {} - {}'.format(server.code,server.reason)
         except error.HTTPError as err:
-            return 'HTTP Code: {}\n{}'.format(err.code, codecs.decode(err.read(),'utf-8-sig'))
+            payload = json.loads(codecs.decode(err.read(),'utf-8-sig'))
+            # print('HTTP Code: {}\n{}'.format(err.code,payload), file=sys.stderr)
+            raise KepError.KepHTTPError(err.url, err.code, err.msg, err.hdrs, payload)
         except error.URLError as err:
-            return 'URLError: {} URL: {}'.format(err.reason, request_obj.get_full_url())
+            # print('URLError: {} URL: {}'.format(err.reason, request_obj.get_full_url()), file=sys.stderr)
+            raise KepError.KepURLError(err.reason, request_obj.get_full_url())
 
     # Fucntion used to ensure special characters are handled in the URL
     # Ex. = Space will be turned to %20
@@ -254,3 +281,9 @@ class server:
         if limit != None:
             query['limit'] = limit
         return query
+
+class _HttpDataAbstract:
+    def __init__(self):
+        self.payload = ''
+        self.code = ''
+        self.reason = ''
