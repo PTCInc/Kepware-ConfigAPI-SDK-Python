@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)
-from . import connection
+from . import connection, error
 
 def path_split(path):
     '''Used to split the standard Kepware address decimal notation into a dict that contains the 
