@@ -19,6 +19,7 @@ def _create_url(channel = None):
 
     Returns the channel specific url when a value is passed as the channel name.
     '''
+    
     if channel == None:
         return CHANNEL_ROOT
     else:
@@ -31,27 +32,50 @@ def add_channel(server, DATA):
 
     Additionally it can be used to pass a list of channels and it's children to be added all at once.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "DATA" - properly JSON object (dict) of the channel and it's children
     expected by Kepware Configuration API
+
+    RETURNS:
+    True - If a "HTTP 201 - Created" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_add(server.url + _create_url(), DATA)
+
+    r = server._config_add(server.url + _create_url(), DATA)
+    if r.code == 201: return True 
+    else: return False
 
 def del_channel(server, channel):
     '''Delete a "channel" object in Kepware. This will delete all children as well
     
+    INPUTS:
     "server" - instance of the "server" class
 
     "channel" - name of channel
+    
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_del(server.url + _create_url(channel))
+
+    r = server._config_del(server.url + _create_url(channel))
+    if r.code == 200: return True 
+    else: return False
 
 def modify_channel(server, DATA, channel = None, force = False):
     '''Modify a channel object and it's properties in Kepware. If a "channel" is not provided as an input,
     you need to identify the channel in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the channel that is to be modified.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "DATA" - properly JSON object (dict) of the channel properties to be modified.
@@ -59,32 +83,63 @@ def modify_channel(server, DATA, channel = None, force = False):
     "channel" (optional) - name of channel to modify. Only needed if not existing in  "DATA"
 
     "force" (optional) - if True, will force the configuration update to the Kepware server
+    
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
 
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
     
     channel_data = server._force_update_check(force, DATA)
     if channel == None:
         try:
-            return server._config_update(server.url + _create_url(channel_data['common.ALLTYPES_NAME']), channel_data)
+            r = server._config_update(server.url + _create_url(channel_data['common.ALLTYPES_NAME']), channel_data)
+            if r.code == 200: return True 
+            else: return False
         except KeyError as err:
-            return 'Error: No Channel identified in DATA | Key Error: {}'.format(err)
-        except Exception as e:
-            return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+            print('Error: No Channel identified in DATA | Key Error: {}'.format(err))
+            return False
+        # except Exception as e:
+        #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     else:
-        return server._config_update(server.url + _create_url(channel), channel_data)
+        r = server._config_update(server.url + _create_url(channel), channel_data)
+        if r.code == 200: return True 
+        else: return False
 
 def get_channel(server, channel):
     '''Returns the properties of the channel object. Returned object is JSON.
     
+    INPUTS:
     "server" - instance of the "server" class
 
     "channel" - name of channel
+    
+    RETURNS:
+    JSON - data for the channel requested
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_get(server.url + _create_url(channel))
+
+    r = server._config_get(server.url + _create_url(channel))
+    return r.payload
 
 def get_all_channels(server):
     '''Returns list of all channel objects and their properties. Returned object is JSON list.
     
+    INPUTS:
     "server" - instance of the "server" class
+    
+    RETURNS:
+    JSON - data for the channel requested
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_get(server.url + _create_url())
+
+    r = server._config_get(server.url + _create_url())
+    return r.payload

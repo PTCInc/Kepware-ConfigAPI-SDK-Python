@@ -31,6 +31,7 @@ def add_iot_item(server, DATA, agent, agent_type):
     '''Add a "iot item" or multiple "iot item" objects to Kepware's IoT Gateway agent. Additionally 
     it can be used to pass a list of iot items to be added to an agent all at once.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "DATA" - properly JSON object (dict) of the iot item or list of items
@@ -39,12 +40,22 @@ def add_iot_item(server, DATA, agent, agent_type):
     "agent" - name of IoT Agent
 
     "agent_type" - agent type
+
+    RETURNS:
+    True - If a "HTTP 201 - Created" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_add(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(), DATA)
+    r = server._config_add(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(), DATA)
+    if r.code == 201: return True 
+    else: return False
 
 def del_iot_item(server, iot_item, agent, agent_type):
     '''Delete a "iot item" object in Kepware.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "iot_item" - IoT item to delete
@@ -52,14 +63,24 @@ def del_iot_item(server, iot_item, agent, agent_type):
     "agent" - name of IoT Agent
 
     "agent_type" - agent type 
+
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_del(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item))
+    r = server._config_del(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item))
+    if r.code == 200: return True 
+    else: return False
 
 def modify_iot_item(server, DATA, agent, agent_type, iot_item = None, force = False):
     '''Modify a iot item object and it's properties in Kepware. If a "iot item" is not provided as an input,
     you need to identify the iot item in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the iot item that is to be modified.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "DATA" - properly JSON object (dict) of the iot item properties to be modified.
@@ -71,22 +92,35 @@ def modify_iot_item(server, DATA, agent, agent_type, iot_item = None, force = Fa
     "iot_item" (optional) - IoT item to modify
 
     "force" (optional) - if True, will force the configuration update to the Kepware server
+
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
     
     agent_data = server._force_update_check(force, DATA)
     if iot_item == None:
         try:
-            return server._config_update(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(agent_data['common.ALLTYPES_NAME']), agent_data)
+            r = server._config_update(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(agent_data['common.ALLTYPES_NAME']), agent_data)
+            if r.code == 200: return True 
+            else: return False
         except KeyError as err:
-            return 'Error: No agent identified in DATA | Key Error: {}'.format(err)
-        except:
-            return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
+            print('Error: No agent identified in DATA | Key Error: {}'.format(err))
+            return False
+        # except:
+        #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
-        return server._config_update(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item), agent_data)
+        r = server._config_update(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item), agent_data)
+        if r.code == 200: return True 
+        else: return False
 
 def get_iot_item(server, iot_item, agent, agent_type):
     '''Returns the properties of the agent object. Returned object is JSON.
 
+    INPUTS:
     "server" - instance of the "server" class
     
     "iot_item" - IoT item
@@ -94,16 +128,33 @@ def get_iot_item(server, iot_item, agent, agent_type):
     "agent" - name of IoT Agent
 
     "agent_type" - agent type
+
+    RETURNS:
+    JSON - data for the IoT item requested
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_get(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item))
+    r = server._config_get(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item))
+    return r.payload
 
 def get_all_iot_items(server, agent, agent_type):
     '''Returns the properties of all iot item objects for an agent. Returned object is JSON list.
     
+    INPUTS:
     "server" - instance of the "server" class
 
     "agent" - name of IoT Agent
 
     "agent_type" - agent type
+
+    RETURNS:
+    JSON - data for the IoT item requested
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_get(server.url + IOT.agent._create_url(agent_type, agent) + _create_url())
+    r = server._config_get(server.url + IOT.agent._create_url(agent_type, agent) + _create_url())
+    return r.payload

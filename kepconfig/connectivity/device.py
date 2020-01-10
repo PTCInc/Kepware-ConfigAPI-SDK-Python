@@ -33,34 +33,56 @@ def add_device(server, dev_channel, DATA):
 
     Additionally it can be used to pass a list of channelsdevices and it's children to be added all at once.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "dev_channel" - channel the device object exists
 
     "DATA" - properly JSON object (dict) of the device and it's children 
     expected by Kepware Configuration API
+    
+    RETURNS:
+    True - If a "HTTP 201 - Created" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_add(server.url + channel._create_url(dev_channel) + _create_url(), DATA)
+
+    r = server._config_add(server.url + channel._create_url(dev_channel) + _create_url(), DATA)
+    if r.code == 201: return True 
+    else: return False
 
 def del_device(server, device_path):
     '''Delete a "device" object in Kepware. This will delete all children as well.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "device_path" - path identifying device to delete. Standard Kepware address decimal notation string including the 
     device such as "channel1.device1"
+
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
+
     path_obj = helper.path_split(device_path)
     try:
-        return server._config_del(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
+        r = server._config_del(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
+        if r.code == 200: return True 
+        else: return False
     except KeyError as err:
-            return 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
-    except Exception as e:
-        return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
+        return False
 
 def modify_device(server, device_path, DATA, force = False):
     '''Modify a device object and it's properties in Kepware.
 
+    INPUTS:
     "server" - instance of the "server" class
 
     "device_path" -  path identifying device to modify. Standard Kepware address decimal notation string including the 
@@ -69,48 +91,97 @@ def modify_device(server, device_path, DATA, force = False):
     "DATA" - properly JSON object (dict) of the device properties to be modified.
 
     "force" (optional) - if True, will force the configuration update to the Kepware server
+    
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
+
     device_data = server._force_update_check(force, DATA)
 
     path_obj = helper.path_split(device_path)
     try:
-        return server._config_update(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']), device_data)
+        r = server._config_update(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']), device_data)
+        if r.code == 200: return True 
+        else: return False
     except KeyError as err:
-            return 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
-    except Exception as e:
-        return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+            print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
+            return False
+    # except Exception as e:
+    #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
 
 def get_device(server, device_path):
     '''Returns the properties of the device object. Returned object is JSON.
 
+    INPUTS:
     "server" - instance of the "server" class
     
     "device_path" -  path identifying device. Standard Kepware address decimal notation string including the 
     device such as "channel1.device1"
+
+    RETURNS:
+    JSON - data for the device requested
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
+
     path_obj = helper.path_split(device_path)
     try:
-        return server._config_get(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
+        r = server._config_get(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
+        return r.payload
     except KeyError as err:
-            return 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
-    except Exception as e:
-        return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
+        return False
+    # except Exception as err:
+    #     print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(err)))
+    #     raise err
 
 def get_all_devices(server, dev_channel):
     '''Returns list of all device objects and their properties within a channel. Returned object is JSON list.
     
+    INPUTS:
     "dev_channel" - channel the device object exists
+
+    RETURNS:
+    JSON - data for the devices requested
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
     '''
-    return server._config_get(server.url + channel._create_url(dev_channel) + _create_url())
+    r = server._config_get(server.url + channel._create_url(dev_channel) + _create_url())
+    return r.payload
 
 def auto_tag_gen(server, device_path):
-    '''Executes Auto Tag Generation function on devices that support the feature in Kepware'''
+    '''Executes Auto Tag Generation function on devices that support the feature in Kepware
+    
+    INPUTS:
+    "server" - instance of the "server" class
+    
+    "device_path" -  path identifying device. Standard Kepware address decimal notation string including the 
+    device such as "channel1.device1"
+
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
     
     path_obj = helper.path_split(device_path)
     try:
-        return server._config_update(server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL)
+        r = server._config_update(server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL)
+        if r.code == 200: return True 
+        else: return False
     except KeyError as err:
-        return 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
-    except Exception as e:
-        return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
+        return False
+    # except Exception as e:
+    #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     
