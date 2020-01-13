@@ -8,7 +8,7 @@ r""":mod:`tag` exposes an API to allow modifications (add, delete, modify) to
 tag and tag group objects within the Kepware Configuration API
 """
 
-import kepconfig as helper
+import kepconfig
 from . import channel, device
 import inspect
 
@@ -61,11 +61,10 @@ def add_all_tags(server, ch_dev_path, DATA):
 
     result = False
     if 'tags' in DATA:
-        try:
-            if (add_tag(server, ch_dev_path, DATA['tags'])):
-                result = True
-            else: 
-                return False
+        if (add_tag(server, ch_dev_path, DATA['tags'])):
+            result = True
+        else: 
+            return False
     if 'tag_groups' in DATA:
         #Add all Tag Groups
         if (add_tag_group(server, ch_dev_path, DATA['tag_groups'])):
@@ -95,7 +94,7 @@ def add_tag(server, tag_path, DATA):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(tag_path)
+    path_obj = kepconfig.path_split(tag_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         if 'tag_path' in path_obj:
@@ -134,7 +133,7 @@ def add_tag_group(server, tag_group_path, DATA):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(tag_group_path)
+    path_obj = kepconfig.path_split(tag_group_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         if 'tag_path' in path_obj:
@@ -174,7 +173,7 @@ def modify_tag(server, full_tag_path, DATA, force = False):
 
     tag_data = server._force_update_check(force, DATA)
 
-    path_obj = helper.path_split(full_tag_path)
+    path_obj = kepconfig.path_split(full_tag_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         for x in range(0, len(path_obj['tag_path'])-1):
@@ -211,7 +210,7 @@ def modify_tag_group(server, tag_group_path, DATA, force = False):
 
     tag_group_data = server._force_update_check(force, DATA)
 
-    path_obj = helper.path_split(tag_group_path)
+    path_obj = kepconfig.path_split(tag_group_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         for tg in path_obj['tag_path']:
@@ -243,7 +242,7 @@ def del_tag(server, full_tag_path):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(full_tag_path)
+    path_obj = kepconfig.path_split(full_tag_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         for x in range(0, len(path_obj['tag_path'])-1):
@@ -276,7 +275,7 @@ def del_tag_group(server, tag_group_path):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(tag_group_path)
+    path_obj = kepconfig.path_split(tag_group_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         for tg in path_obj['tag_path']:
@@ -309,7 +308,7 @@ def get_tag(server, full_tag_path):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(full_tag_path)
+    path_obj = kepconfig.path_split(full_tag_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         for x in range(0, len(path_obj['tag_path'])-1):
@@ -342,7 +341,7 @@ def get_all_tags(server, full_tag_path):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(full_tag_path)
+    path_obj = kepconfig.path_split(full_tag_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         if 'tag_path' in path_obj:
@@ -375,7 +374,7 @@ def get_tag_group(server, tag_group_path):
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    path_obj = helper.path_split(tag_group_path)
+    path_obj = kepconfig.path_split(tag_group_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         for tg in path_obj['tag_path']:
@@ -406,7 +405,7 @@ def get_all_tag_groups(server, tag_group_path):
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    path_obj = helper.path_split(tag_group_path)
+    path_obj = kepconfig.path_split(tag_group_path)
     try:
         url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
         if 'tag_path' in path_obj:
