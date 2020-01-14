@@ -28,6 +28,16 @@ import kepconfig
 from kepconfig.connectivity import channel, device, tag
 import kepconfig.iot_gateway as IoT
 
+def HTTPErrorHandler(err):
+    # Generic Handler for exception errors
+    if err.__class__ is kepconfig.error.KepHTTPError:
+        print(err.code)
+        print(err.msg)
+        print(err.url)
+        print(err.hdrs)
+        print(err.payload)
+    else:
+        print('Different Exception Received')
 
 def get_parameters(setup_file):
     try:
@@ -197,7 +207,12 @@ if __name__ == "__main__":
     print ("-- Channel and devices and agent creation attempt")
     for Kepware_IP in Kepware_IP_Array:
         server = kepconfig.connection.server(Kepware_IP, Kepware_Port, user, passw)
-        print("{} - {}".format("Adding all devices", channel.add_channel(server,all_devices_JSON)))
-        print("{} - {}".format("Adding all Agents", IoT.agent.add_iot_agent(server,all_agents_JSON,IoT.MQTT_CLIENT_AGENT)))
-    
+        try:
+            print("{} - {}".format("Adding all devices", channel.add_channel(server,all_devices_JSON)))
+        except Exception as err:
+            HTTPErrorHandler(err)
+        try:
+            print("{} - {}".format("Adding all Agents", IoT.agent.add_iot_agent(server,all_agents_JSON,IoT.MQTT_CLIENT_AGENT)))
+        except Exception as err:
+            HTTPErrorHandler(err)
     print ("-- Channel and devices and agent creation completed")

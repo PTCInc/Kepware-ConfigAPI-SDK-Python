@@ -9,7 +9,7 @@
 # configuration API
 
 
-from kepconfig import connection
+from kepconfig import connection, error
 from kepconfig.connectivity import channel, device, tag
 import json
 import time
@@ -17,6 +17,18 @@ import time
 # Channel and Device name to be used
 ch_name = 'Channel1'
 dev_name = 'Device1'
+
+def HTTPErrorHandler(err):
+    # Generic Handler for exception errors
+    if err.__class__ is error.KepHTTPError:
+        print(err.code)
+        print(err.msg)
+        print(err.url)
+        print(err.hdrs)
+        print(err.payload)
+    else:
+        print('Different Exception Received')
+
 
 # This creates a server reference that is used to target all modifications of 
 # the Kepware configuration
@@ -41,14 +53,19 @@ channel_data = {
     "common.ALLTYPES_NAME": ch_name,
     "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"
     }
-print("{} - {}".format("Adding Channel", channel.add_channel(server,channel_data)))
-
+try:
+    print("{} - {}".format("Adding Channel", channel.add_channel(server,channel_data)))
+except Exception as err:
+    HTTPErrorHandler(err)
 # Add a Device to the created Channel
 device_data = {
     "common.ALLTYPES_NAME": dev_name,
     "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"
     }
-print("{} - {}".format("Adding Device", device.add_device(server,ch_name,device_data)))
+try:
+    print("{} - {}".format("Adding Device", device.add_device(server,ch_name,device_data)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Add a collection of Tags and Tag Group objects.
 all_tags_data = {
@@ -81,7 +98,10 @@ all_tags_data = {
         }
     ]
 }
-print("{} - {}".format("Adding Tags and Tag Groups", tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data)))
+try:
+    print("{} - {}".format("Adding Tags and Tag Groups", tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Add tag to an existing tag group
 tag_info = [
@@ -95,39 +115,57 @@ tag_info = [
     }
 ]
 tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-print("{} - {}".format("Adding Tags to Existing Tag Group", tag.add_tag(server, tag_path, tag_info)))
+try:
+    print("{} - {}".format("Adding Tags to Existing Tag Group", tag.add_tag(server, tag_path, tag_info)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 #
 # Examples of reading properties for various objects (channels, devices, tags, etc)
 #
 
 # Get Channel
-print("{} - {}".format("Read Channel Properties", channel.get_channel(server,ch_name)))
-
+try:
+    print("{} - {}".format("Read Channel Properties", channel.get_channel(server,ch_name)))
+except Exception as err:
+    HTTPErrorHandler(err)
 # Get Device
 device_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-print("{} - {}".format("Read Device Properties", device.get_device(server, device_path)))
+try:
+    print("{} - {}".format("Read Device Properties", device.get_device(server, device_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Get Tag
 tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-print("{} - {}".format("Read Tag Properties", tag.get_tag(server, tag_path)))
+try:
+    print("{} - {}".format("Read Tag Properties", tag.get_tag(server, tag_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Get Tag Group
 tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-print("{} - {}".format("Read Tag Group Properties", tag.get_tag_group(server, tag_group_path)))
-
+try:
+    print("{} - {}".format("Read Tag Group Properties", tag.get_tag_group(server, tag_group_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Channel Modify - Modify the description of the Channel that was created. "Force" will force the 
 # update to the Kepware Server, if "FORCE_UPDATE" not provided in the JSON data.
 channel_data = {
 }
 channel_data['common.ALLTYPES_DESCRIPTION'] = 'This is the test channel created'
-print("{} - {}".format("Modifying Channel 'Description' Property", channel.modify_channel(server, channel_data, channel=ch_name, force=True)))
+try:
+    print("{} - {}".format("Modifying Channel 'Description' Property", channel.modify_channel(server, channel_data, channel=ch_name, force=True)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # If Modify function calls do not provide "FORCE_UPDATE" and the "Force" input is "False" 
 # the API will first read the "PROJECT_ID" then use the ID when executing the modification.
-print("{} - {}".format("Modifying Channel 'Description' Property", channel.modify_channel(server, channel_data, channel=ch_name, force=True)))
-
+try:
+    print("{} - {}".format("Modifying Channel 'Description' Property", channel.modify_channel(server, channel_data, channel=ch_name, force=True)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 #
 # Examples of deleting various objects (channels, devices, tags, etc)
@@ -135,14 +173,26 @@ print("{} - {}".format("Modifying Channel 'Description' Property", channel.modif
 
 # Delete Tag
 tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-print("{} - {}".format("Delete Tag", tag.del_tag(server, tag_path)))
+try:
+    print("{} - {}".format("Delete Tag", tag.del_tag(server, tag_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Delete Tag Group
 tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-print("{} - {}".format("Delete Tag Group", tag.del_tag_group(server, tag_group_path)))
+try:
+    print("{} - {}".format("Delete Tag Group", tag.del_tag_group(server, tag_group_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Delete Device
-print("{} - {}".format("Delete Device", device.del_device(server, device_path)))
+try:
+    print("{} - {}".format("Delete Device", device.del_device(server, device_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
 
 # Delete Channel
-print("{} - {}".format("Delete Channel", channel.del_channel(server,ch_name)))
+try:
+    print("{} - {}".format("Delete Channel", channel.del_channel(server,ch_name)))
+except Exception as err:
+    HTTPErrorHandler(err)
