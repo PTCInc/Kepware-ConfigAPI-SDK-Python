@@ -34,7 +34,11 @@ Additionally the following *Services* are implemented:
 
 ## Installation
 
-> TBD
+> PIP packages can be found in the [dist](dist) folder to install. Installation can be done manually using the following:
+
+```cmd
+pip install kepconfig-<version>-py3-none-any.whl -f ./ --no-index
+```
 
 ## Key Concepts
 
