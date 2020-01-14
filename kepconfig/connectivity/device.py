@@ -8,7 +8,7 @@ r""":mod:`device` exposes an API to allow modifications (add, delete, modify) to
 device objects within the Kepware Configuration API
 """
 
-import kepconfig as helper
+import kepconfig
 from . import channel
 import inspect
 
@@ -70,7 +70,7 @@ def del_device(server, device_path):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(device_path)
+    path_obj = kepconfig.path_split(device_path)
     try:
         r = server._config_del(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
         if r.code == 200: return True 
@@ -102,7 +102,7 @@ def modify_device(server, device_path, DATA, force = False):
 
     device_data = server._force_update_check(force, DATA)
 
-    path_obj = helper.path_split(device_path)
+    path_obj = kepconfig.path_split(device_path)
     try:
         r = server._config_update(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']), device_data)
         if r.code == 200: return True 
@@ -130,7 +130,7 @@ def get_device(server, device_path):
     KepURLError - If urllib provides an URLError
     '''
 
-    path_obj = helper.path_split(device_path)
+    path_obj = kepconfig.path_split(device_path)
     try:
         r = server._config_get(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
         return r.payload
@@ -167,21 +167,28 @@ def auto_tag_gen(server, device_path):
     device such as "channel1.device1"
 
     RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    KepServiceReturn with the result of the service either Code 202 (Accepted) or 429 (Too Busy)
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
     
-    path_obj = helper.path_split(device_path)
+    path_obj = kepconfig.path_split(device_path)
     try:
         r = server._config_update(server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL)
-        if r.code == 200: return True 
-        else: return False
+        job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
+        return job
     except KeyError as err:
         print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
         return False
+    except kepconfig.error.KepHTTPError as err:
+        if err.code == 429:
+            job.code = err.code
+            job.message = err.payload
+            return job
+        else:
+            raise err
     # except Exception as e:
     #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     

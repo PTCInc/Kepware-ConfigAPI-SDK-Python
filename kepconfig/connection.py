@@ -112,9 +112,19 @@ class server:
     def reinitialize(self):
         '''Executes a Reinitialize call to the Kepware instance.
         '''
-        url = self.url + self.__project_services_url + '/ReinitializeRuntime'
-        return self._config_update(url, None)
-
+        url = self.url + self.__project_services_url + '/ReinitializeRuntime' 
+        try:
+            r = self._config_update(url, None)
+            job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
+            return job
+        except kepconfig.error.KepHTTPError as err:
+            if err.code == 429:
+                job.code = err.code
+                job.message = err.payload
+                return job
+            else:
+                raise err
+        
     def get_trans_log(self, start = None, end = None, limit = None):
         ''' Get the Transaction Log from the Kepware instance.
 
@@ -281,6 +291,25 @@ class server:
         if limit != None:
             query['limit'] = limit
         return query
+
+class KepServiceResponse:
+    '''A class to represent a return object when calling a "service" API of Kepware. This is
+    used to return the responses when a "service" is executed appropriately
+
+    Properties:
+
+    "code" - HTTP code returned
+    "message" - return from the "service" call
+    "href" - URL reference to the JOB that is created by the service API
+    '''
+
+    def __init__(self, code = '', message = '', href = ''):
+        self.code = code
+        self.message = message
+        self.href = href
+    
+    def __str__(self):
+        return '{"code": %s, "message": %s, "href": %s}' % (self.code, self.message, self.href)
 
 class _HttpDataAbstract:
     def __init__(self):
