@@ -48,6 +48,18 @@ serverHTTPS.SSL_ignore_hostname = True
 # During certificate validation trust any certificate - if True, will "set SSL_ignore_hostname" to true
 serverHTTPS.SSL_trust_all_certs = True
 
+# Modify the Kepware project properties
+project_prop = {
+    "uaserverinterface.PROJECT_OPC_UA_ENABLE": True,
+    "opcdaserver.PROJECT_OPC_DA_1_ENABLED": True,
+	"opcdaserver.PROJECT_OPC_DA_2_ENABLED": True,
+	"opcdaserver.PROJECT_OPC_DA_3_ENABLED": True
+}
+try:
+    print(server.modify_project_properties(project_prop, force = True))
+except Exception as err:
+    HTTPErrorHandler(err)
+
 # Add a Channel using the "Simulator Driver"
 channel_data = {
     "common.ALLTYPES_NAME": ch_name,

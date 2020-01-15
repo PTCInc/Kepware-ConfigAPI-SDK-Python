@@ -2,6 +2,7 @@
 #*.gitignore
 _test.py
 _new.py
+_build_pip.cmd
 *.pem
 
 

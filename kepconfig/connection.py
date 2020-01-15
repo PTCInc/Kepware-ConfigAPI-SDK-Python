@@ -152,6 +152,28 @@ class server:
         url = self.url + self.__event_log_url + '?' + parse.urlencode(query)
         r = self._config_get(url)
         return r.payload
+    
+    def modify_project_properties(self, DATA, force = False):
+        ''' Modify the Project Properties of the Kepware instance.
+
+        INPUTS:
+
+        "DATA" - properly JSON object (dict) of the project properties to be modified
+
+        "force" (optional) - if True, will force the configuration update to the Kepware server
+        
+        RETURNS:
+        True - If a "HTTP 200 - OK" is received from Kepware
+
+        EXCEPTIONS:
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+
+        prop_data = self._force_update_check(force, DATA)
+        r = self._config_update(self.url + '/project', prop_data)
+        if r.code == 200: return True 
+        else: return False
 
     #Function used to Add an object to Kepware (HTTP POST)
     def _config_add(self, url, DATA):
