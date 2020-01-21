@@ -27,7 +27,7 @@ def HTTPErrorHandler(err):
         print(err.hdrs)
         print(err.payload)
     else:
-        print('Different Exception Received')
+        print('Different Exception Received: {}'.format(err))
 
 
 # This creates a server reference that is used to target all modifications of 
@@ -56,7 +56,7 @@ project_prop = {
 	"opcdaserver.PROJECT_OPC_DA_3_ENABLED": True
 }
 try:
-    print(server.modify_project_properties(project_prop, force = True))
+    print("{} - {}".format("Modifying Project Properties",server.modify_project_properties(project_prop, force = True)))
 except Exception as err:
     HTTPErrorHandler(err)
 

@@ -31,7 +31,7 @@ def HTTPErrorHandler(err):
         print(err.hdrs)
         print(err.payload)
     else:
-        print('Different Exception Received')
+        print('Different Exception Received: {}'.format(err))
 
 # This creates a server reference that is used to target all modifications of 
 # the Kepware configuration

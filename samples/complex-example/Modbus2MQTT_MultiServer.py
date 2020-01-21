@@ -37,7 +37,7 @@ def HTTPErrorHandler(err):
         print(err.hdrs)
         print(err.payload)
     else:
-        print('Different Exception Received')
+        print('Different Exception Received: {}'.format(err))
 
 def get_parameters(setup_file):
     try:
