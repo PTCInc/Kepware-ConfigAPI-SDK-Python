@@ -26,6 +26,9 @@ def HTTPErrorHandler(err):
         print(err.url)
         print(err.hdrs)
         print(err.payload)
+    elif err.__class__ is error.KepURLError:
+        print(err.url)
+        print(err.reason)
     else:
         print('Different Exception Received: {}'.format(err))
 
