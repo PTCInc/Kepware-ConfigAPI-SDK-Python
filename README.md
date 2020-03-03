@@ -12,7 +12,7 @@ The client libraries are supported on Python 3.6 or later.
 
 SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware configuration objects:
 
-- **Project Properties** *(Modify Only)*
+- **Project Properties** *(Get and Modify Only)*
 - **Connectivity** *(Channel, Devices, Tags, Tag Groups)*
 - **IoT Gateway** *(Agents, IoT Items)*
 
