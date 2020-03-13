@@ -57,9 +57,9 @@ server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrat
 
 For certificate validation, the SDK uses the OS/systems trusted CA certificate store. The connection leverages uses the "create_default_context()" function as part of urllib as described at the following links:
 
-- https://docs.python.org/3/library/ssl.html#ssl.create_default_context
-- https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_default_certs
-- https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_default_verify_paths
+- [ssl.create_default_context](https://docs.python.org/3/library/ssl.html#ssl.create_default_context)
+- [ssl.SSLContext.load_default_certs](https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_default_certs)
+- [set_default_verify_paths](https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_default_verify_paths)
 
 For Windows OSes, the Kepware server's instance certificate can be loaded into the hosts "Trusted Root Certificate Authorities" store.
 
@@ -96,7 +96,7 @@ result = tag.add_tag(server, tag_path, tag_info))
 
 ```
 
-## Need help?
+## Need help
 
 **Visit:**
 [Kepware.com](https://www.kepware.com/)
