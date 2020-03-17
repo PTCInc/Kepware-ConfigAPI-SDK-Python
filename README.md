@@ -96,7 +96,7 @@ result = tag.add_tag(server, tag_path, tag_info))
 
 ```
 
-## Need help
+## Need More Information
 
 **Visit:**
 [Kepware.com](https://www.kepware.com/)

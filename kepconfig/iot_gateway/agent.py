@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
+
 r""":mod:`agent` exposes an API to allow modifications (add, delete, modify) to 
 Iot Gateway agent objects within the Kepware Configuration API
 """

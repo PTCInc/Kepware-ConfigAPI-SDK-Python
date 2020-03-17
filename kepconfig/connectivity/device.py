@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
+
 r""":mod:`device` exposes an API to allow modifications (add, delete, modify) to 
 device objects within the Kepware Configuration API
 """
