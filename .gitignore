@@ -1,8 +1,11 @@
 # Custom
 #*.gitignore
 *.pem
-_*
+_notes
 
+_new*
+_test*
+_build*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
