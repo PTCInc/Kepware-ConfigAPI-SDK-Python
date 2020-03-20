@@ -28,7 +28,6 @@ Additionally the following *Services* are implemented:
 
 ## Known Limitations
 
-- Project Properties are not defined
 - Other property configruation for more complex drivers are not explicitly defined
 - Other supported plug-ins (Datalogger, Scheduler, etc) are not defined
 - When using hostnames (not IP addresses) for connections, delays may occur under certain network configurations as the connection may attempt IPv6 connections first. IPv6 is not supported by Kepware servers at this time.
