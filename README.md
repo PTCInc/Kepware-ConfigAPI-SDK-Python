@@ -4,7 +4,7 @@ This is a package SDK to create Python modules to conduct operations with the Ke
 
 ## Prerequisites
 
-The client libraries are supported on Python 3.6 or later.
+The client libraries are supported on Python 3.6 or later. All HTTP communication is handled by the [urllib](https://docs.python.org/3.6/library/urllib.html#module-urllib) Python standard library.
 
 ## Features
 
@@ -28,14 +28,13 @@ Additionally the following *Services* are implemented:
 
 ## Known Limitations
 
-- Project Properties are not defined
 - Other property configruation for more complex drivers are not explicitly defined
 - Other supported plug-ins (Datalogger, Scheduler, etc) are not defined
 - When using hostnames (not IP addresses) for connections, delays may occur under certain network configurations as the connection may attempt IPv6 connections first. IPv6 is not supported by Kepware servers at this time.
 
 ## Installation
 
-> PIP packages can be found in the [dist](dist) folder to install. Installation can be done manually using the following:
+PIP packages can be found in the [dist](dist) folder to install. Installation can be done manually using the following:
 
 ```cmd
 pip install kepconfig-<version>-py3-none-any.whl -f ./ --no-index
@@ -55,7 +54,7 @@ server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrat
 
 ```
 
-For certificate validation, the SDK uses the OS/systems trusted CA certificate store. The connection leverages uses the "create_default_context()" function as part of urllib as described at the following links:
+For certificate validation, the SDK uses the OS/systems trusted CA certificate store. The connection uses the "create_default_context()" function as part of urllib as described at the following links:
 
 - [ssl.create_default_context](https://docs.python.org/3/library/ssl.html#ssl.create_default_context)
 - [ssl.SSLContext.load_default_certs](https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_default_certs)
@@ -100,3 +99,4 @@ result = tag.add_tag(server, tag_path, tag_info))
 
 **Visit:**
 [Kepware.com](https://www.kepware.com/)
+[Configuration API Info](https://www.kepware.com/en-us/products/kepserverex/features/configuration-api/)
