@@ -98,5 +98,5 @@ result = tag.add_tag(server, tag_path, tag_info))
 ## Need More Information
 
 **Visit:**
-[Kepware.com](https://www.kepware.com/)
-[Configuration API Info](https://www.kepware.com/en-us/products/kepserverex/features/configuration-api/)
+- [Kepware.com](https://www.kepware.com/)
+- [Configuration API Info](https://www.kepware.com/en-us/products/kepserverex/features/configuration-api/)
