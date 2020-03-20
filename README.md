@@ -4,7 +4,7 @@ This is a package SDK to create Python modules to conduct operations with the Ke
 
 ## Prerequisites
 
-The client libraries are supported on Python 3.6 or later.
+The client libraries are supported on Python 3.6 or later. All HTTP communication is handled by the [urllib](https://docs.python.org/3.6/library/urllib.html#module-urllib) Python standard library.
 
 ## Features
 
@@ -99,3 +99,4 @@ result = tag.add_tag(server, tag_path, tag_info))
 
 **Visit:**
 [Kepware.com](https://www.kepware.com/)
+[Configuration API Info](https://www.kepware.com/en-us/products/kepserverex/features/configuration-api/)
