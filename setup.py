@@ -13,7 +13,7 @@ setuptools.setup(
     name="kepconfig",
     version="1.0b2.1",
     author="PTC Inc",
-    author_email="presales.support@kepware.com",
+    author_email="",
     description="API package for Kepware Configuration API",
     keywords="Kepware OPC Configuration Thingworx",
     long_description=long_description,
