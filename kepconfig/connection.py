@@ -117,7 +117,7 @@ class server:
             r = self._config_update(url, None)
             job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
             return job
-        except kepconfig.error.KepHTTPError as err:
+        except KepError.KepHTTPError as err:
             if err.code == 429:
                 job.code = err.code
                 job.message = err.payload
