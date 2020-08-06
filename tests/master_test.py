@@ -40,8 +40,10 @@ if __name__ == "__main__":
     # This creates a server reference that is used to target all modifications of 
     # the Kepware configuration
     server = kepconfig.connection.server(host = 'localhost', port = 57412, user = 'Administrator', pw = '', https = False)
-    # server = kepconfig.connection.server(host = 'RML1', port = 57512, user = 'Administrator', pw = '', https = True)
-    tke_server = kepconfig.connection.server(host = '192.168.192.130', port = 57413, user = 'Administrator', pw = 'Kepware4001234', https = True)
+    tke_server = kepconfig.connection.server(host = '192.168.192.136', port = 57513, user = 'Administrator', pw = 'Kepware400400400', https = True)
+
+    tke_server.SSL_trust_all_certs = True
+    tke_server.SSL_ignore_hostname = True
 
     server.SSL_trust_all_certs = True
 
@@ -112,6 +114,8 @@ if __name__ == "__main__":
 
     # Execute Module Tests
     admin.user_manager_test(server)
+    # runs on TKE since UA Endpoint management isn't available in TKS
+    admin.uaserver_test(tke_server)
     connectivity.connectivity_test(server)
     iot_gateway.iot_gateway_test(server)
     datalogger.datalogger_test(server)
