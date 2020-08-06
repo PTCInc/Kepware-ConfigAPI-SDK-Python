@@ -23,7 +23,7 @@ def _create_url(user = None):
 
 def add_user(server, DATA):
     '''Add a "user" or multiple "user" objects to Kepware User Manager by passing a 
-    list of channels and it's children to be added all at once.
+    list of users to be added all at once.
 
     INPUTS:
     "server" - instance of the "server" class

@@ -23,7 +23,7 @@ def _create_url(user_group = None):
 
 def add_user_group(server, DATA):
     '''Add a "user_group" or multiple "user_group" objects to Kepware User Manager by passing a 
-    list of channels and it's children to be added all at once.
+    list of user groups to be added all at once.
 
     INPUTS:
     "server" - instance of the "server" class
