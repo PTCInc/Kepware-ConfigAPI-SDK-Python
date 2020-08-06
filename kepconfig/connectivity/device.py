@@ -177,7 +177,7 @@ def auto_tag_gen(server, device_path):
     path_obj = kepconfig.path_split(device_path)
     try:
         r = server._config_update(server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL)
-        job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
+        job = kepconfig.connection.KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
         return job
     except KeyError as err:
         print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
