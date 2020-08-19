@@ -114,8 +114,10 @@ if __name__ == "__main__":
 
     # Execute Module Tests
     admin.user_manager_test(server)
+   
     # runs on TKE since UA Endpoint management isn't available in TKS
     admin.uaserver_test(tke_server)
+    
     connectivity.connectivity_test(server)
     iot_gateway.iot_gateway_test(server)
     datalogger.datalogger_test(server)
