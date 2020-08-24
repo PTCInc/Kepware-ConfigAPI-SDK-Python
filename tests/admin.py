@@ -101,7 +101,7 @@ def uaserver_test(server):
 def user_manager_test(server):
     # User Group tests
     group1 = {'common.ALLTYPES_NAME': 'Operators'}
-    group2 = {'common.ALLTYPES_NAME': 'DipShits'}
+    group2 = {'common.ALLTYPES_NAME': 'Group1'}
     
     try: 
         print(kepconfig.admin.user_groups.add_user_group(server,group1))
@@ -122,6 +122,12 @@ def user_manager_test(server):
             group1['common.ALLTYPES_NAME']))
     except Exception as err:
         HTTPErrorHandler(err)
+    
+    try: 
+        print(kepconfig.admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": True},
+            group1['common.ALLTYPES_NAME']))
+    except Exception as err:
+        HTTPErrorHandler(err)
 
     # Bad Inputs
     try: 
@@ -130,7 +136,12 @@ def user_manager_test(server):
         HTTPErrorHandler(err)
 
     try: 
-        print(kepconfig.admin.user_groups.modify_user_group(server,{'common.ALLTYPES_NAME': 'DipShits',"libadminsettings.USERMANAGER_GROUP_ENABLED": False}))
+        print(kepconfig.admin.user_groups.modify_user_group(server,{'common.ALLTYPES_NAME': 'Group1',"libadminsettings.USERMANAGER_GROUP_ENABLED": False}))
+    except Exception as err:
+        HTTPErrorHandler(err)
+    
+    try: 
+        print(kepconfig.admin.user_groups.modify_user_group(server,{'common.ALLTYPES_NAME': 'Group1',"libadminsettings.USERMANAGER_GROUP_ENABLED": True}))
     except Exception as err:
         HTTPErrorHandler(err)
 
@@ -141,6 +152,16 @@ def user_manager_test(server):
     
     try: 
         print(kepconfig.admin.user_groups.get_all_user_groups(server))
+    except Exception as err:
+        HTTPErrorHandler(err)
+    
+    try: 
+        print(kepconfig.admin.user_groups.disable_user_group(server, group1['common.ALLTYPES_NAME']))
+    except Exception as err:
+        HTTPErrorHandler(err)
+
+    try: 
+        print(kepconfig.admin.user_groups.enable_user_group(server, group1['common.ALLTYPES_NAME']))
     except Exception as err:
         HTTPErrorHandler(err)
 
@@ -155,7 +176,7 @@ def user_manager_test(server):
     user2 = {
         "common.ALLTYPES_NAME": "Client2",
         "common.ALLTYPES_DESCRIPTION": "Built-in account representing data clients",
-        "libadminsettings.USERMANAGER_USER_GROUPNAME": "DipShits",
+        "libadminsettings.USERMANAGER_USER_GROUPNAME": "Group1",
         "libadminsettings.USERMANAGER_USER_ENABLED": True,
         "libadminsettings.USERMANAGER_USER_PASSWORD": "Kepware400400400"      
     }
@@ -202,6 +223,16 @@ def user_manager_test(server):
         HTTPErrorHandler(err)
     
     try: 
+        print(kepconfig.admin.users.disable_user(server, user1['common.ALLTYPES_NAME']))
+    except Exception as err:
+        HTTPErrorHandler(err)
+
+    try: 
+        print(kepconfig.admin.users.enable_user(server, user1['common.ALLTYPES_NAME']))
+    except Exception as err:
+        HTTPErrorHandler(err)
+
+    try: 
         print(kepconfig.admin.users.del_user(server, user1['common.ALLTYPES_NAME']))
     except Exception as err:
         HTTPErrorHandler(err)
@@ -232,9 +263,7 @@ if __name__ == "__main__":
 
     # This creates a server reference that is used to target all modifications of 
     # the Kepware configuration
-    server = kepconfig.connection.server(host = '192.168.192.136', port = 57513, user = 'Administrator', pw = 'Kepware400400400', https = True)
-    server.SSL_ignore_hostname = True
-    server.SSL_trust_all_certs = True
+    server = kepconfig.connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
     
     user_manager_test(server)
     uaserver_test(server)

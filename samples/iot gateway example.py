@@ -1,12 +1,12 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
 
 # IoT Gateway Example - Simple example on how to manage a connection and 
-# exectute various calls for the IoT Gateway components of the Kepware
-# configuration API
+# execute various calls for the IoT Gateway components of the Kepware
+# Configuration API
 
 from kepconfig import connection, error
 from kepconfig.connectivity import channel
@@ -41,7 +41,7 @@ def HTTPErrorHandler(err):
 server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
 
 
-# Add a Channel using the "Simulator Driver"with device and tags. 
+# Add a Channel using the "Simulator Driver" with device and tags. 
 # These tags will be added to the IoT Agent.
 channel_data = {
     "common.ALLTYPES_NAME": "Channel1",
@@ -103,7 +103,7 @@ try:
 except Exception as err:
     HTTPErrorHandler(err)
 
-# Modify a parperty of the Agent
+# Modify a property of the Agent
 agent_data = {
 }
 agent_data['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'

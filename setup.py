@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="kepconfig",
-    version="1.0b2",
+    version="1.0b3",
     author="PTC",
     # author_email="author@example.com",
     description="API package for Kepware Configuration API",

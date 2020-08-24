@@ -8,6 +8,7 @@ r""":mod:`user_groups` exposes an API to allow modifications (add, delete, modif
 user_groups within the Kepware Administration User Manager through the Kepware Configuration API
 """
 USERGROUPS_ROOT = '/admin/server_usergroups'
+ENABLE_PROPERTY = 'libadminsettings.USERMANAGER_GROUP_ENABLED'
 
 def _create_url(user_group = None):
     '''Creates url object for the "server_usergroups" branch of Kepware's project tree. Used 
@@ -134,3 +135,39 @@ def get_all_user_groups(server):
 
     r = server._config_get(server.url + _create_url())
     return r.payload
+
+def enable_user_group(server, user_group):
+    '''Enable the user group. Returned object is JSON.
+    
+    INPUTS:
+    "server" - instance of the "server" class
+
+    "user_group" - name of user group
+
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+    DATA = {ENABLE_PROPERTY: True}
+    return modify_user_group(server, DATA, user_group)
+
+def disable_user_group(server, user_group):
+    '''Disable the user group. Returned object is JSON.
+    
+    INPUTS:
+    "server" - instance of the "server" class
+
+    "user_group" - name of user group
+
+    RETURNS:
+    True - If a "HTTP 200 - OK" is received from Kepware
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+    DATA = {ENABLE_PROPERTY: False}
+    return modify_user_group(server, DATA, user_group)

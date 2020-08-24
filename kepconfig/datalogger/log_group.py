@@ -154,10 +154,10 @@ def enable_log_group(server, log_group):
     KepURLError - If urllib provides an URLError
     '''
     DATA = {ENABLE_PROPERTY: True}
-    modify_log_group(server, DATA, log_group)
+    return modify_log_group(server, DATA, log_group)
 
 def disable_log_group(server, log_group):
-    '''Enable the log group. Returned object is JSON.
+    '''Disable the log group. Returned object is JSON.
     
     INPUTS:
     "server" - instance of the "server" class
@@ -172,7 +172,7 @@ def disable_log_group(server, log_group):
     KepURLError - If urllib provides an URLError
     '''
     DATA = {ENABLE_PROPERTY: False}
-    modify_log_group(server, DATA, log_group)
+    return modify_log_group(server, DATA, log_group)
 
 def reset_column_mapping_service(server, log_group):
     '''Executes a ResetColumnMapping serivce call to the log group
