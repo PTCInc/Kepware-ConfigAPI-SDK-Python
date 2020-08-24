@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
@@ -112,13 +112,21 @@ class server:
 
     def reinitialize(self):
         '''Executes a Reinitialize call to the Kepware instance.
+
+        RETURNS:
+        KepServiceResponse instance with job information
+
+        EXCEPTIONS (If not HTTP 200 or 429 returned):
+        
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
         '''
         url = self.url + self.__project_services_url + '/ReinitializeRuntime' 
         try:
             r = self._config_update(url, None)
             job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
             return job
-        except kepconfig.error.KepHTTPError as err:
+        except KepError.KepHTTPError as err:
             if err.code == 429:
                 job.code = err.code
                 job.message = err.payload
