@@ -115,6 +115,6 @@ result = tag.add_tag(server, tag_path, tag_info))
 
 **Visit:**
 
-[Kepware.com](https://www.kepware.com/)
-[Configuration API Info](https://www.kepware.com/en-us/products/kepserverex/features/configuration-api/)
-[PTC.com](https://www.ptc.com/)
+- [Kepware.com](https://www.kepware.com/)
+- [Configuration API Info](https://www.kepware.com/en-us/products/kepserverex/features/configuration-api/)
+- [PTC.com](https://www.ptc.com/)
