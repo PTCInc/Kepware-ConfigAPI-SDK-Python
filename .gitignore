@@ -1,3 +1,9 @@
+# -------------------------------------------------------------------------
+# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# See License.txt in the project root for
+# license information.
+# --------------------------------------------------------------------------
+
 # Custom
 #*.gitignore
 *.pem
@@ -6,7 +12,6 @@ _notes
 _new*
 _test*
 _build*
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
