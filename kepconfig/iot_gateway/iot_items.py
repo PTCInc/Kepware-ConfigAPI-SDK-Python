@@ -9,6 +9,7 @@ r""":mod:`iot_items` exposes an API to allow modifications (add, delete, modify)
 iot_items objects within the Kepware Configuration API
 """
 
+from typing import Union
 import kepconfig as helper
 from .. import iot_gateway as IOT
 import inspect
@@ -28,7 +29,7 @@ def _create_url(tag = None):
         return '{}/{}'.format(IOT_ITEMS_ROOT,normalized_tag)
 
 
-def add_iot_item(server, DATA, agent, agent_type):
+def add_iot_item(server, DATA, agent, agent_type) -> Union[bool, list]:
     '''Add a "iot item" or multiple "iot item" objects to Kepware's IoT Gateway agent. Additionally 
     it can be used to pass a list of iot items to be added to an agent all at once.
 
@@ -45,12 +46,23 @@ def add_iot_item(server, DATA, agent, agent_type):
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
 
+    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    iot items added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
+
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
     r = server._config_add(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(), DATA)
-    if r.code == 201: return True 
+    if r.code == 201: return True
+    elif r.code == 207:
+            errors = [] 
+            for item in r.payload:
+                if item['code'] != 201:
+                    errors.append(item)
+            return errors 
     else: return False
 
 def del_iot_item(server, iot_item, agent, agent_type):

@@ -9,6 +9,7 @@ r""":mod:`tag` exposes an API to allow modifications (add, delete, modify) to
 tag and tag group objects within the Kepware Configuration API
 """
 
+from typing import Union
 import kepconfig
 from . import channel, device
 import inspect
@@ -38,43 +39,7 @@ def _create_tag_groups_url(tag_group = None):
     else: 
         return '{}/{}'.format(TAG_GRP_ROOT,tag_group)
 
-def add_all_tags(server, ch_dev_path, DATA):
-    '''Add "tag" and "tag group" objects to a device in Kepware. To be used to 
-    pass a list of tags, tag groups and/or children of tag groups (tags and tag 
-    groups) to be added at once.
-    
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "ch_dev_path" - path to add tags and tag groups. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-    
-    "DATA" - properly JSON object (dict) of the tags, 
-    tag groups and it's children expected by Kepware Configuration API.
-    
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
-    '''
-
-    result = False
-    if 'tags' in DATA:
-        if (add_tag(server, ch_dev_path, DATA['tags'])):
-            result = True
-        else: 
-            return False
-    if 'tag_groups' in DATA:
-        #Add all Tag Groups
-        if (add_tag_group(server, ch_dev_path, DATA['tag_groups'])):
-            result = True
-        else:
-            return False
-    return result
-
-def add_tag(server, tag_path, DATA):
+def add_tag(server, tag_path, DATA) -> Union[bool, list]:
     '''Add "tag" objects to a specific path in Kepware. To be used to 
     pass a list of tags to be added at one path location.
 
@@ -89,6 +54,11 @@ def add_tag(server, tag_path, DATA):
 
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
+
+    List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    tags added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -110,9 +80,15 @@ def add_tag(server, tag_path, DATA):
         return False
     r = server._config_add(url, DATA)
     if r.code == 201: return True 
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
     else: return False
 
-def add_tag_group(server, tag_group_path, DATA):
+def add_tag_group(server, tag_group_path, DATA) -> Union[bool, list]:
     '''Add "tag_group" objects to a specific path in Kepware. To be used to 
     pass a list of tag_groups and children (tags or tag groups) to be added at one 
     path location.
@@ -128,6 +104,11 @@ def add_tag_group(server, tag_group_path, DATA):
 
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
+
+    List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    tag groups added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -149,7 +130,67 @@ def add_tag_group(server, tag_group_path, DATA):
         return False
     r = server._config_add(url, DATA)
     if r.code == 201: return True 
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
     else: return False
+
+def add_all_tags(server, ch_dev_path, DATA) -> Union[bool, list]:
+    '''Add "tag" and "tag group" objects to a device in Kepware. To be used to 
+    pass a list of tags, tag groups and/or children of tag groups (tags and tag 
+    groups) to be added at once.
+    
+    INPUTS:
+    "server" - instance of the "server" class
+
+    "ch_dev_path" - path to add tags and tag groups. Standard Kepware address decimal 
+    notation string such as "channel1.device1"
+    
+    "DATA" - properly JSON object (dict) of the tags, 
+    tag groups and it's children expected by Kepware Configuration API.
+    
+    RETURNS:
+    True - If a "HTTP 201 - Created" is received from Kepware for all items
+
+    List  - [tag failure list, tag group failure list] -   If a "HTTP 207 - Multi-Status" is received from 
+    Kepware for either tags or tag groups, a list of dict error responses for all tags and/or tag groups added that failed. 
+
+    False - If tags or tag groups are not found in DATA
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+######################################################
+# Need to Handle HTTP 207 from the tag/tag group calls
+######################################################
+    
+    tags_result = False
+    tag_groups_result = False
+
+    # check to see if there are dict entries for tags or tag groups
+    if ('tag_groups' not in DATA) and ('tags' not in DATA):
+        return False
+
+    if 'tags' in DATA:
+        tags_result = add_tag(server, ch_dev_path, DATA['tags'])
+    if 'tag_groups' in DATA:
+        #Add all Tag Groups
+        tag_groups_result = add_tag_group(server, ch_dev_path, DATA['tag_groups'])
+    
+    # build results return from both calls
+    if tags_result == True and tag_groups_result == True:
+        return True
+    elif tags_result == True:
+        return [[], tag_groups_result]
+    elif tag_groups_result == True:
+        return [tags_result, []]
+    else:
+        # mixed results from both tags and tag groups
+        return [tags_result, tag_groups_result]
 
 def modify_tag(server, full_tag_path, DATA, force = False):
     '''Modify a "tag" object and it's properties in Kepware.

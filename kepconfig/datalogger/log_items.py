@@ -7,6 +7,7 @@
 r""":mod:`log_items` exposes an API to allow modifications (add, delete, modify) to 
 log item (tag) objects in a Datalogger log group within the Kepware Configuration API
 """
+from typing import Union
 from . import log_group as Log_Group
 
 LOG_ITEMS_ROOT = '/log_items'
@@ -24,7 +25,7 @@ def _create_url(log_item = None):
         return '{}/{}'.format(LOG_ITEMS_ROOT, log_item)
 
 
-def add_log_item(server, log_group, DATA):
+def add_log_item(server, log_group, DATA) -> Union[bool, list]:
     '''Add a "log item" or multiple "log item" objects to a log group in Kepware's Datalogger. It can 
     be used to pass a list of log items to be added all at once.
 
@@ -38,13 +39,24 @@ def add_log_item(server, log_group, DATA):
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
 
+    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    log items added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
+
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
 
     r = server._config_add(server.url + Log_Group._create_url(log_group) + _create_url(), DATA)
-    if r.code == 201: return True 
+    if r.code == 201: return True
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors 
     else: return False
 
 def del_log_item(server, log_group, log_item):

@@ -78,25 +78,26 @@ def iot_gateway_test(server):
         
         # Add Agent without Agent Type (error)
         agent_data = {
-            "common.ALLTYPES_NAME": agent_name,
-            "iot_items":[
-                {
-                "common.ALLTYPES_NAME": "_System_Time",
-                "common.ALLTYPES_DESCRIPTION": "",
-                "iot_gateway.IOT_ITEM_SERVER_TAG": "_System._Time",
-                "iot_gateway.IOT_ITEM_USE_SCAN_RATE": True,
-                "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 1000,
-                "iot_gateway.IOT_ITEM_SEND_EVERY_SCAN": False,
-                "iot_gateway.IOT_ITEM_DEADBAND_PERCENT": 0,
-                "iot_gateway.IOT_ITEM_ENABLED": True,
-                "iot_gateway.IOT_ITEM_DATA_TYPE": 5 
-                }
-            ]
+            "common.ALLTYPES_NAME": agent_name + "1"
         }
         try:
             print(kepconfig.iot_gateway.agent.add_iot_agent(server, agent_data))
         except Exception as err:
             HTTPErrorHandler(err)   
+
+        # Add Agent with bad name (error)
+        agent_data = [
+            {
+            "common.ALLTYPES_NAME": agent_name + "1"
+            },
+            {
+            "common.ALLTYPES_NAME": "_" + agent_name
+            },
+        ]
+        try:
+            print(kepconfig.iot_gateway.agent.add_iot_agent(server, agent_data, agent_type))
+        except Exception as err:
+            HTTPErrorHandler(err)  
 
         # Modify Agent
         agent_data = {
@@ -144,6 +145,38 @@ def iot_gateway_test(server):
             print(kepconfig.iot_gateway.iot_items.add_iot_item(server, iot_item_data, agent_name, agent_type))
         except Exception as err:
             HTTPErrorHandler(err)
+        
+        # Add Iot Items with one failed
+        
+        iot_item_data = [
+            {
+                "common.ALLTYPES_NAME": iot_item_name + "1",
+                "common.ALLTYPES_DESCRIPTION": "",
+                "iot_gateway.IOT_ITEM_SERVER_TAG": "_System._Time_Minute",
+                "iot_gateway.IOT_ITEM_USE_SCAN_RATE": True,
+                "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 1000,
+                "iot_gateway.IOT_ITEM_SEND_EVERY_SCAN": False,
+                "iot_gateway.IOT_ITEM_DEADBAND_PERCENT": 0,
+                "iot_gateway.IOT_ITEM_ENABLED": True,
+                "iot_gateway.IOT_ITEM_DATA_TYPE": 5 
+            },
+            {
+                "common.ALLTYPES_NAME": iot_item_name,
+                "common.ALLTYPES_DESCRIPTION": "",
+                "iot_gateway.IOT_ITEM_SERVER_TAG": "_System._Time_Seconds",
+                "iot_gateway.IOT_ITEM_USE_SCAN_RATE": True,
+                "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 1000,
+                "iot_gateway.IOT_ITEM_SEND_EVERY_SCAN": False,
+                "iot_gateway.IOT_ITEM_DEADBAND_PERCENT": 0,
+                "iot_gateway.IOT_ITEM_ENABLED": True,
+                "iot_gateway.IOT_ITEM_DATA_TYPE": 5 
+            }
+        ]
+        try:
+            print(kepconfig.iot_gateway.iot_items.add_iot_item(server, iot_item_data, agent_name, agent_type))
+        except Exception as err:
+            HTTPErrorHandler(err)
+
 
         # Modify IoT Item
         modify_iot_item = {
@@ -181,11 +214,20 @@ def iot_gateway_test(server):
             print(kepconfig.iot_gateway.iot_items.del_iot_item(server, iot_item_name, agent_name, agent_type))
         except Exception as err:
             HTTPErrorHandler(err)
+        
         # Delete IoT Agent
         try:
             print(kepconfig.iot_gateway.agent.del_iot_agent(server, agent_name, agent_type))
         except Exception as err:
-            HTTPErrorHandler(err)  
+            HTTPErrorHandler(err)
+        
+        # Delete all Channels
+        try:
+            agent_left = kepconfig.iot_gateway.agent.get_all_iot_agents(server, agent_type)
+            for x in agent_left:
+                print(kepconfig.iot_gateway.agent.del_iot_agent(server,x['common.ALLTYPES_NAME'],agent_type))
+        except Exception as err:
+            HTTPErrorHandler(err)
 
 if __name__ == "__main__":
     time_start = time.perf_counter()

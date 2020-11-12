@@ -44,10 +44,30 @@ def connectivity_test(server):
         print(kepconfig.connectivity.channel.add_channel(server,channel_data))
     except Exception as err:
         HTTPErrorHandler(err)
+    
+    # Add multi channels with one failure
+    try:
+        channel_data = [
+            {"common.ALLTYPES_NAME": ch_name+"1","servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"},
+            {"common.ALLTYPES_NAME": "_" + ch_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
+        ]
+        print(kepconfig.connectivity.channel.add_channel(server,channel_data))
+    except Exception as err:
+        HTTPErrorHandler(err)
 
     # Add a Device to the created Channel
     try:
         device_data = {"common.ALLTYPES_NAME": dev_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
+        print(kepconfig.connectivity.device.add_device(server,ch_name,device_data))
+    except Exception as err:
+        HTTPErrorHandler(err)
+    
+    # Add multi devices with one failure
+    try:
+        device_data = [
+            {"common.ALLTYPES_NAME": dev_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"},
+            {"common.ALLTYPES_NAME": dev_name+"1","servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
+        ]
         print(kepconfig.connectivity.device.add_device(server,ch_name,device_data))
     except Exception as err:
         HTTPErrorHandler(err)
@@ -81,6 +101,129 @@ def connectivity_test(server):
                     }
                 ]
             }
+        ]
+    }
+    try:
+        print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
+    except Exception as err:
+        HTTPErrorHandler(err)
+
+    # Add a collection with bad tag
+    all_tags_data = {
+        "tags": [
+            {
+                "common.ALLTYPES_NAME": "_Temp1",
+                "servermain.TAG_ADDRESS": "R0"
+            },
+            {
+                "common.ALLTYPES_NAME": "Temp2",
+                "servermain.TAG_ADDRESS": "R0"
+            }
+        ],
+        "tag_groups": [
+            {
+                "common.ALLTYPES_NAME": "ALARM3",
+                "tags": [
+                    {
+                        "common.ALLTYPES_NAME": "ALARM_C_READY",
+                        "servermain.TAG_ADDRESS": "R1"
+                    }
+                ],
+                "tag_groups": [
+                    {
+                        "common.ALLTYPES_NAME": "ALARM4",
+                        "tags": [
+                            {
+                                "common.ALLTYPES_NAME": "ALARM_C_READY2",
+                                "servermain.TAG_ADDRESS": "R2"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+    try:
+        print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
+    except Exception as err:
+        HTTPErrorHandler(err)
+    
+    # Add a collection with bad tag_group child
+    all_tags_data = {
+        "tags": [
+            {
+                "common.ALLTYPES_NAME": "Temp3",
+                "servermain.TAG_ADDRESS": "R0"
+            }
+        ],
+        "tag_groups": [
+            {
+                "common.ALLTYPES_NAME": "ALARM5",
+                "tags": [
+                    {
+                        "common.ALLTYPES_NAME": "_ALARM_C_READY",
+                        "servermain.TAG_ADDRESS": "R1"
+                    }
+                ],
+                "tag_groups": [
+                    {
+                        "common.ALLTYPES_NAME": "ALARM6",
+                        "tags": [
+                            {
+                                "common.ALLTYPES_NAME": "ALARM_C_READY2",
+                                "servermain.TAG_ADDRESS": "R2"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "common.ALLTYPES_NAME": "ALARM5"
+            }
+        ]
+    }
+    try:
+        print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
+    except Exception as err:
+        HTTPErrorHandler(err)
+
+    # Add a collection with bad tag and tag_group child
+    all_tags_data = {
+        "tags": [
+            {
+                "common.ALLTYPES_NAME": "_Temp4",
+                "servermain.TAG_ADDRESS": "R0"
+            },
+            {
+                "common.ALLTYPES_NAME": "Temp4",
+                "servermain.TAG_ADDRESS": "R0"
+            }
+        ],
+        "tag_groups": [
+            {
+                "common.ALLTYPES_NAME": "ALARM7",
+                "tags": [
+                    {
+                        "common.ALLTYPES_NAME": "_ALARM_C_READY",
+                        "servermain.TAG_ADDRESS": "R1"
+                    }
+                ],
+                "tag_groups": [
+                    {
+                        "common.ALLTYPES_NAME": "ALARM6",
+                        "tags": [
+                            {
+                                "common.ALLTYPES_NAME": "ALARM_C_READY2",
+                                "servermain.TAG_ADDRESS": "R2"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "common.ALLTYPES_NAME": "ALARM8"
+            }
+
         ]
     }
     try:
@@ -275,6 +418,14 @@ def connectivity_test(server):
     # Delete Channel
     try:
         print(kepconfig.connectivity.channel.del_channel(server,ch_name))
+    except Exception as err:
+        HTTPErrorHandler(err)
+    
+    # Delete all Channels
+    try:
+        ch_left = kepconfig.connectivity.channel.get_all_channels(server)
+        for x in ch_left:
+            print(kepconfig.connectivity.channel.del_channel(server,x['common.ALLTYPES_NAME']))
     except Exception as err:
         HTTPErrorHandler(err)
 

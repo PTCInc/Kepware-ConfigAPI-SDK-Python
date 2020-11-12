@@ -7,6 +7,9 @@
 r""":mod:`ua_server` exposes an API to allow modifications (add, delete, modify) to 
 OPC UA Server endpoints within the Kepware Administration through the Kepware Configuration API
 """
+from typing import Union
+
+
 UA_ROOT = '/admin/ua_endpoints'
 
 def _create_url(endpoint = None):
@@ -21,7 +24,7 @@ def _create_url(endpoint = None):
     else:
         return '{}/{}'.format(UA_ROOT,endpoint)
 
-def add_endpoint(server, DATA):
+def add_endpoint(server, DATA) -> Union[bool, list]:
     '''Add an "endpoint" or multiple "endpoint" objects to Kepware UA Server by passing a 
     list of endpoints to be added all at once.
 
@@ -34,13 +37,24 @@ def add_endpoint(server, DATA):
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
 
+    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    endpoints added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
+
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
 
     r = server._config_add(server.url + _create_url(), DATA)
-    if r.code == 201: return True 
+    if r.code == 201: return True
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
     else: return False
 
 def del_endpoint(server, endpoint):

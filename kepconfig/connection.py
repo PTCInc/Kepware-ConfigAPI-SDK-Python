@@ -272,14 +272,6 @@ class server:
                 data.code = server.code
                 data.reason = server.reason
                 return data
-                # if request_obj.method == 'GET':
-                #     data.payload = json.loads(codecs.decode(server.read(),'utf-8-sig'))
-                #     data.code = server.code
-                #     data.reason = server.reason
-                #     return data
-                # else:
-                #     return server
-                    # return 'HTTP Code: {} - {}'.format(server.code,server.reason)
         except error.HTTPError as err:
             payload = json.loads(codecs.decode(err.read(),'utf-8-sig'))
             # print('HTTP Code: {}\n{}'.format(err.code,payload), file=sys.stderr)
@@ -289,7 +281,7 @@ class server:
             raise KepError.KepURLError(err.reason, request_obj.get_full_url())
 
     # Fucntion used to ensure special characters are handled in the URL
-    # Ex. = Space will be turned to %20
+    # Ex: Space will be turned to %20
     def __url_validate(self, url):
         parsed_url = parse.urlparse(url)
         updated_path = parse.quote(parsed_url.path)

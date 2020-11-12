@@ -9,6 +9,7 @@ r""":mod:`device` exposes an API to allow modifications (add, delete, modify) to
 device objects within the Kepware Configuration API
 """
 
+from typing import Union
 import kepconfig
 from . import channel
 import inspect
@@ -27,7 +28,7 @@ def _create_url(device = None):
     else:
         return '{}/{}'.format(DEVICE_ROOT,device)
 
-def add_device(server, dev_channel, DATA):
+def add_device(server, dev_channel, DATA) -> Union[bool, list]:
     '''Add a "device" object to a channel in Kepware. Can be used to pass children of a device object 
     such as tags and tag groups. This allows you to create a device and tags 
     all in one function, if desired.
@@ -44,6 +45,11 @@ def add_device(server, dev_channel, DATA):
     
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
+    
+    List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    devices added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -51,7 +57,13 @@ def add_device(server, dev_channel, DATA):
     '''
 
     r = server._config_add(server.url + channel._create_url(dev_channel) + _create_url(), DATA)
-    if r.code == 201: return True 
+    if r.code == 201: return True
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
     else: return False
 
 def del_device(server, device_path):

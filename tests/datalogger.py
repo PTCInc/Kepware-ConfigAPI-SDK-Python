@@ -49,6 +49,11 @@ def __log_items_test(server, log_group):
 		"datalogger.LOG_ITEM_ID": "_System._Date"
 	}
 
+	log_item3 = {
+		"common.ALLTYPES_NAME": "LogItem3",
+		"datalogger.LOG_ITEM_ID": "_System._Time_Second"
+	}
+
 	try:
 		print(datalogger.log_items.add_log_item(server, log_group, log_item1))
 	except Exception as err:
@@ -60,6 +65,12 @@ def __log_items_test(server, log_group):
 
 	try:
 		print(datalogger.log_items.add_log_item(server, log_group, [log_item1, log_item2]))
+	except Exception as err:
+		HTTPErrorHandler(err)
+	
+	# Fails for item 2 since it's already existing
+	try:
+		print(datalogger.log_items.add_log_item(server, log_group, [log_item2, log_item3]))
 	except Exception as err:
 		HTTPErrorHandler(err)
 
@@ -125,6 +136,12 @@ def __triggers_test(server, log_group):
 		"common.ALLTYPES_NAME": "Trigger3",
 		"datalogger.TRIGGER_TYPE": 1
 	}
+
+	trigger3 = {
+
+		"common.ALLTYPES_NAME": "Trigger4",
+		"datalogger.TRIGGER_TYPE": 1
+	}
 	
 	try:
 		print(datalogger.triggers.add_trigger(server, log_group, trigger1))
@@ -137,6 +154,12 @@ def __triggers_test(server, log_group):
 
 	try:
 		print(datalogger.triggers.add_trigger(server, log_group, [trigger1, trigger2]))
+	except Exception as err:
+		HTTPErrorHandler(err)
+	
+	# Fails adding trigger 2 since it exists
+	try:
+		print(datalogger.triggers.add_trigger(server, log_group, [trigger2, trigger3]))
 	except Exception as err:
 		HTTPErrorHandler(err)
 
@@ -277,6 +300,36 @@ def datalogger_test(server):
 		"datalogger.LOG_GROUP_REGENERATE_ALIAS_TABLE_ON_TABLE_SELECTION_CHANGE": False
 	}
 
+	log_group_data3 = {
+		"common.ALLTYPES_NAME": log_group_name +'2',
+		"common.ALLTYPES_DESCRIPTION": "",
+		"datalogger.LOG_GROUP_ENABLED": False,
+		"datalogger.LOG_GROUP_UPDATE_RATE_MSEC": 100,
+		"datalogger.LOG_GROUP_UPDATE_RATE_UNITS": 0,
+		"datalogger.LOG_GROUP_MAP_NUMERIC_ID_TO_VARCHAR": False,
+		"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True,
+		"datalogger.LOG_GROUP_STORE_AND_FORWARD_ENABLED": False,
+		"datalogger.LOG_GROUP_STORE_AND_FORWARD_STORAGE_DIRECTORY": "C:\\ProgramData\\PTC\\ThingWorx Kepware Server\\V6\\DataLogger",
+		"datalogger.LOG_GROUP_STORE_AND_FORWARD_MAX_STORAGE_SIZE": 10,
+		"datalogger.LOG_GROUP_MAX_ROW_BUFFER_SIZE": 1000,
+		"datalogger.LOG_GROUP_DSN": "",
+		"datalogger.LOG_GROUP_DSN_USERNAME": "",
+		"datalogger.LOG_GROUP_DSN_PASSWORD": "",
+		"datalogger.LOG_GROUP_DSN_LOGIN_TIMEOUT": 10,
+		"datalogger.LOG_GROUP_DSN_QUERY_TIMEOUT": 15,
+		"datalogger.LOG_GROUP_TABLE_SELECTION": 0,
+		"datalogger.LOG_GROUP_TABLE_NAME": "",
+		"datalogger.LOG_GROUP_TABLE_FORMAT": 0,
+		"datalogger.LOG_GROUP_BATCH_ID_ITEM": "",
+		"datalogger.LOG_GROUP_BATCH_ID_ITEM_TYPE": "Default",
+		"datalogger.LOG_GROUP_BATCH_ID_UPDATE_RATE": 1000,
+		"datalogger.LOG_GROUP_BATCH_ID_UPDATE_RATE_UNITS": 0,
+		"datalogger.LOG_GROUP_REGENERATE_ALIAS_TABLE_ON_DSN_CHANGE": True,
+		"datalogger.LOG_GROUP_REGENERATE_ALIAS_TABLE_ON_BATCH_ID_CHANGE": True,
+		"datalogger.LOG_GROUP_REGENERATE_ALIAS_TABLE_ON_TABLE_NAME_CHANGE": False,
+		"datalogger.LOG_GROUP_REGENERATE_ALIAS_TABLE_ON_TABLE_SELECTION_CHANGE": False
+	}
+
 	try:
 		print(datalogger.log_group.add_log_group(server, log_group_data1))
 	except Exception as err:
@@ -299,6 +352,12 @@ def datalogger_test(server):
 	
 	try:
 		print(datalogger.log_group.add_log_group(server, [log_group_data1, log_group_data2]))
+	except Exception as err:
+		HTTPErrorHandler(err)
+	
+	# Log Group 2 should fail since it exists
+	try:
+		print(datalogger.log_group.add_log_group(server, [log_group_data2, log_group_data3]))
 	except Exception as err:
 		HTTPErrorHandler(err)
 
@@ -346,12 +405,9 @@ def datalogger_test(server):
 		HTTPErrorHandler(err)
 
 	try:
-		print(datalogger.log_group.del_log_group(server, log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
-	
-	try:
-		print(datalogger.log_group.del_log_group(server, log_group_data2['common.ALLTYPES_NAME']))
+		lg_left = datalogger.log_group.get_all_log_groups(server)
+		for x in lg_left:
+			print(datalogger.log_group.del_log_group(server, x['common.ALLTYPES_NAME']))
 	except Exception as err:
 		HTTPErrorHandler(err)
 
