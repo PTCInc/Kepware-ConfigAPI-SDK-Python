@@ -46,6 +46,10 @@ def uaserver_test(server):
         "common.ALLTYPES_NAME": "DefaultEndpoint3",
         "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49332
     }
+    uaendpoint3 = {
+        "common.ALLTYPES_NAME": "DefaultEndpoint4",
+        "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49333
+    }
 
     try: 
         print(kepconfig.admin.ua_server.add_endpoint(server,uaendpoint1))
@@ -59,6 +63,12 @@ def uaserver_test(server):
     
     try: 
         print(kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint1,uaendpoint2]))
+    except Exception as err:
+        HTTPErrorHandler(err)
+
+# Endpoint 2 fails since it already exists
+    try: 
+        print(kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint2,uaendpoint3]))
     except Exception as err:
         HTTPErrorHandler(err)
 
@@ -102,6 +112,7 @@ def user_manager_test(server):
     # User Group tests
     group1 = {'common.ALLTYPES_NAME': 'Operators'}
     group2 = {'common.ALLTYPES_NAME': 'Group1'}
+    group3 = {'common.ALLTYPES_NAME': 'Group2'}
     
     try: 
         print(kepconfig.admin.user_groups.add_user_group(server,group1))
@@ -114,6 +125,12 @@ def user_manager_test(server):
 
     try: 
         print(kepconfig.admin.user_groups.add_user_group(server,[group1, group2]))
+    except Exception as err:
+        HTTPErrorHandler(err)
+
+# Group 2 fails since it already exists
+    try: 
+        print(kepconfig.admin.user_groups.add_user_group(server,[group2, group3]))
     except Exception as err:
         HTTPErrorHandler(err)
     
@@ -180,6 +197,13 @@ def user_manager_test(server):
         "libadminsettings.USERMANAGER_USER_ENABLED": True,
         "libadminsettings.USERMANAGER_USER_PASSWORD": "Kepware400400400"      
     }
+    user3 = {
+        "common.ALLTYPES_NAME": "Client3",
+        "common.ALLTYPES_DESCRIPTION": "Built-in account representing data clients",
+        "libadminsettings.USERMANAGER_USER_GROUPNAME": "Group1",
+        "libadminsettings.USERMANAGER_USER_ENABLED": True,
+        "libadminsettings.USERMANAGER_USER_PASSWORD": "Kepware400400400"      
+    }
 
     try: 
         print(kepconfig.admin.users.add_user(server,user1))
@@ -193,6 +217,12 @@ def user_manager_test(server):
 
     try: 
         print(kepconfig.admin.users.add_user(server,[user1, user2]))
+    except Exception as err:
+        HTTPErrorHandler(err)
+    
+# User 2 fails since it already exists
+    try: 
+        print(kepconfig.admin.users.add_user(server,[user2, user3]))
     except Exception as err:
         HTTPErrorHandler(err)
     
@@ -252,7 +282,11 @@ def user_manager_test(server):
         print(kepconfig.admin.user_groups.del_user_group(server,group2['common.ALLTYPES_NAME']))
     except Exception as err:
         HTTPErrorHandler(err)
-
+    
+    try: 
+        print(kepconfig.admin.user_groups.del_user_group(server,group3['common.ALLTYPES_NAME']))
+    except Exception as err:
+        HTTPErrorHandler(err)
 
 
 

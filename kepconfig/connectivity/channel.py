@@ -11,6 +11,7 @@ channel objects within the Kepware Configuration API
 
  
 import inspect
+from typing import Union
 
 CHANNEL_ROOT = '/project/channels'
 
@@ -26,7 +27,7 @@ def _create_url(channel = None):
     else:
         return '{}/{}'.format(CHANNEL_ROOT,channel)
 
-def add_channel(server, DATA):
+def add_channel(server, DATA) -> Union[bool, list]:
     '''Add a "channel" or multiple "channel" objects to Kepware. Can be used to pass children of a channel object 
     such as devices and tags/tag groups. This allows you to create a channel, it's devices and tags 
     all in one function, if desired.
@@ -41,6 +42,12 @@ def add_channel(server, DATA):
 
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
+    
+    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    channels added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
+        
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -48,7 +55,13 @@ def add_channel(server, DATA):
     '''
 
     r = server._config_add(server.url + _create_url(), DATA)
-    if r.code == 201: return True 
+    if r.code == 201: return True
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
     else: return False
 
 def del_channel(server, channel):

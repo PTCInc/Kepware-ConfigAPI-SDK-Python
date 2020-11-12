@@ -7,6 +7,9 @@
 r""":mod:`users` exposes an API to allow modifications (add, delete, modify) to 
 users within the Kepware Administration User Management through the Kepware Configuration API
 """
+from typing import Union
+
+
 USERS_ROOT = '/admin/server_users'
 ENABLE_PROPERTY = 'libadminsettings.USERMANAGER_USER_ENABLED'
 
@@ -22,7 +25,7 @@ def _create_url(user = None):
     else:
         return '{}/{}'.format(USERS_ROOT,user)
 
-def add_user(server, DATA):
+def add_user(server, DATA) -> Union[bool, list]:
     '''Add a "user" or multiple "user" objects to Kepware User Manager by passing a 
     list of users to be added all at once.
 
@@ -35,6 +38,11 @@ def add_user(server, DATA):
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
 
+    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    users added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
+
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -42,6 +50,12 @@ def add_user(server, DATA):
 
     r = server._config_add(server.url + _create_url(), DATA)
     if r.code == 201: return True 
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
     else: return False
 
 def del_user(server, user):

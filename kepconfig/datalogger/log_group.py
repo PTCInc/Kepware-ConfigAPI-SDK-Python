@@ -7,6 +7,7 @@
 r""":mod:`log_group` exposes an API to allow modifications (add, delete, modify) to 
 log group objects in DataLogger within the Kepware Configuration API
 """
+from typing import Union
 from kepconfig import connection, error as KepError
 
 ENABLE_PROPERTY = 'datalogger.LOG_GROUP_ENABLED'
@@ -25,7 +26,7 @@ def _create_url(log_group = None):
         return '{}/{}'.format(LOG_GROUP_ROOT, log_group)
 
 
-def add_log_group(server, DATA):
+def add_log_group(server, DATA) -> Union[bool, list]:
     '''Add a "log group" or multiple "log groups" objects to Kepware's DataLogger. It can be used 
     to pass a list of log groups to be added all at once.
 
@@ -37,6 +38,11 @@ def add_log_group(server, DATA):
     RETURNS:
     True - If a "HTTP 201 - Created" is received from Kepware
 
+    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    log groups added that failed.
+
+    False - If a non-expected "2xx successful" code is returned
+
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -44,6 +50,12 @@ def add_log_group(server, DATA):
 
     r = server._config_add(server.url + _create_url(), DATA)
     if r.code == 201: return True 
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
     else: return False
 
 def del_log_group(server, log_group):
