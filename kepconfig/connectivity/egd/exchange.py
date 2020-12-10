@@ -16,7 +16,7 @@ from .. import egd as EGD, channel, device
 CONSUMER_ROOT = '/consumer_exchange_groups/consumer exchanges/consumer_exchanges'
 PRODUCER_ROOT = '/producer_exchange_groups/producer exchanges/producer_exchanges'
 
-def _create_url(device_path, type, exchange = None):
+def _create_url(device_path, ex_type, exchange_name = None):
     '''Creates url object for the "exchange" branch of Kepware's project tree. Used 
     to build a part of Kepware Configuration API URL structure
 
@@ -25,18 +25,18 @@ def _create_url(device_path, type, exchange = None):
     path_obj = kepconfig.path_split(device_path)
     device_root = channel._create_url(path_obj['channel']) + device._create_url(path_obj['device'])
 
-    if exchange == None:
-        if type == EGD.CONSUMER_EXCHANGE:
+    if exchange_name == None:
+        if ex_type == EGD.CONSUMER_EXCHANGE:
             return device_root + CONSUMER_ROOT
         else:
             return device_root + PRODUCER_ROOT
     else:
-        if type == EGD.CONSUMER_EXCHANGE:
-            return '{}/{}/{}'.format(device_root,CONSUMER_ROOT,exchange)
+        if ex_type == EGD.CONSUMER_EXCHANGE:
+            return '{}{}/{}'.format(device_root,CONSUMER_ROOT,exchange_name)
         else:
-            return '{}/{}/{}'.format(device_root,PRODUCER_ROOT,exchange)
+            return '{}{}/{}'.format(device_root,PRODUCER_ROOT,exchange_name)
 
-def add_exchange(server, device_path, type, DATA) -> Union[bool, list]:
+def add_exchange(server, device_path, ex_type, DATA) -> Union[bool, list]:
     '''Add a "exchange" or multiple "exchange" objects to Kepware. Can be used to pass children of a exchange object 
     such as ranges. This allows you to create a exchange and ranges for the exchange all in one function, if desired.
 
@@ -70,7 +70,7 @@ def add_exchange(server, device_path, type, DATA) -> Union[bool, list]:
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_add(server.url + _create_url(device_path, type), DATA)
+    r = server._config_add(server.url + _create_url(device_path, ex_type), DATA)
     if r.code == 201: return True
     elif r.code == 207:
         errors = [] 
@@ -80,7 +80,7 @@ def add_exchange(server, device_path, type, DATA) -> Union[bool, list]:
         return errors
     else: return False
 
-def del_exchange(server, device_path, type, exchange) -> bool:
+def del_exchange(server, device_path, ex_type, exchange_name) -> bool:
     '''Delete a "exchange" object in Kepware. This will delete all children as well
     
     INPUTS:
@@ -90,9 +90,9 @@ def del_exchange(server, device_path, type, exchange) -> bool:
     "device_path" - path to exchanges. Standard Kepware address decimal 
     notation string such as "channel1.device1"
 
-    "type" - type of exchange either consumer or producer
+    "ex_type" - type of exchange either consumer or producer
 
-    "exchange" - name of exchange
+    "exchange_name" - name of exchange
     
     RETURNS:
 
@@ -104,11 +104,11 @@ def del_exchange(server, device_path, type, exchange) -> bool:
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_del(server.url + _create_url(device_path, type, exchange))
+    r = server._config_del(server.url + _create_url(device_path, ex_type, exchange_name))
     if r.code == 200: return True 
     else: return False
 
-def modify_exchange(server, device_path, type, DATA, exchange_name = None, force = False) -> bool:
+def modify_exchange(server, device_path, ex_type, DATA, exchange_name = None, force = False) -> bool:
     '''Modify a exchange object and it's properties in Kepware. If a "exchange_name" is not provided as an input,
     you need to identify the exchange in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the exchange that is to be modified.
@@ -120,7 +120,7 @@ def modify_exchange(server, device_path, type, DATA, exchange_name = None, force
     "device_path" - path to exchanges. Standard Kepware address decimal 
     notation string such as "channel1.device1"
 
-    "type" - type of exchange either consumer or producer
+    "ex_type" - type of exchange either consumer or producer
 
     "DATA" - properly JSON object (dict) of the exchange properties to be modified.
 
@@ -141,7 +141,7 @@ def modify_exchange(server, device_path, type, DATA, exchange_name = None, force
     exchange_data = server._force_update_check(force, DATA)
     if exchange_name == None:
         try:
-            r = server._config_update(server.url + _create_url(device_path, type, exchange_data['common.ALLTYPES_NAME']), exchange_data)
+            r = server._config_update(server.url + _create_url(device_path, ex_type, exchange_data['common.ALLTYPES_NAME']), exchange_data)
             if r.code == 200: return True 
             else: return False
         except KeyError as err:
@@ -150,11 +150,11 @@ def modify_exchange(server, device_path, type, DATA, exchange_name = None, force
         # except Exception as e:
         #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     else:
-        r = server._config_update(server.url + _create_url(device_path, type, exchange_name), exchange_data)
+        r = server._config_update(server.url + _create_url(device_path, ex_type, exchange_name), exchange_data)
         if r.code == 200: return True 
         else: return False
 
-def get_exchange(server, device_path, type, exchange_name = None) -> Union[dict, list]:
+def get_exchange(server, device_path, ex_type, exchange_name = None) -> Union[dict, list]:
     '''Returns the properties of the exchange object or a list of all exchanges and their 
     properties for the type input. Returned object is JSON.
     
@@ -165,7 +165,7 @@ def get_exchange(server, device_path, type, exchange_name = None) -> Union[dict,
     "device_path" - path to exchanges. Standard Kepware address decimal 
     notation string such as "channel1.device1"
 
-    "type" - type of exchange either consumer or producer
+    "ex_type" - type of exchange either consumer or producer
 
     "exchange_name" - name of exchange
     
@@ -179,9 +179,9 @@ def get_exchange(server, device_path, type, exchange_name = None) -> Union[dict,
     KepURLError - If urllib provides an URLError
     '''
     if exchange_name == None:
-        r = server._config_get(server.url + _create_url(device_path, type))
+        r = server._config_get(server.url + _create_url(device_path, ex_type))
     else:
-        r = server._config_get(server.url + _create_url(device_path, type, exchange_name))
+        r = server._config_get(server.url + _create_url(device_path, ex_type, exchange_name))
     return r.payload
 
 def get_all_exchanges(server, device_path):

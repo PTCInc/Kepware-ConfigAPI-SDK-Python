@@ -14,20 +14,20 @@ from .. import egd as EGD
 
 RANGES_ROOT = '/ranges'
 
-def _create_url(device_path, ex_type, exchange, range = None):
+def _create_url(device_path, ex_type, exchange_name, range = None):
     '''Creates url object for the "range" branch of Kepware's project tree. Used 
     to build a part of Kepware Configuration API URL structure
 
     Returns the range specific url when a value is passed as the range name.
     '''
-    exchange_root = EGD.exchange._create_url(device_path, ex_type, exchange)
+    exchange_root = EGD.exchange._create_url(device_path, ex_type, exchange_name)
 
     if range == None:
-        return '{}/{}'.format(exchange_root, RANGES_ROOT)
+        return '{}{}'.format(exchange_root, RANGES_ROOT)
     else:
-        return '{}/{}/{}'.format(exchange_root, RANGES_ROOT, range)
+        return '{}{}/{}'.format(exchange_root, RANGES_ROOT, range)
 
-def add_range(server, device_path, ex_type, exchange, DATA) -> Union[bool, list]:
+def add_range(server, device_path, ex_type, exchange_name, DATA) -> Union[bool, list]:
     '''Add a "range" or multiple "range" objects to Kepware. This allows you to 
     create a range or multiple ranges all in one function, if desired.
 
@@ -42,6 +42,8 @@ def add_range(server, device_path, ex_type, exchange, DATA) -> Union[bool, list]
     notation string such as "channel1.device1"
 
     "ex_type" - type of exchange either consumer or producer
+
+    "exchange_name" - name of exchange to add range to
 
     "DATA" - properly JSON object (dict) of the range or ranges
 
@@ -60,7 +62,7 @@ def add_range(server, device_path, ex_type, exchange, DATA) -> Union[bool, list]
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_add(server.url + _create_url(device_path, ex_type, exchange), DATA)
+    r = server._config_add(server.url + _create_url(device_path, ex_type, exchange_name), DATA)
     if r.code == 201: return True
     elif r.code == 207:
         errors = [] 
@@ -70,7 +72,7 @@ def add_range(server, device_path, ex_type, exchange, DATA) -> Union[bool, list]
         return errors
     else: return False
 
-def del_range(server, device_path, ex_type, exchange, range) -> bool:
+def del_range(server, device_path, ex_type, exchange_name, range_name) -> bool:
     '''Delete a "range" object in Kepware.
     
     INPUTS:
@@ -82,9 +84,9 @@ def del_range(server, device_path, ex_type, exchange, range) -> bool:
 
     "ex_type" - type of exchange either consumer or producer
 
-    "exchange" - name of exchange that range is located
+    "exchange_name" - name of exchange that range is located
 
-    "range" - name of range
+    "range_name" - name of range
     
     RETURNS:
 
@@ -96,7 +98,7 @@ def del_range(server, device_path, ex_type, exchange, range) -> bool:
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_del(server.url + _create_url(device_path, ex_type, exchange, range))
+    r = server._config_del(server.url + _create_url(device_path, ex_type, exchange_name, range_name))
     if r.code == 200: return True 
     else: return False
 
