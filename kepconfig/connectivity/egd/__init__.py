@@ -6,4 +6,7 @@
 
 
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)
-from . import channel, device, tag, egd
+from . import exchange, range, name
+
+CONSUMER_EXCHANGE = 'CONSUMER'
+PRODUCER_EXCHANGE = 'PRODUCER'

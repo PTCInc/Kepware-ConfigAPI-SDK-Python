@@ -197,6 +197,7 @@ def auto_tag_gen(server, device_path):
         return False
     except kepconfig.error.KepHTTPError as err:
         if err.code == 429:
+            job = kepconfig.connection.KepServiceResponse()
             job.code = err.code
             job.message = err.payload
             return job
