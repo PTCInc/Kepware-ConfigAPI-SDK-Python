@@ -261,6 +261,7 @@ class server:
         data = _HttpDataAbstract()
         request_obj.add_header("Authorization", "Basic %s" % self.__build_auth_str(self.username, self.password))
         request_obj.add_header("Content-Type", "application/json")
+        request_obj.add_header("Accept", "application/json")
         try:
             # context is sent regardless of HTTP or HTTPS - seems to be ignored if HTTP URL
             with request.urlopen(request_obj, context=self.__ssl_context) as server:
@@ -284,7 +285,8 @@ class server:
     # Ex: Space will be turned to %20
     def __url_validate(self, url):
         parsed_url = parse.urlparse(url)
-        updated_path = parse.quote(parsed_url.path)
+        # Added % for scenarios where special characters have already been escaped with %
+        updated_path = parse.quote(parsed_url.path, safe = '/%')
 
         # If host is "localhost", force using the IPv4 loopback adapter IP address in all calls
         # This is done to remove retries that will happen when the host resolution uses IPv6 intially
