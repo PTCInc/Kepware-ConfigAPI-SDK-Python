@@ -22,6 +22,11 @@ SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following 
 
 Note (*) - UA Endpoints supported for Kepware Edge only
 
+Driver specific features:
+| Driver          | Features       |
+| :----------:  | :----------:  |
+|GE Ethernet Global Data|Exchanges, Ranges and Name Resolutions|
+
 Methods to read the following logs:
 
 | Logs          | TKS/KEP       | TKE           |
