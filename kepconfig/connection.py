@@ -128,6 +128,7 @@ class server:
             return job
         except KepError.KepHTTPError as err:
             if err.code == 429:
+                job = KepServiceResponse()
                 job.code = err.code
                 job.message = err.payload
                 return job
