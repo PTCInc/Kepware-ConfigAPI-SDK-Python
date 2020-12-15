@@ -163,6 +163,20 @@ class server:
         r = self._config_get(url)
         return r.payload
     
+    def get_project_properties(self):
+        ''' Get the Project Properties of the Kepware instance.
+        
+        RETURNS:
+        JSON - Dict of all the project properties
+
+        EXCEPTIONS:
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+
+        r = self._config_get(self.url + '/project')
+        return r.payload
+    
     def modify_project_properties(self, DATA, force = False):
         ''' Modify the Project Properties of the Kepware instance.
 
