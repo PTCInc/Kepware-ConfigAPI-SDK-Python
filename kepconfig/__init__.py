@@ -14,7 +14,7 @@ def path_split(path):
 
     Ex. path input = "ch1.dev1.tg1.tg2.tg3"
 
-    Returns: {'channel': 'ch1', 'device': 'dev1', 'tag_path': 'tg1.tg2.tg3'}
+    Returns: {'channel': 'ch1', 'device': 'dev1', 'tag_path': ['tg1','tg2','tg3']}
 
     Ex. path input = "ch1.dev1"
 
