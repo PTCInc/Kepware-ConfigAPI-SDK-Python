@@ -462,3 +462,60 @@ def get_all_tag_groups(server, tag_group_path):
         return False
     r = server._config_get(url)
     return r.payload
+
+def get_full_tag_structure(server, path, recursive = False):
+    '''Returns the properties of all "tag" and "tag group" objects at a specific 
+    path in Kepware. Returned object is a dict of tag list and tag group list.
+
+    Ex.
+    {
+        'tags': [tag1_dict, tag2_dict,...],
+        'tag_groups':[tag_group1_dict, tag_group2_dict,...]
+    } 
+
+    If recursive is TRUE, then the call will iterate through all tag groups and get the tags and 
+    tag groups of all tag group children.This would be the equivilant of asking for all tags and tag groups
+    that exist below the "path" location. The returned object would look like below, nested based on how many 
+    levels the tag_group namespace has tags or tag_groups:
+
+    Ex.
+    {
+        'tags': [tag1_dict, tag2_dict,...],
+        'tag_groups':[
+            {
+                tag_group1_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            }, 
+            {
+                tag_group2_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            },...]
+    } 
+
+    INPUTS:
+    "server" - instance of the "server" class
+    
+    "path" - path identifying location to retreive the tag structure. Standard Kepware address decimal 
+    notation string such as "channel1.device1.tag_group1" and must container at least the channel and device.
+
+    RETURNS:
+    dict - data for the tag structure requested at "path" location
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+    r = {}
+    tags = get_all_tags(server, path)
+    if tags:
+        r['tags'] = tags
+
+    tag_group = get_all_tag_groups(server, path)
+    if tag_group:
+        r['tag_groups'] = tag_group
+        if recursive:
+            for group in tag_group:
+                group.update(get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME']))
+    return r
