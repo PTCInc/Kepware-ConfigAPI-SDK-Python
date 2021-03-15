@@ -9,6 +9,7 @@ r""":mod:`device` exposes an API to allow modifications (add, delete, modify) to
 device objects within the Kepware Configuration API
 """
 
+from kepconfig.connection import KepServiceResponse
 from typing import Union
 import kepconfig
 from . import channel
@@ -170,7 +171,7 @@ def get_all_devices(server, dev_channel):
     r = server._config_get(server.url + channel._create_url(dev_channel) + _create_url())
     return r.payload
 
-def auto_tag_gen(server, device_path):
+def auto_tag_gen(server, device_path, job_ttl = None) -> KepServiceResponse:
     '''Executes Auto Tag Generation function on devices that support the feature in Kepware
     
     INPUTS:
@@ -189,20 +190,12 @@ def auto_tag_gen(server, device_path):
     
     path_obj = kepconfig.path_split(device_path)
     try:
-        r = server._config_update(server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL)
-        job = kepconfig.connection.KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
+        url = server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL
+        job = server._kep_service_execute(url, job_ttl)
         return job
     except KeyError as err:
         print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
         return False
-    except kepconfig.error.KepHTTPError as err:
-        if err.code == 429:
-            job = kepconfig.connection.KepServiceResponse()
-            job.code = err.code
-            job.message = err.payload
-            return job
-        else:
-            raise err
-    # except Exception as e:
-    #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+    except Exception as err:
+        raise err
     

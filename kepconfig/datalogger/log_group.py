@@ -8,6 +8,7 @@ r""":mod:`log_group` exposes an API to allow modifications (add, delete, modify)
 log group objects in DataLogger within the Kepware Configuration API
 """
 from typing import Union
+from kepconfig.connection import KepServiceResponse
 from kepconfig import connection, error as KepError
 
 ENABLE_PROPERTY = 'datalogger.LOG_GROUP_ENABLED'
@@ -186,7 +187,7 @@ def disable_log_group(server, log_group):
     DATA = {ENABLE_PROPERTY: False}
     return modify_log_group(server, DATA, log_group)
 
-def reset_column_mapping_service(server, log_group):
+def reset_column_mapping_service(server, log_group, job_ttl = None) -> KepServiceResponse:
     '''Executes a ResetColumnMapping serivce call to the log group
 
     INPUTS:
@@ -203,13 +204,8 @@ def reset_column_mapping_service(server, log_group):
     '''
 
     try:
-        r = server._config_update(server.url + _create_url(log_group) + SERVICES_ROOT + '/ResetColumnMapping', None)
-        job = connection.KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
+        url = server.url + _create_url(log_group) + SERVICES_ROOT + '/ResetColumnMapping'
+        job = server._kep_service_execute(url, job_ttl)
         return job
-    except KepError.KepHTTPError as err:
-        if err.code == 429:
-            job.code = err.code
-            job.message = err.payload
-            return job
-        else:
-            raise err
+    except Exception as err:
+        raise err

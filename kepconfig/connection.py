@@ -110,7 +110,7 @@ class server:
 
 
 
-    def reinitialize(self):
+    def reinitialize(self, job_ttl = None):
         '''Executes a Reinitialize call to the Kepware instance.
 
         RETURNS:
@@ -123,17 +123,10 @@ class server:
         '''
         url = self.url + self.__project_services_url + '/ReinitializeRuntime' 
         try:
-            r = self._config_update(url, None)
-            job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
+            job = self._kep_service_execute(url,job_ttl)
             return job
-        except KepError.KepHTTPError as err:
-            if err.code == 429:
-                job = KepServiceResponse()
-                job.code = err.code
-                job.message = err.payload
-                return job
-            else:
-                raise err
+        except Exception as err:
+            raise err
         
     def get_trans_log(self, start = None, end = None, limit = None):
         ''' Get the Transaction Log from the Kepware instance.
@@ -263,6 +256,22 @@ class server:
                         #NEED TO COVER ERROR CONDITION
                         pass
         return DATA
+    # General service call handler
+    def _kep_service_execute(self, url, TTL):
+        try:
+            if TTL != None:
+                TTL = {"servermain.JOB_TIME_TO_LIVE_SECONDS": TTL}
+            r = self._config_update(url, TTL)
+            job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
+            return job
+        except KepError.KepHTTPError as err:
+            if err.code == 429:
+                job = KepServiceResponse()
+                job.code = err.code
+                job.message = err.payload
+                return job
+            else:
+                raise err
 
 # 
 # Supporting Functions
@@ -331,6 +340,7 @@ class server:
         if limit != None:
             query['limit'] = limit
         return query
+
 
 class KepServiceResponse:
     '''A class to represent a return object when calling a "service" API of Kepware. This is
