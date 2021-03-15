@@ -119,9 +119,14 @@ egd_device = {
 
 def initialize(server):
     try:
+        server._config_get(server.url +"/doc/drivers/GE Ethernet Global Data/channels")
+    except Exception as err:
+        pytest.skip("EGD Driver is not installed", allow_module_level=True)
+    
+    try:
         kepconfig.connectivity.channel.add_channel(server,egd_device) == True
     except Exception as err:
-            HTTPErrorHandler(err)
+        pytest.skip("Device Configuration couldn't be added", allow_module_level=True)
 
 def complete(server):
     try:
@@ -268,8 +273,9 @@ def delete_name(server, name):
 # MAIN TEST SET
 # 
 
+
 def test_consumer_exchange(server):
-    initialize(server)
+    # initialize(server)
     create_exchange(server, kepconfig.connectivity.egd.CONSUMER_EXCHANGE,[consumer_exchange, consumer_exchange10])
     get_exchange(server, kepconfig.connectivity.egd.CONSUMER_EXCHANGE, [consumer_exchange, consumer_exchange10])
 
@@ -281,10 +287,11 @@ def test_consumer_exchange(server):
 
     modify_exchange(server, kepconfig.connectivity.egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'])
     delete_exchange(server, kepconfig.connectivity.egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'])
-    complete(server)
+    delete_exchange(server, kepconfig.connectivity.egd.CONSUMER_EXCHANGE, consumer_exchange10['common.ALLTYPES_NAME'])
+    # complete(server)
 
 def test_producer_exchange(server):
-    initialize(server)
+    # initialize(server)
     create_exchange(server, kepconfig.connectivity.egd.PRODUCER_EXCHANGE,[producer_exchange, producer_exchange10])
     get_exchange(server, kepconfig.connectivity.egd.PRODUCER_EXCHANGE, [producer_exchange, producer_exchange10])
     
@@ -296,12 +303,13 @@ def test_producer_exchange(server):
 
     modify_exchange(server, kepconfig.connectivity.egd.PRODUCER_EXCHANGE, producer_exchange['common.ALLTYPES_NAME'])
     delete_exchange(server, kepconfig.connectivity.egd.PRODUCER_EXCHANGE, producer_exchange['common.ALLTYPES_NAME'])
-    complete(server)
+    delete_exchange(server, kepconfig.connectivity.egd.PRODUCER_EXCHANGE, producer_exchange10['common.ALLTYPES_NAME'])
+    # complete(server)
 
 def test_name_resolutions(server):
-    initialize(server)
+    # initialize(server)
     create_name(server, [name1, name2])
     get_name(server, [name1, name2])
     modify_name(server, name1['common.ALLTYPES_NAME'])
     delete_name(server, name1['common.ALLTYPES_NAME'])
-    complete(server)
+    # complete(server)

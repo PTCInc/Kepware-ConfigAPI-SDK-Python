@@ -8,6 +8,7 @@
 # parts of the Kepware configuration API
 
 import os, sys
+from typing import Dict, List
 import pytest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import kepconfig
@@ -32,6 +33,19 @@ group1 = {'common.ALLTYPES_NAME': 'Operators'}
 group2 = {'common.ALLTYPES_NAME': 'Group1'}
 group3 = {'common.ALLTYPES_NAME': 'Group2'}
 
+uaendpoint1 = {
+        "common.ALLTYPES_NAME": "DefaultEndpoint2",
+        "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49331
+    }
+uaendpoint2 = {
+    "common.ALLTYPES_NAME": "DefaultEndpoint3",
+    "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49332
+}
+uaendpoint3 = {
+    "common.ALLTYPES_NAME": "DefaultEndpoint4",
+    "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49333
+}
+
 def HTTPErrorHandler(err):
     if err.__class__ is kepconfig.error.KepHTTPError:
         print(err.code)
@@ -46,20 +60,21 @@ def initialize(server):
     pass
 
 def complete(server):
-    try: 
-        print(kepconfig.admin.user_groups.del_user_group(server,group1['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
-
-    try: 
-        print(kepconfig.admin.user_groups.del_user_group(server,group2['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
-
-    try: 
-        print(kepconfig.admin.user_groups.del_user_group(server,group3['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    endpoint_list = [uaendpoint1, uaendpoint2, uaendpoint3]
+    usergroup_list = [group1, group2, group3]
+    
+    for ua in endpoint_list:
+        try:
+            kepconfig.admin.ua_server.del_endpoint(server,ua['common.ALLTYPES_NAME'])
+        except Exception as err:
+            pass
+    
+    
+    for ug in usergroup_list:
+        try: 
+            kepconfig.admin.user_groups.del_user_group(server,ug['common.ALLTYPES_NAME'])
+        except Exception as err:
+            pass
 
 @pytest.fixture(scope="module")
 def server(kepware_server):
@@ -74,75 +89,31 @@ def server(kepware_server):
     
 
 def test_uaserver(server):
-    uaendpoint1 = {
-        "common.ALLTYPES_NAME": "DefaultEndpoint2",
-        "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49331
-    }
-    uaendpoint2 = {
-        "common.ALLTYPES_NAME": "DefaultEndpoint3",
-        "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49332
-    }
-    uaendpoint3 = {
-        "common.ALLTYPES_NAME": "DefaultEndpoint4",
-        "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49333
-    }
+    
+    assert kepconfig.admin.ua_server.add_endpoint(server,uaendpoint1)
+    
+    assert kepconfig.admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
+    
+    assert kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint1,uaendpoint2])
 
-    try: 
-        print(kepconfig.admin.ua_server.add_endpoint(server,uaendpoint1))
-    except Exception as err:
-        HTTPErrorHandler(err)
-    
-    try: 
-        print(kepconfig.admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
-    
-    try: 
-        print(kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint1,uaendpoint2]))
-    except Exception as err:
-        HTTPErrorHandler(err)
 
 # Endpoint 2 fails since it already exists
-    try: 
-        print(kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint2,uaendpoint3]))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint2,uaendpoint3])) == list
 
-    try: 
-        print(kepconfig.admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False},uaendpoint1['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False},uaendpoint1['common.ALLTYPES_NAME'])
     
     # Bad Input test
-    try: 
-        print(kepconfig.admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False}))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert not (kepconfig.admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False}))
 
-    try: 
-        print(kepconfig.admin.ua_server.modify_endpoint(server,{"common.ALLTYPES_NAME": "DefaultEndpoint3","libadminsettings.UACONFIGMANAGER_ENDPOINT_SECURITY_NONE": True}))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.admin.ua_server.modify_endpoint(server,{"common.ALLTYPES_NAME": "DefaultEndpoint3","libadminsettings.UACONFIGMANAGER_ENDPOINT_SECURITY_NONE": True})
     
-    try: 
-        print(kepconfig.admin.ua_server.get_endpoint(server,uaendpoint1['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.admin.ua_server.get_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])) ==  dict
     
-    try: 
-        print(kepconfig.admin.ua_server.get_all_endpoints(server))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.admin.ua_server.get_all_endpoints(server)) == list
     
-    try: 
-        print(kepconfig.admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
     
-    try: 
-        print(kepconfig.admin.ua_server.del_endpoint(server,uaendpoint2['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.admin.ua_server.del_endpoint(server,uaendpoint2['common.ALLTYPES_NAME'])
 
 def test_user_groups(server):
     # User Group tests

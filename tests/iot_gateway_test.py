@@ -4,8 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# Test Example - Test to exectute various calls for the conenctivity 
-# parts of the Kepware configuration API
+# IoT Gateway Test - Test to exersice all IoT Gateway related features
 
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -95,13 +94,6 @@ def server(kepware_server):
     # Everything below yield is run after module tests are completed
     yield server
     complete(server)
-
-
-
-# def iot_gateway_test(server):
-    # 
-    # Execute IoT Gateway Tests
-    # 
 
 def test_agent_add(server):
     for agent_name, agent_type in agent_list:

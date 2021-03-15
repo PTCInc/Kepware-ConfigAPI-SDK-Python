@@ -154,7 +154,10 @@ def HTTPErrorHandler(err):
         print('Different Exception Received: {}'.format(err))
 		
 def initialize(server):
-	pass
+	try:
+		server._config_get(server.url +"/project/_datalogger")
+	except Exception as err:
+		pytest.skip("DataLogger plug-in is not installed", allow_module_level=True)
 
 def complete(server):
 	try:
@@ -176,255 +179,123 @@ def server(kepware_server):
     complete(server)
 
 def test_log_group_add(server):
-	try:
-		print(datalogger.log_group.add_log_group(server, log_group_data1))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.add_log_group(server, log_group_data1)
 	
-	try:
-		print(datalogger.log_group.enable_log_group(server,log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.enable_log_group(server,log_group_name)
 
-	try:
-		print(datalogger.log_group.disable_log_group(server,log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.disable_log_group(server,log_group_name)
 
-	try:
-		print(datalogger.log_group.del_log_group(server, log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.del_log_group(server, log_group_name)
 	
-	try:
-		print(datalogger.log_group.add_log_group(server, [log_group_data1, log_group_data2]))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.add_log_group(server, [log_group_data1, log_group_data2])
 	
 	# Log Group 2 should fail since it exists
-	try:
-		print(datalogger.log_group.add_log_group(server, [log_group_data2, log_group_data3]))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type(datalogger.log_group.add_log_group(server, [log_group_data2, log_group_data3])) == list
 
 def test_log_group_modify(server):
-	try:
-		print(datalogger.log_group.modify_log_group(server, {"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": False},log_group_data1['common.ALLTYPES_NAME'], force=True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.modify_log_group(server, {"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": False},log_group_data1['common.ALLTYPES_NAME'], force=True)
 	
-	try:
-		print(datalogger.log_group.modify_log_group(server,{"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True},log_group_data1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.modify_log_group(server,{"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True},log_group_data1['common.ALLTYPES_NAME'])
 
 	# Fail due to no log_group name provided
-	try:
-		print(datalogger.log_group.modify_log_group(server,{"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True}))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert not datalogger.log_group.modify_log_group(server,{"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True})
 	
-	try:
-		print(datalogger.log_group.modify_log_group(server,{"common.ALLTYPES_NAME": log_group_name,"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True}))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.modify_log_group(server,{"common.ALLTYPES_NAME": log_group_name,"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True})
 
 def test_log_group_get(server):
-	try:
-		print(datalogger.log_group.get_log_group(server, log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type(datalogger.log_group.get_log_group(server, log_group_name)) == dict
 	
-	try:
-		print(datalogger.log_group.get_all_log_groups(server))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type(datalogger.log_group.get_all_log_groups(server)) == list
 
 def test_log_item_add(server):
-	try:
-		print(datalogger.log_items.add_log_item(server, log_group_name, log_item1))
-	except Exception as err:
-		HTTPErrorHandler(err)
-	try:
-		print(datalogger.log_items.del_log_item(server, log_group_name, log_item1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_items.add_log_item(server, log_group_name, log_item1)
 
-	try:
-		print(datalogger.log_items.add_log_item(server, log_group_name, [log_item1, log_item2]))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_items.del_log_item(server, log_group_name, log_item1['common.ALLTYPES_NAME'])
+
+	assert datalogger.log_items.add_log_item(server, log_group_name, [log_item1, log_item2])
 	
 	# Fails for item 2 since it's already existing
-	try:
-		print(datalogger.log_items.add_log_item(server, log_group_name, [log_item2, log_item3]))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type(datalogger.log_items.add_log_item(server, log_group_name, [log_item2, log_item3])) == list
 
 def test_log_item_modify(server):
-	try:
-		print(datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "1"} ,log_item1['common.ALLTYPES_NAME'], force=True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "1"} ,log_item1['common.ALLTYPES_NAME'], force=True)
 
-	try:
-		print(datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "0"} ,log_item1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "0"} ,log_item1['common.ALLTYPES_NAME'])
 
 	# Fail due to item not identified
-	try:
-		print(datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "0"}))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert not datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "0"})
 
-	try:
-		print(datalogger.log_items.modify_log_item(server, log_group_name, {"common.ALLTYPES_NAME": "LogItem1","datalogger.LOG_ITEM_NUMERIC_ID": "0"}, force= True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_items.modify_log_item(server, log_group_name, {"common.ALLTYPES_NAME": "LogItem1","datalogger.LOG_ITEM_NUMERIC_ID": "0"}, force= True)
 
 def test_log_item_get(server):
-	try:
-		print(datalogger.log_items.get_log_item(server, log_group_name,log_item1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type (datalogger.log_items.get_log_item(server, log_group_name,log_item1['common.ALLTYPES_NAME'])) == dict
 
-	try:
-		print(datalogger.log_items.get_all_log_items(server, log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type(datalogger.log_items.get_all_log_items(server, log_group_name)) == list
 
 	# Execute mapping test before deleting items
 	# Modify group to wide format
-	try:
-		print(datalogger.log_group.modify_log_group(server, {"datalogger.LOG_GROUP_TABLE_FORMAT": 1}, log_group_name, force=True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_group.modify_log_group(server, {"datalogger.LOG_GROUP_TABLE_FORMAT": 1}, log_group_name, force=True)
 
 def test_mapping_get(server):
 	mapping_list = []
-	try:
-		mapping_list = datalogger.mapping.get_all_mappings(server, log_group_name)
-		print(mapping_list)
-	except Exception as err:
-		HTTPErrorHandler(err)
+	mapping_list = datalogger.mapping.get_all_mappings(server, log_group_name)
 
-	try:
-		print(datalogger.mapping.get_mapping(server, log_group_name, mapping_list[0]['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type(mapping_list) == list
+
+	assert type(datalogger.mapping.get_mapping(server, log_group_name, mapping_list[0]['common.ALLTYPES_NAME'])) == dict
 
 def test_mapping_modify(server):
-	# get mapping list
 	mapping_list = []
-	try:
-		mapping_list = datalogger.mapping.get_all_mappings(server, log_group_name)
-	except Exception as err:
-		HTTPErrorHandler(err)
-	
-	try:
-		print(datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 10} , mapping_list[0]['common.ALLTYPES_NAME'], force=True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	mapping_list = datalogger.mapping.get_all_mappings(server, log_group_name)
+	assert datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 10} , mapping_list[0]['common.ALLTYPES_NAME'], force=True)
 
-	try:
-		print(datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 15} , mapping_list[0]['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 15} , mapping_list[0]['common.ALLTYPES_NAME'])
 
 	# Fail due to map not identified
-	try:
-		print(datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 1}))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert not datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 1})
 
-	try:
-		print(datalogger.mapping.modify_mapping(server, log_group_name, {"common.ALLTYPES_NAME": mapping_list[0]['common.ALLTYPES_NAME'],"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 0}, force= True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.mapping.modify_mapping(server, log_group_name, {"common.ALLTYPES_NAME": mapping_list[0]['common.ALLTYPES_NAME'],"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 0}, force= True)
 
 def test_log_item_del(server):
 	# Delete Items
-	try:
-		print(datalogger.log_items.del_log_item(server, log_group_name,log_item1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
-	
-	try:
-		print(datalogger.log_items.del_log_item(server, log_group_name,log_item2['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.log_items.del_log_item(server, log_group_name,log_item1['common.ALLTYPES_NAME'])
+
+	assert datalogger.log_items.del_log_item(server, log_group_name,log_item2['common.ALLTYPES_NAME'])
 
 def test_trigger_add(server):
-	try:
-		print(datalogger.triggers.add_trigger(server, log_group_name, trigger1))
-	except Exception as err:
-		HTTPErrorHandler(err)
-	try:
-		print(datalogger.triggers.del_trigger(server, log_group_name, trigger1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.triggers.add_trigger(server, log_group_name, trigger1)
+	
+	assert datalogger.triggers.del_trigger(server, log_group_name, trigger1['common.ALLTYPES_NAME'])
 
-	try:
-		print(datalogger.triggers.add_trigger(server, log_group_name, [trigger1, trigger2]))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.triggers.add_trigger(server, log_group_name, [trigger1, trigger2])
 	
 	# Fails adding trigger 2 since it exists
-	try:
-		print(datalogger.triggers.add_trigger(server, log_group_name, [trigger2, trigger3]))
-	except Exception as err:
-		HTTPErrorHandler(err)
-
+	assert type(datalogger.triggers.add_trigger(server, log_group_name, [trigger2, trigger3])) == list
+	
 def test_trigger_modify(server):
-	try:
-		print(datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 1000} ,trigger1['common.ALLTYPES_NAME'], force=True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 1000} ,trigger1['common.ALLTYPES_NAME'], force=True)
 
-	try:
-		print(datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 500} ,trigger1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 500} ,trigger1['common.ALLTYPES_NAME'])
 
 	# Fail due to trigger not identified
-	try:
-		print(datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 500}))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert not datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 500})
 
-	try:
-		print(datalogger.triggers.modify_trigger(server, log_group_name, {"common.ALLTYPES_NAME": trigger1['common.ALLTYPES_NAME'],"datalogger.TRIGGER_STATIC_INTERVAL": 1000}, force= True))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.triggers.modify_trigger(server, log_group_name, {"common.ALLTYPES_NAME": trigger1['common.ALLTYPES_NAME'],"datalogger.TRIGGER_STATIC_INTERVAL": 1000}, force= True)
 
 def test_trigger_get(server):
-	try:
-		print(datalogger.triggers.get_trigger(server, log_group_name,trigger1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
-
-	try:
-		print(datalogger.triggers.get_all_triggers(server, log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert type(datalogger.triggers.get_trigger(server, log_group_name,trigger1['common.ALLTYPES_NAME'])) == dict
+	assert type(datalogger.triggers.get_all_triggers(server, log_group_name)) == list
 
 def test_trigger_del(server):
 	# Delete triggers
-	try:
-		print(datalogger.triggers.del_trigger(server, log_group_name,trigger1['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.triggers.del_trigger(server, log_group_name,trigger1['common.ALLTYPES_NAME'])
 	
-	try:
-		print(datalogger.triggers.del_trigger(server, log_group_name,trigger2['common.ALLTYPES_NAME']))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	assert datalogger.triggers.del_trigger(server, log_group_name,trigger2['common.ALLTYPES_NAME'])
 
 def test_log_group_services(server):
 	# Execute Services
-	try:
-		print(datalogger.log_group.reset_column_mapping_service(server,log_group_name))
-	except Exception as err:
-		HTTPErrorHandler(err)
+	job = datalogger.log_group.reset_column_mapping_service(server,log_group_name)
+	assert type(job) == kepconfig.connection.KepServiceResponse
+	job = datalogger.log_group.reset_column_mapping_service(server,log_group_name, 60)
+	assert type(job) == kepconfig.connection.KepServiceResponse
 

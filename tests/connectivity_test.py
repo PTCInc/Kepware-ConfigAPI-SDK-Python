@@ -374,6 +374,26 @@ def test_channel_modify(server):
     channel_data['common.ALLTYPES_DESCRIPTION'] = 'This is the test channel created'
     assert kepconfig.connectivity.channel.modify_channel(server, channel_data, channel=ch_name, force=True)
 
+def test_auto_tag_gen(server):
+    # Add a Channel and Device using the "Controllogix Driver"
+    channel_data = {
+        "common.ALLTYPES_NAME": "Logix",
+        "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Allen-Bradley Controllogix Ethernet",
+        "devices": [
+            {
+                "common.ALLTYPES_NAME": "Logix",
+                "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Allen-Bradley Controllogix Ethernet",
+                "servermain.DEVICE_MODEL": 0,
+                "servermain.DEVICE_ID_STRING": "<127.0.0.1>,1,0"
+            }
+        ]
+    }
+    assert kepconfig.connectivity.channel.add_channel(server,channel_data)
+    job = kepconfig.connectivity.device.auto_tag_gen(server,"Logix.Logix")
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    job = kepconfig.connectivity.device.auto_tag_gen(server,"Logix.Logix", 60)
+    assert type(job) == kepconfig.connection.KepServiceResponse
+
 def test_tag_del(server):
     # Delete Tag
     tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
