@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# Test Example - Test to exectute various calls for the conenctivity 
+# Connectivity Test - Test to exectute various calls for the basic driver/connectivity 
 # parts of the Kepware configuration API
 
 import os, sys

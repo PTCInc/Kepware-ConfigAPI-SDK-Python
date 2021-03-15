@@ -4,8 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# Master Test - Test to exectute various test modules to exersice the 
-# parts of the Kepware configuration API
+# Basic Server Connection Test - Test to exectute various server class functions 
+# that exersice parts of the Kepware configuration API
 
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

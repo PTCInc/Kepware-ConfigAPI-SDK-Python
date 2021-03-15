@@ -1,3 +1,11 @@
+# -------------------------------------------------------------------------
+# Copyright (c) PTC Inc. All rights reserved.
+# See License.txt in the project root for
+# license information.
+# --------------------------------------------------------------------------
+
+# Pytest config file
+
 import pytest
 import kepconfig
 
