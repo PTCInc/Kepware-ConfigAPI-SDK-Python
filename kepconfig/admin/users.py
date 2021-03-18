@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`users` exposes an API to allow modifications (add, delete, modify) to 
+r"""`users` exposes an API to allow modifications (add, delete, modify) to 
 users within the Kepware Administration User Management through the Kepware Configuration API
 """
 from typing import Union

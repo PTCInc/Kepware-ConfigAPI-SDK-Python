@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`user_groups` exposes an API to allow modifications (add, delete, modify) to 
+r"""`user_groups` exposes an API to allow modifications (add, delete, modify) to 
 user_groups within the Kepware Administration User Manager through the Kepware Configuration API
 """
 from typing import Union

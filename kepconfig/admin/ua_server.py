@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`ua_server` exposes an API to allow modifications (add, delete, modify) to 
+r"""`ua_server` exposes an API to allow modifications (add, delete, modify) to 
 OPC UA Server endpoints within the Kepware Administration through the Kepware Configuration API
 """
 from typing import Union

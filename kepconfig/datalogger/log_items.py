@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`log_items` exposes an API to allow modifications (add, delete, modify) to 
+r"""`log_items` exposes an API to allow modifications (add, delete, modify) to 
 log item (tag) objects in a Datalogger log group within the Kepware Configuration API
 """
 from typing import Union

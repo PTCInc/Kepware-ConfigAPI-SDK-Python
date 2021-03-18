@@ -5,9 +5,9 @@
 # --------------------------------------------------------------------------
 
 
-# r""":mod:`names` exposes an API to allow modifications (add, delete, modify) to 
-# name resolution objects for EGD devices within the Kepware Configuration API
-# """
+r"""`names` exposes an API to allow modifications (add, delete, modify) to 
+name resolution objects for EGD devices within the Kepware Configuration API
+"""
 
 import kepconfig
 from typing import Union

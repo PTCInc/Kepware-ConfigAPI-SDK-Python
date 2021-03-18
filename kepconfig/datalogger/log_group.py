@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`log_group` exposes an API to allow modifications (add, delete, modify) to 
+r"""`log_group` exposes an API to allow modifications (add, delete, modify) to 
 log group objects in DataLogger within the Kepware Configuration API
 """
 from typing import Union

@@ -1,11 +1,11 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
 
 
-r""":mod:`agent` exposes an API to allow modifications (add, delete, modify) to 
+r"""`agent` exposes an API to allow modifications (add, delete, modify) to 
 Iot Gateway agent objects within the Kepware Configuration API
 """
 

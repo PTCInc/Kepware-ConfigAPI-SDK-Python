@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`mapping` exposes an API to allow modifications (add, delete, modify) to 
+r"""`mapping` exposes an API to allow modifications (add, delete, modify) to 
 column mapping objects in a Datalogger log group within the Kepware Configuration API
 """
 

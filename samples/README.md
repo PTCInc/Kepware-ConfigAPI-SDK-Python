@@ -2,13 +2,15 @@
 
 This directory contains samples showing how to use the various features of the Kepware Config API SDK including configuring and modifying various parameters of Kepware.
 
-**Note that these samples are configured for Python 3.6+**
+**Note that these samples are tested for Python 3.6+**
 
-## Simple Connectivity Example
-
-## IoT Gateway Example
-
-## Services and Logs Example
+- Simple Connectivity Example
+- IoT Gateway Example
+- Services and Logs Example
+- UA Server Configuration Example
+- User Management Configuration Example
+- DataLogger Plug-in Example
+- GE EGD Driver Exchanges Example
 
 ## Complex Example
 

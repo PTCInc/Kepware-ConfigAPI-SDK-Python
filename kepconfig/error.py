@@ -1,11 +1,11 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
 
 
-r""":mod:`error` Exception classes raised by Kepconfig.
+r"""`error` Exception classes raised by Kepconfig.
 Includes KepURLError and KepHTTPError
 """
 

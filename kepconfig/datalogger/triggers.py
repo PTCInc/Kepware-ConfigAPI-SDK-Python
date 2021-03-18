@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`triggers` exposes an API to allow modifications (add, delete, modify) to 
+r"""`triggers` exposes an API to allow modifications (add, delete, modify) to 
 trigger objects in a Datalogger log group within the Kepware Configuration API
 """
 

@@ -23,6 +23,7 @@ SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following 
 Note (*) - UA Endpoints supported for Kepware Edge only
 
 Driver specific features:
+
 | Driver          | Features       |
 | :----------:  | :----------:  |
 |GE Ethernet Global Data|Exchanges, Ranges and Name Resolutions|
@@ -38,7 +39,7 @@ Configuration API *Services* implemented:
 
 | Services      | TKS/KEP       | TKE           |
 | :----------:  | :----------:  | :----------:  |
-| **TagGeneration** <br /> *(not supported by all drivers)* | Y | Y |
+| **TagGeneration** <br /> *(for supported drivers)* | Y | Y |
 | **ReinitializeRuntime** | Y* | Y |
 
 Note (*) - Reinitialize service was implemented for Kepware Server v6.8+
@@ -47,16 +48,16 @@ Generic REST methods are provided to use for functions not developed in SDK pack
 
 ## Known Limitations
 
-- Other property configruation for more complex drivers are not explicitly defined
+- Other property configuration for more complex drivers with objects besides channels, devices, tags and tag groups are not explicitly defined
 - Other supported plug-ins (EFM Exporter, Scheduler, etc) are not defined
 - When using hostnames (not IP addresses) for connections, delays may occur under certain network configurations as the connection may attempt IPv6 connections first. IPv6 is not supported by Kepware servers at this time.
 
 ## Installation
 
-PIP packages can be found in the [dist](dist) folder to install. Installation can be done manually using the following:
+Package can be installed with `pip` using the following:
 
 ```cmd
-pip install kepconfig-<version>-py3-none-any.whl -f ./ --no-index
+    pip install kepconfig
 ```
 
 ## Key Concepts
