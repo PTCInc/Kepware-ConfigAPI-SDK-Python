@@ -1,17 +1,18 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
 
 
-r""":mod:`channel` exposes an API to allow modifications (add, delete, modify) to 
+r"""`channel` exposes an API to allow modifications (add, delete, modify) to 
 channel objects within the Kepware Configuration API
 """
 
  
 import inspect
 from typing import Union
+from. import device
 
 CHANNEL_ROOT = '/project/channels'
 
@@ -157,3 +158,64 @@ def get_all_channels(server):
 
     r = server._config_get(server.url + _create_url())
     return r.payload
+
+def get_channel_structure(server, channel):
+    '''Returns the properties of "channel" and includes all "devices" and the "tag" and "tag group" objects for a 
+    channel in Kepware. Returned object is a dict of channel properties including a device list with 
+    tag lists and tag group lists.
+
+    The returned object resembles below, nested based on how many 
+    levels the tag_group namespace has tags or tag_groups:
+
+    Ex.
+    {
+        channel_properties,
+        'devices: [
+            {
+                device1_properties,
+                'tags': [tag1_dict, tag2_dict,...],
+                'tag_groups':[
+                    {
+                        tag_group1_properties,
+                        'tags': [tag1_dict, tag2_dict,...]
+                        'tag_groups':[sub_group1, subgroup2,...]
+                    }, 
+                    {
+                        tag_group2_properties,
+                        'tags': [tag1_dict, tag2_dict,...]
+                        'tag_groups':[sub_group1, subgroup2,...]
+                    },...]
+            },...]
+    }       
+
+    INPUTS:
+    "server" - instance of the "server" class
+    
+    "channel" - name of channel
+
+    RETURNS:
+    dict - data for the device structure requested for "channel"
+    FALSE - If the call fails
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+
+    try:
+        channel_properties = get_channel(server, channel)
+        device_list = device.get_all_devices(server,channel)
+        if type(device_list) is not list or type(channel_properties) is not dict:
+            return False
+        else:
+            for dev in device_list:
+                device_properties = []
+                dev_struct = device.get_device_structure(server,channel + '.' + dev['common.ALLTYPES_NAME'])
+                if type(dev_struct) is dict:
+                    device_properties.append(dev_struct)
+                else:
+                    return False
+            return {**channel_properties,'device': device_properties}
+    except Exception as err:
+        # pass on exceptions
+        raise err

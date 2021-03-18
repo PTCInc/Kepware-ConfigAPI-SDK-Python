@@ -1,18 +1,18 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
 
 
-r""":mod:`device` exposes an API to allow modifications (add, delete, modify) to 
+r"""`device` exposes an API to allow modifications (add, delete, modify) to 
 device objects within the Kepware Configuration API
 """
 
 from kepconfig.connection import KepServiceResponse
 from typing import Union
 import kepconfig
-from . import channel
+from . import channel, tag
 import inspect
 
 DEVICE_ROOT = '/devices'
@@ -198,4 +198,98 @@ def auto_tag_gen(server, device_path, job_ttl = None) -> KepServiceResponse:
         return False
     except Exception as err:
         raise err
+
+def get_all_tags_tag_groups(server, device_path):
+    '''Returns the properties of all "tag" and "tag group" objects for as specific
+    device in Kepware. Returned object is a dict of tag list and tag group list.
+
+    The returned object resembles below, nested based on how many 
+    levels the tag_group namespace has tags or tag_groups:
+
+    Ex.
+    {
+        'tags': [tag1_dict, tag2_dict,...],
+        'tag_groups':[
+            {
+                tag_group1_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            }, 
+            {
+                tag_group2_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            },...]
+    } 
+
+    INPUTS:
+    "server" - instance of the "server" class
     
+    "device_path" - path identifying device. Standard Kepware address decimal notation string including the 
+    device such as "channel1.device1"
+
+    RETURNS:
+    dict - data for the tag structure requested at "device_path" location
+    FALSE - If the call fails
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+
+    try:
+        r = tag.get_full_tag_structure(server, device_path,recursive=True)
+        return r
+    except Exception as err:
+        # pass on exceptions
+        raise err
+
+def get_device_structure(server, device_path):
+    '''Returns the properties of "device" and includes all "tag" and "tag group" objects for as specific
+    device in Kepware. Returned object is a dict of device properties including a tag list and tag group list.
+
+    The returned object resembles below, nested based on how many 
+    levels the tag_group namespace has tags or tag_groups:
+
+    Ex.
+    {
+        device_properties,
+        'tags': [tag1_dict, tag2_dict,...],
+        'tag_groups':[
+            {
+                tag_group1_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            }, 
+            {
+                tag_group2_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            },...]
+    } 
+
+    INPUTS:
+    "server" - instance of the "server" class
+    
+    "device_path" - path identifying device. Standard Kepware address decimal notation string including the 
+    device such as "channel1.device1"
+
+    RETURNS:
+    dict - data for the device structure requested at "device_path" location
+    FALSE - If the call fails
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+
+    try:
+        tags = tag.get_full_tag_structure(server, device_path,recursive=True)
+        device_properties = get_device(server,device_path)
+        if type(tags) is not dict or type(device_properties) is not dict:
+            return False
+        else:
+            return {**device_properties, **tags}
+    except Exception as err:
+        # pass on exceptions
+        raise err

@@ -304,6 +304,8 @@ def test_channel_get(server):
     # Get all Channels
     assert type(kepconfig.connectivity.channel.get_all_channels(server)) == list
 
+def test_channel_struct_get(server):
+    assert type(kepconfig.connectivity.channel.get_channel_structure(server,ch_name)) == dict
 
 def test_device_get(server):
     # Get Device
@@ -313,6 +315,20 @@ def test_device_get(server):
 
     # Get all Devices
     assert type(kepconfig.connectivity.device.get_all_devices(server, ch_name)) == list
+
+def test_device_tag_struct_only_get(server):
+    # Get ProjectID
+    # props = server.get_project_properties()
+    # proj_id = props['PROJECT_ID']
+    dev_path = '{}.{}'.format(ch_name, dev_name)
+    assert type(kepconfig.connectivity.device.get_all_tags_tag_groups(server, dev_path)) == dict
+
+def test_device_tag_all_get(server):
+    # Get ProjectID
+    # props = server.get_project_properties()
+    # proj_id = props['PROJECT_ID']
+    dev_path = '{}.{}'.format(ch_name, dev_name)
+    assert type(kepconfig.connectivity.device.get_device_structure(server, dev_path)) == dict
 
 def test_tag_get(server):
     # Get Tag

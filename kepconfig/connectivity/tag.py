@@ -1,11 +1,11 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
 
 
-r""":mod:`tag` exposes an API to allow modifications (add, delete, modify) to 
+r"""`tag` exposes an API to allow modifications (add, delete, modify) to 
 tag and tag group objects within the Kepware Configuration API
 """
 
@@ -502,20 +502,33 @@ def get_full_tag_structure(server, path, recursive = False):
 
     RETURNS:
     dict - data for the tag structure requested at "path" location
+    FALSE - If the call fails
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
     r = {}
+        
     tags = get_all_tags(server, path)
-    if tags:
+    if type(tags) is list:
         r['tags'] = tags
+    else:
+        # call failed with FALSE return
+        return False
 
     tag_group = get_all_tag_groups(server, path)
-    if tag_group:
+    if type(tag_group) is list:
         r['tag_groups'] = tag_group
         if recursive:
             for group in tag_group:
-                group.update(get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME']))
+                res = get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME'])
+                if type(res) is dict:
+                    group.update(res)
+                else:
+                    # call failed with FALSE return
+                    return False
+    else:
+        # call failed with FALSE return
+        return False
     return r

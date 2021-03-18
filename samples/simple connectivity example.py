@@ -144,10 +144,32 @@ try:
     print("{} - {}".format("Read Channel Properties", channel.get_channel(server,ch_name)))
 except Exception as err:
     HTTPErrorHandler(err)
+
+# Get Channel and all Device config with Tags and Tag groups
+try:
+    print("{} - {}".format("Read Channel Properties and all Devices and Tag/Tag Groups", json.dumps(channel.get_channel_structure(server, ch_name),  indent=4)))
+except Exception as err:
+    HTTPErrorHandler(err)
+
+
 # Get Device
 device_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
 try:
     print("{} - {}".format("Read Device Properties", device.get_device(server, device_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
+
+# Get Device and all tags/tag groups
+device_path = '{}.{}'.format(ch_name, dev_name)
+try:
+    print("{} - {}".format("Read Device Properties and all Tags/Tag groups", device.get_device_structure(server, device_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
+
+# Get All Tags and Tag groups from a device
+device_path = '{}.{}'.format(ch_name, dev_name)
+try:
+    print("{} {} - {}".format("Read All Tags and Tag Groups from device", device_path, device.get_all_tags_tag_groups(server, device_path, recursive=True)))
 except Exception as err:
     HTTPErrorHandler(err)
 
@@ -162,6 +184,20 @@ except Exception as err:
 tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
 try:
     print("{} - {}".format("Read Tag Group Properties", tag.get_tag_group(server, tag_group_path)))
+except Exception as err:
+    HTTPErrorHandler(err)
+
+# Get All Tags and Tag groups from a path
+tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
+try:
+    print("{} {} - {}".format("Read All Tags and Tag Groups from device", device_path, tag.get_full_tag_structure(server, tag_group_path, recursive=True)))
+except Exception as err:
+    HTTPErrorHandler(err)
+
+# Get Tags and Tag groups only at a particular path
+tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
+try:
+    print("{} {} - {}".format("Read All Tags and Tag Groups from device", device_path, tag.get_full_tag_structure(server, tag_group_path)))
 except Exception as err:
     HTTPErrorHandler(err)
 
