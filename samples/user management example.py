@@ -10,7 +10,6 @@
 
 from kepconfig import connection, error
 from kepconfig.admin import user_groups, users
-import json
 
 # User Groups
 group1 = {
@@ -70,9 +69,11 @@ user2 = {
     "libadminsettings.USERMANAGER_USER_PASSWORD": "Password123456"      
 }
 
-def HTTPErrorHandler(err):
+def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepHTTPError:
+    if err.__class__ is error.KepError:
+        print(err.msg)
+    elif err.__class__ is error.KepHTTPError:
         print(err.code)
         print(err.msg)
         print(err.url)
@@ -96,7 +97,7 @@ server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrat
 try:
     print("{} - {}".format("Add new User Groups", user_groups.add_user_group(server, [group1, group2])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify permissions on a User Group
 # Ex: Prevent Write access for user group
@@ -110,18 +111,18 @@ modify_group = {
 try:
     print("{} - {}".format("Modify User Group properties to prevent 'Writes'",user_groups.modify_user_group(server, modify_group, group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Disable and Enable a user groups
 try: 
     print("{} - {}".format("Disable User Group",user_groups.disable_user_group(server, group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 try: 
     print("{} - {}".format("Enable User Group",user_groups.enable_user_group(server, group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # ---------------------------------------------
 # User Methods
@@ -131,7 +132,7 @@ except Exception as err:
 try:
     print("{} - {}".format("Add new Users", users.add_user(server, [user1, user2])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify new user parameters - New Password
 modify_pass = {
@@ -141,14 +142,14 @@ modify_pass = {
 try:
     print("{} - {}".format("Updated a user password", users.modify_user(server,modify_pass, user1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Disable and Enable a user
 try:
     print("{} - {}".format("Disable a user", users.disable_user(server, user1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 try:
     print("{} - {}".format("Enable a user", users.enable_user(server, user1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)

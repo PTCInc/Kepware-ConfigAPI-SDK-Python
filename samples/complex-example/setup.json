@@ -7,4 +7,3 @@
 	"path" : "csvs/ModbusTags.csv",
 	"Broker_URL" : "tcp://127.0.0.1:1883"
 }
-

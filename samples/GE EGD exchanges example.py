@@ -11,8 +11,6 @@
 
 from kepconfig import connection, error
 from kepconfig.connectivity import channel, device, tag, egd
-import json
-import time
 
 # Channel and Device name to be used
 ch_name = 'EGD'
@@ -27,9 +25,11 @@ egd_device = {
     }]
 }
 
-def HTTPErrorHandler(err):
+def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepHTTPError:
+    if err.__class__ is error.KepError:
+        print(err.msg)
+    elif err.__class__ is error.KepHTTPError:
         print(err.code)
         print(err.msg)
         print(err.url)
@@ -50,7 +50,7 @@ server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrat
 try:
     print("{} - {}".format("Adding EGD Channel and Device:", channel.add_channel(server,egd_device)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 #####################################################################
 # Examples of managing Exchanges and Ranges in the Exchanges
@@ -72,7 +72,7 @@ consumer_exchange = {
 try:
     print("{} - {}".format("Adding Consumer Exchange:", egd.exchange.add_exchange(server, ch_name + '.' + dev_name, egd.CONSUMER_EXCHANGE, consumer_exchange)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 producer_exchange = {
     "common.ALLTYPES_NAME": "0",
@@ -89,42 +89,42 @@ producer_exchange = {
 try:
     print("{} - {}".format("Adding Producer Exchange:", egd.exchange.add_exchange(server, ch_name + '.' + dev_name, egd.PRODUCER_EXCHANGE, producer_exchange)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify an Exchange
 try:
     print("{} - {}".format("Modify Consumer Exchange:", egd.exchange.modify_exchange(server, ch_name + '.' + dev_name, egd.CONSUMER_EXCHANGE, 
         {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2}, consumer_exchange['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get Exchange Properties
 try:
     print("{} - {}".format("Read Consumer Exchange {}:".format(consumer_exchange['common.ALLTYPES_NAME']), 
         egd.exchange.get_exchange(server, ch_name + '.' + dev_name, egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get all Consumer/Producer Exchanges
 try:
     print("{} - {}".format("Read all Consumer Exchanges:", 
         egd.exchange.get_exchange(server, ch_name + '.' + dev_name, egd.CONSUMER_EXCHANGE)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get all Exchanges
 try:
     print("{} - {}".format("Read all Exchanges:", 
         egd.exchange.get_all_exchanges(server, ch_name + '.' + dev_name)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Delete Exchange
 try:
     print("{} - {}".format("Deleting Producer Exchange {}:".format(producer_exchange['common.ALLTYPES_NAME']), 
         egd.exchange.del_exchange(server, ch_name + '.' + dev_name, egd.PRODUCER_EXCHANGE, producer_exchange['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Adding a Range - Multiple ranges can be added by creating a list of ranges
 range = {
@@ -141,35 +141,35 @@ try:
     print("{} - {}".format("Adding a Range to a Consumer Exchange:", egd.range.add_range(server, ch_name + '.' + dev_name, 
         egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'], range)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify a Range
 try:
     print("{} - {}".format("Modify a Range to a Consumer Exchange:", egd.range.modify_range(server, ch_name + '.' + dev_name, egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'], 
         {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2}, range['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get a Range for an Exchange
 try:
     print("{} - {}".format("Read a Range from a Consumer Exchange - {}:".format(range['common.ALLTYPES_NAME']), egd.range.get_range(server, ch_name + '.' + dev_name, 
         egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'], range['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get all Ranges for an Exchange
 try:
     print("{} - {}".format("Read all Ranges from a Consumer Exchange:", egd.range.get_range(server, ch_name + '.' + dev_name, 
         egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Delete a Range for an Exchange
 try:
     print("{} - {}".format("Delete a Range from a Consumer Exchange:", egd.range.del_range(server, ch_name + '.' + dev_name, 
         egd.CONSUMER_EXCHANGE, consumer_exchange['common.ALLTYPES_NAME'], range['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 #####################################################################
 # Examples of managing Name Resolutions
@@ -186,32 +186,32 @@ name = {
 try:
     print("{} - {}".format("Adding Name Resolution:", egd.name.add_name_resolution(server, ch_name + '.' + dev_name, name)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify a Name Resolution
 try:
     print("{} - {}".format("Modify Name Resolution {}:".format(name['common.ALLTYPES_NAME']), egd.name.modify_name_resolution(server, ch_name + '.' + dev_name,
         {"ge_ethernet_global_data.NAME_RESOLUTION_IP_ADDRESS": '192.168.1.50'}, name['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get Name Resolution Properties
 try:
     print("{} - {}".format("Read Name Resolution {}:".format(name['common.ALLTYPES_NAME']), 
         egd.name.get_name_resolution(server, ch_name + '.' + dev_name, name['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get all Name Resolutions
 try:
     print("{} - {}".format("Read All Name Resolutions:".format(name['common.ALLTYPES_NAME']), 
         egd.name.get_name_resolution(server, ch_name + '.' + dev_name, name['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Delete a Name Resolution
 try:
     print("{} - {}".format("Delete Name Resolution {}:".format(name['common.ALLTYPES_NAME']), 
         egd.name.del_name_resolution(server, ch_name + '.' + dev_name, name['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)

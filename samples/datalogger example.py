@@ -11,7 +11,6 @@
 from kepconfig import connection, error
 from kepconfig.connectivity import channel
 import kepconfig.datalogger as DL 
-import json
 
 # Log Group to be used with properties that can be configured
 
@@ -57,9 +56,11 @@ log_item2 = {
 		"datalogger.LOG_ITEM_ID": "Channel1.Device1.Tag2"
 	}
 
-def HTTPErrorHandler(err):
+def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepHTTPError:
+    if err.__class__ is error.KepError:
+        print(err.msg)
+    elif err.__class__ is error.KepHTTPError:
         print(err.code)
         print(err.msg)
         print(err.url)
@@ -114,14 +115,14 @@ channel_data = {
 try:
     print("{} - {}".format("Adding Channel, Device and tags", channel.add_channel(server,channel_data)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 
 # Add the Datalogger Log Group with the appropriate parameters
 try:
     print("{} - {}".format("Add the Datalogger Log Group", DL.log_group.add_log_group(server, log_group1)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify a property of the Log Group If the "common.ALLTYPES_Name" is defined
 # the "modify_log_group" function does not need have the log group name as an input
@@ -133,26 +134,26 @@ log_group_mod_properties = {
 try:
     print("{} - {}".format("Modify property in the Log Group", DL.log_group.modify_log_group(server,log_group_mod_properties,log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get properties for the log group that was created. It will return the 
 # JSON of the properties
 try:
     print("{} - {}".format("Read properties of the Log Group", DL.log_group.get_log_group(server, log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get a list of all Log Groups that are configured
 try:
     print("{} - {}".format("Getting list of Log Groups", DL.log_group.get_all_log_groups(server)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Add an tag or log item to the to the log group
 try:
     print("{} - {}".format("Add new tags to the Log Group", DL.log_items.add_log_item(server, log_group1['common.ALLTYPES_NAME'], [log_item1,log_item2])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify properties of the tag or log item. If the "common.ALLTYPES_Name" is defined
 # the "modify_log_item" function does not need have the log item name as an input
@@ -163,7 +164,7 @@ modify_log_item = {
 try:
     print("{} - {}".format("Modify the tag or Log Item added", DL.log_items.modify_log_item(server, log_group1['common.ALLTYPES_NAME'], modify_log_item)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify properties of the tag or log Item. (Version 2) It is not necessary to pass JSON 
 # with the "common.ALLTYPES_Name" of the tag to modify. It can be passed as a input
@@ -175,19 +176,19 @@ modify_log_item = {
 try:
     print("{} - {}".format("Modify the tag or Log Item added", DL.log_items.modify_log_item(server, log_group1['common.ALLTYPES_NAME'], modify_log_item, log_item1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Read the tag or log Item configured in the Log Group
 try:
     print("{} - {}".format("Read the properties of the Log Item", DL.log_items.get_log_item(server, log_group1['common.ALLTYPES_NAME'], log_item1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get a list of all tags or log Items configured in the Log Group
 try:
     print("{} - {}".format("Get a list of all the Log Items configured in the Log Group", DL.log_items.get_all_log_items(server, log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Setup a trigger in the log group
 
@@ -201,13 +202,13 @@ trigger_data = {
 try:
     print("{} - {}".format("Add new trigger to the Log Group", DL.triggers.add_trigger(server, log_group1['common.ALLTYPES_NAME'],trigger_data)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Once configured, enable log group
 try:
     print("{} - {}".format("Enable the Log Group", DL.log_group.enable_log_group(server, log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Note: Changes cannot be made to the log group while enabled
 
@@ -215,10 +216,10 @@ except Exception as err:
 try:
     print("{} - {}".format("Disable the Log Group", DL.log_group.disable_log_group(server, log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Delete the Log Group
 try:
     print("{} - {}".format("Delete the Log Group", DL.log_group.del_log_group(server, log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)

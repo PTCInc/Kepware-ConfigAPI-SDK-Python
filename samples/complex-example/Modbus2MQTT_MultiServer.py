@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
@@ -28,9 +28,11 @@ import kepconfig
 from kepconfig.connectivity import channel, device, tag
 import kepconfig.iot_gateway as IoT
 
-def HTTPErrorHandler(err):
+def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is kepconfig.error.KepHTTPError:
+    if err.__class__ is kepconfig.error.KepError:
+        print(err.msg)
+    elif err.__class__ is kepconfig.error.KepHTTPError:
         print(err.code)
         print(err.msg)
         print(err.url)
@@ -213,9 +215,9 @@ if __name__ == "__main__":
         try:
             print("{} - {}".format("Adding all devices", channel.add_channel(server,all_devices_JSON)))
         except Exception as err:
-            HTTPErrorHandler(err)
+            ErrorHandler(err)
         try:
             print("{} - {}".format("Adding all Agents", IoT.agent.add_iot_agent(server,all_agents_JSON,IoT.MQTT_CLIENT_AGENT)))
         except Exception as err:
-            HTTPErrorHandler(err)
+            ErrorHandler(err)
     print ("-- Channel and devices and agent creation completed")
