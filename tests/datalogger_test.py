@@ -7,6 +7,7 @@
 # Datalogger Test - Test to exectute various calls for the Datalogger 
 # parts of the Kepware configuration API
 
+from kepconfig.error import KepError
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import kepconfig
@@ -198,7 +199,8 @@ def test_log_group_modify(server):
 	assert datalogger.log_group.modify_log_group(server,{"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True},log_group_data1['common.ALLTYPES_NAME'])
 
 	# Fail due to no log_group name provided
-	assert not datalogger.log_group.modify_log_group(server,{"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True})
+	with pytest.raises(KepError):
+		assert datalogger.log_group.modify_log_group(server,{"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True})
 	
 	assert datalogger.log_group.modify_log_group(server,{"common.ALLTYPES_NAME": log_group_name,"datalogger.LOG_GROUP_USE_LOCAL_TIME_FOR_TIMESTAMP_INSERTS": True})
 
@@ -223,7 +225,8 @@ def test_log_item_modify(server):
 	assert datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "0"} ,log_item1['common.ALLTYPES_NAME'])
 
 	# Fail due to item not identified
-	assert not datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "0"})
+	with pytest.raises(KepError):
+		assert datalogger.log_items.modify_log_item(server, log_group_name, {"datalogger.LOG_ITEM_NUMERIC_ID": "0"})
 
 	assert datalogger.log_items.modify_log_item(server, log_group_name, {"common.ALLTYPES_NAME": "LogItem1","datalogger.LOG_ITEM_NUMERIC_ID": "0"}, force= True)
 
@@ -252,7 +255,8 @@ def test_mapping_modify(server):
 	assert datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 15} , mapping_list[0]['common.ALLTYPES_NAME'])
 
 	# Fail due to map not identified
-	assert not datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 1})
+	with pytest.raises(KepError):
+		assert datalogger.mapping.modify_mapping(server, log_group_name, {"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 1})
 
 	assert datalogger.mapping.modify_mapping(server, log_group_name, {"common.ALLTYPES_NAME": mapping_list[0]['common.ALLTYPES_NAME'],"datalogger.TABLE_ALIAS_SQL_LENGTH_QUALITY": 0}, force= True)
 
@@ -278,7 +282,8 @@ def test_trigger_modify(server):
 	assert datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 500} ,trigger1['common.ALLTYPES_NAME'])
 
 	# Fail due to trigger not identified
-	assert not datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 500})
+	with pytest.raises(KepError):
+		assert datalogger.triggers.modify_trigger(server, log_group_name, {"datalogger.TRIGGER_STATIC_INTERVAL": 500})
 
 	assert datalogger.triggers.modify_trigger(server, log_group_name, {"common.ALLTYPES_NAME": trigger1['common.ALLTYPES_NAME'],"datalogger.TRIGGER_STATIC_INTERVAL": 1000}, force= True)
 

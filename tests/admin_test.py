@@ -7,14 +7,13 @@
 # Admin Test - Test to exectute various calls for the Administrator 
 # parts of the Kepware configuration API
 
+from kepconfig.error import KepError, KepHTTPError
 import os, sys
 from typing import Dict, List
 import pytest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import kepconfig
-import kepconfig.admin
-import kepconfig.connectivity
-import kepconfig.iot_gateway
+# import kepconfig
+from kepconfig import admin
 import json
 import time
 import datetime
@@ -47,7 +46,7 @@ uaendpoint3 = {
 }
 
 def HTTPErrorHandler(err):
-    if err.__class__ is kepconfig.error.KepHTTPError:
+    if err.__class__ is KepHTTPError:
         print(err.code)
         print(err.msg)
         print(err.url)
@@ -65,14 +64,14 @@ def complete(server):
     
     for ua in endpoint_list:
         try:
-            kepconfig.admin.ua_server.del_endpoint(server,ua['common.ALLTYPES_NAME'])
+            admin.ua_server.del_endpoint(server,ua['common.ALLTYPES_NAME'])
         except Exception as err:
             pass
     
     
     for ug in usergroup_list:
         try: 
-            kepconfig.admin.user_groups.del_user_group(server,ug['common.ALLTYPES_NAME'])
+            admin.user_groups.del_user_group(server,ug['common.ALLTYPES_NAME'])
         except Exception as err:
             pass
 
@@ -90,62 +89,64 @@ def server(kepware_server):
 
 def test_uaserver(server):
     
-    assert kepconfig.admin.ua_server.add_endpoint(server,uaendpoint1)
+    assert admin.ua_server.add_endpoint(server,uaendpoint1)
     
-    assert kepconfig.admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
+    assert admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
     
-    assert kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint1,uaendpoint2])
+    assert admin.ua_server.add_endpoint(server,[uaendpoint1,uaendpoint2])
 
 
 # Endpoint 2 fails since it already exists
-    assert type(kepconfig.admin.ua_server.add_endpoint(server,[uaendpoint2,uaendpoint3])) == list
+    assert type(admin.ua_server.add_endpoint(server,[uaendpoint2,uaendpoint3])) == list
 
-    assert kepconfig.admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False},uaendpoint1['common.ALLTYPES_NAME'])
+    assert admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False},uaendpoint1['common.ALLTYPES_NAME'])
     
     # Bad Input test
-    assert not (kepconfig.admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False}))
+    with pytest.raises(KepError):
+        assert admin.ua_server.modify_endpoint(server,{"libadminsettings.UACONFIGMANAGER_ENDPOINT_ENABLE": False})
 
-    assert kepconfig.admin.ua_server.modify_endpoint(server,{"common.ALLTYPES_NAME": "DefaultEndpoint3","libadminsettings.UACONFIGMANAGER_ENDPOINT_SECURITY_NONE": True})
+    assert admin.ua_server.modify_endpoint(server,{"common.ALLTYPES_NAME": "DefaultEndpoint3","libadminsettings.UACONFIGMANAGER_ENDPOINT_SECURITY_NONE": True})
     
-    assert type(kepconfig.admin.ua_server.get_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])) ==  dict
+    assert type(admin.ua_server.get_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])) ==  dict
     
-    assert type(kepconfig.admin.ua_server.get_all_endpoints(server)) == list
+    assert type(admin.ua_server.get_all_endpoints(server)) == list
     
-    assert kepconfig.admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
+    assert admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
     
-    assert kepconfig.admin.ua_server.del_endpoint(server,uaendpoint2['common.ALLTYPES_NAME'])
+    assert admin.ua_server.del_endpoint(server,uaendpoint2['common.ALLTYPES_NAME'])
 
 def test_user_groups(server):
     # User Group tests
-    assert kepconfig.admin.user_groups.add_user_group(server,group1)
+    assert admin.user_groups.add_user_group(server,group1)
     
-    assert kepconfig.admin.user_groups.del_user_group(server,group1['common.ALLTYPES_NAME'])
+    assert admin.user_groups.del_user_group(server,group1['common.ALLTYPES_NAME'])
 
-    assert kepconfig.admin.user_groups.add_user_group(server,[group1, group2])
+    assert admin.user_groups.add_user_group(server,[group1, group2])
 
 # Group 2 fails since it already exists
-    assert type(kepconfig.admin.user_groups.add_user_group(server,[group2, group3])) == list
+    assert type(admin.user_groups.add_user_group(server,[group2, group3])) == list
     
-    assert kepconfig.admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False},
+    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False},
             group1['common.ALLTYPES_NAME'])
     
-    assert kepconfig.admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": True},
+    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": True},
             group1['common.ALLTYPES_NAME'])
 
     # Bad Inputs
-    assert kepconfig.admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False}) == False
+    with pytest.raises(KepError):
+        assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False})
 
-    assert kepconfig.admin.user_groups.modify_user_group(server,{'common.ALLTYPES_NAME': 'Group1',"libadminsettings.USERMANAGER_GROUP_ENABLED": False})
+    assert admin.user_groups.modify_user_group(server,{'common.ALLTYPES_NAME': 'Group1',"libadminsettings.USERMANAGER_GROUP_ENABLED": False})
     
-    assert kepconfig.admin.user_groups.modify_user_group(server,{'common.ALLTYPES_NAME': 'Group1',"libadminsettings.USERMANAGER_GROUP_ENABLED": True})
+    assert admin.user_groups.modify_user_group(server,{'common.ALLTYPES_NAME': 'Group1',"libadminsettings.USERMANAGER_GROUP_ENABLED": True})
 
-    assert type(kepconfig.admin.user_groups.get_user_group(server,group1['common.ALLTYPES_NAME'])) == dict
+    assert type(admin.user_groups.get_user_group(server,group1['common.ALLTYPES_NAME'])) == dict
     
-    assert type(kepconfig.admin.user_groups.get_all_user_groups(server)) == list
+    assert type(admin.user_groups.get_all_user_groups(server)) == list
     
-    assert kepconfig.admin.user_groups.disable_user_group(server, group1['common.ALLTYPES_NAME'])
+    assert admin.user_groups.disable_user_group(server, group1['common.ALLTYPES_NAME'])
 
-    assert kepconfig.admin.user_groups.enable_user_group(server, group1['common.ALLTYPES_NAME'])
+    assert admin.user_groups.enable_user_group(server, group1['common.ALLTYPES_NAME'])
 
 def test_users(server):
     # User tests
@@ -171,30 +172,31 @@ def test_users(server):
         "libadminsettings.USERMANAGER_USER_PASSWORD": "Kepware400400400"      
     }
 
-    assert kepconfig.admin.users.add_user(server,user1)
+    assert admin.users.add_user(server,user1)
     
-    assert kepconfig.admin.users.del_user(server,user1['common.ALLTYPES_NAME'])
+    assert admin.users.del_user(server,user1['common.ALLTYPES_NAME'])
 
-    assert kepconfig.admin.users.add_user(server,[user1, user2])
+    assert admin.users.add_user(server,[user1, user2])
     
 # User 2 fails since it already exists
-    assert type(kepconfig.admin.users.add_user(server,[user2, user3])) == list
+    assert type(admin.users.add_user(server,[user2, user3])) == list
     
-    assert kepconfig.admin.users.modify_user(server,{"libadminsettings.USERMANAGER_USER_ENABLED": False}, user1['common.ALLTYPES_NAME'])
+    assert admin.users.modify_user(server,{"libadminsettings.USERMANAGER_USER_ENABLED": False}, user1['common.ALLTYPES_NAME'])
     
     # Bad Inputs
-    assert kepconfig.admin.users.modify_user(server,{'common.ALLTYPES_DESCRIPTION': 'TEST'}) == False
+    with pytest.raises(KepError):
+        assert admin.users.modify_user(server,{'common.ALLTYPES_DESCRIPTION': 'TEST'})
     
-    assert kepconfig.admin.users.modify_user(server,{"common.ALLTYPES_NAME": "Client2",'common.ALLTYPES_DESCRIPTION': 'TEST'})
+    assert admin.users.modify_user(server,{"common.ALLTYPES_NAME": "Client2",'common.ALLTYPES_DESCRIPTION': 'TEST'})
 
-    assert type(kepconfig.admin.users.get_user(server,user1['common.ALLTYPES_NAME'])) == dict
+    assert type(admin.users.get_user(server,user1['common.ALLTYPES_NAME'])) == dict
     
-    assert type(kepconfig.admin.users.get_all_users(server)) == list
+    assert type(admin.users.get_all_users(server)) == list
     
-    assert kepconfig.admin.users.disable_user(server, user1['common.ALLTYPES_NAME'])
+    assert admin.users.disable_user(server, user1['common.ALLTYPES_NAME'])
 
-    assert kepconfig.admin.users.enable_user(server, user1['common.ALLTYPES_NAME'])
+    assert admin.users.enable_user(server, user1['common.ALLTYPES_NAME'])
 
-    assert kepconfig.admin.users.del_user(server, user1['common.ALLTYPES_NAME'])
+    assert admin.users.del_user(server, user1['common.ALLTYPES_NAME'])
     
-    assert kepconfig.admin.users.del_user(server, user2['common.ALLTYPES_NAME'])
+    assert admin.users.del_user(server, user2['common.ALLTYPES_NAME'])

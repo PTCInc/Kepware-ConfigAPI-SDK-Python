@@ -6,10 +6,10 @@
 
 # IoT Gateway Test - Test to exersice all IoT Gateway related features
 
+from kepconfig.error import KepError
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import kepconfig
-import kepconfig.admin
 import kepconfig.connectivity
 import kepconfig.iot_gateway
 import json
@@ -105,7 +105,8 @@ def test_agent_add(server):
         
         # Add Agent without Agent Type (error)
         agent['common.ALLTYPES_NAME'] = agent_name + "1"
-        assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent) == False
+        with pytest.raises(KepError):
+            assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent)
 
         # Add Agent with bad name (error)
         agent = [
@@ -114,8 +115,9 @@ def test_agent_add(server):
             },
             {
             "common.ALLTYPES_NAME": "_" + agent_name
-            },
+            }
         ]
+
         assert type(kepconfig.iot_gateway.agent.add_iot_agent(server, agent, agent_type)) == list
 
 def test_agent_modify(server):
@@ -128,7 +130,8 @@ def test_agent_modify(server):
         # Modify Agent without type (error)
         agent = {}
         agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
-        assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_name) == False
+        with pytest.raises(KepError):
+            assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_name)
         
 def test_agent_get(server):
     for agent_name, agent_type in agent_list:
