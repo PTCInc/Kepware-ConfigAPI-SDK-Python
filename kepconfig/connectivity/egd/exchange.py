@@ -5,9 +5,9 @@
 # --------------------------------------------------------------------------
 
 
-# r""":mod:`exchange` exposes an API to allow modifications (add, delete, modify) to 
-# exchange objects for EGD devices within the Kepware Configuration API
-# """
+r"""`exchange` exposes an API to allow modifications (add, delete, modify) to 
+exchange objects for EGD devices within the Kepware Configuration API
+"""
 
 import kepconfig
 from typing import Union

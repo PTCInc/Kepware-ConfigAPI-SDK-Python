@@ -4,11 +4,12 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`mapping` exposes an API to allow modifications (add, delete, modify) to 
+r"""`mapping` exposes an API to allow modifications (add, delete, modify) to 
 column mapping objects in a Datalogger log group within the Kepware Configuration API
 """
 
 from . import log_group as Log_Group
+from ..error import KepError, KepHTTPError
 
 MAPPING_ROOT = '/column_mappings'
 
@@ -24,7 +25,7 @@ def _create_url(mapping = None):
     else:
         return '{}/{}'.format(MAPPING_ROOT, mapping)
 
-def modify_mapping(server, log_group, DATA, mapping = None, force = False):
+def modify_mapping(server, log_group, DATA, mapping = None, force = False) -> bool:
     '''Modify a column mapping object and it's properties in Kepware. If a "mapping" is not provided as an input,
     you need to identify the column mapping in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the column mapping that is to be modified.
@@ -54,18 +55,18 @@ def modify_mapping(server, log_group, DATA, mapping = None, force = False):
         try:
             r = server._config_update(server.url + Log_Group._create_url(log_group) + _create_url(mapping_data['common.ALLTYPES_NAME']), mapping_data)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No column mapping identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No column mapping identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except:
         #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
         r = server._config_update(server.url + Log_Group._create_url(log_group) + _create_url(mapping), mapping_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_mapping(server, log_group, mapping):
+def get_mapping(server, log_group, mapping) -> dict:
     '''Returns the properties of the mapping object. Returned object is JSON.
     
     INPUTS:
@@ -76,7 +77,7 @@ def get_mapping(server, log_group, mapping):
     "mapping" - name of column mapping to retrieve properties for
 
     RETURNS:
-    JSON - data for the column mapping requested
+    dict - data for the column mapping requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -85,7 +86,7 @@ def get_mapping(server, log_group, mapping):
     r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url(mapping))
     return r.payload
 
-def get_all_mappings(server, log_group):
+def get_all_mappings(server, log_group) -> list:
     '''Returns the properties of all column mapping objects for a log group. Returned object is JSON list.
     
     INPUTS:
@@ -94,7 +95,7 @@ def get_all_mappings(server, log_group):
     "log_group" - name of log group
 
     RETURNS:
-    JSON - data for the column mappings requested
+    list - data for the column mappings requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError

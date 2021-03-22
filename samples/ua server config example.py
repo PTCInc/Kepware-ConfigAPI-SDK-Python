@@ -10,7 +10,6 @@
 
 from kepconfig import connection, error
 import kepconfig.admin.ua_server as ua_server
-import json
 
 # UA Endpoints to be created with properties that can be configured
 uaendpoint1 = {
@@ -33,9 +32,11 @@ uaendpoint2 = {
     "libadminsettings.UACONFIGMANAGER_ENDPOINT_SECURITY_BASIC256": 0,
     "libadminsettings.UACONFIGMANAGER_ENDPOINT_SECURITY_BASIC256_SHA256": 2
 }
-def HTTPErrorHandler(err):
+def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepHTTPError:
+    if err.__class__ is error.KepError:
+        print(err.msg)
+    elif err.__class__ is error.KepHTTPError:
         print(err.code)
         print(err.msg)
         print(err.url)
@@ -49,7 +50,7 @@ def HTTPErrorHandler(err):
 
 # This creates a server reference that is used to target all modifications of 
 # the Kepware configuration
-server = connection.server(host = '192.168.1.132', port = 57513, user = 'Administrator', pw = '', https=True)
+server = connection.server(host = 'localhost', port = 57513, user = 'Administrator', pw = '', https=True)
 
 # Disabling certificate validation (INSECURE)
 server.SSL_ignore_hostname = True
@@ -59,7 +60,7 @@ server.SSL_trust_all_certs = True
 try: 
     print("{} - {}".format("Adding multiple UA Endpoints",ua_server.add_endpoint(server,[uaendpoint1,uaendpoint2])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Modify Endpoint to disable all encryption and allow unencrypted connections
 
@@ -73,25 +74,30 @@ modify_ua = {
 try: 
     print("{} - {}".format("Modify UA Endpoint to remove all encrypted enpoints",ua_server.modify_endpoint(server, modify_ua ,uaendpoint1['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Delete an Endpoint
 try: 
     print("{} - {}".format("Delete an UA Endpoint",ua_server.del_endpoint(server,uaendpoint2['common.ALLTYPES_NAME'])))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # All changes will not update until Kepware is Reinitialized
 try: 
     print("{} - {}".format("Reinitialize Kepware to update UA Endpoint Configuration",server.reinitialize()))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
 # Get all UA Endpoints that are configured
 try: 
     print("{} - {}".format("Get all UA Endpoint Configurations",ua_server.get_all_endpoints(server)))
 except Exception as err:
-    HTTPErrorHandler(err)
+    ErrorHandler(err)
 
+# Delete an Endpoint
+try: 
+    print("{} - {}".format("Delete an UA Endpoint",ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])))
+except Exception as err:
+    ErrorHandler(err)
 
 

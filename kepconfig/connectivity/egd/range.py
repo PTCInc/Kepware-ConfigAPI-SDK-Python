@@ -5,9 +5,9 @@
 # --------------------------------------------------------------------------
 
 
-# r""":mod:`ranges` exposes an API to allow modifications (add, delete, modify) to 
-# range objects in exchanges for EGD devices within the Kepware Configuration API
-# """
+r"""`ranges` exposes an API to allow modifications (add, delete, modify) to 
+range objects in exchanges for EGD devices within the Kepware Configuration API
+"""
 
 from typing import Union
 from .. import egd as EGD

@@ -8,10 +8,14 @@
 #*.gitignore
 *.pem
 _notes
+.vscode
 
 _new*
 _test*
 _build*
+/docs
+mkdocs.yml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -24,7 +28,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-# dist/
+dist/
 downloads/
 eggs/
 .eggs/
@@ -137,3 +141,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+

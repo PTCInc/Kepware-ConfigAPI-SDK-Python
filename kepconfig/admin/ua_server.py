@@ -4,10 +4,11 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`ua_server` exposes an API to allow modifications (add, delete, modify) to 
+r"""`ua_server` exposes an API to allow modifications (add, delete, modify) to 
 OPC UA Server endpoints within the Kepware Administration through the Kepware Configuration API
 """
 from typing import Union
+from ..error import KepHTTPError, KepError
 
 
 UA_ROOT = '/admin/ua_endpoints'
@@ -40,8 +41,6 @@ def add_endpoint(server, DATA) -> Union[bool, list]:
     List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     endpoints added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -55,9 +54,9 @@ def add_endpoint(server, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_endpoint(server, endpoint):
+def del_endpoint(server, endpoint) -> bool:
     '''Delete a "endpoint" object in Kepware UA Server
     
     INPUTS:
@@ -75,9 +74,9 @@ def del_endpoint(server, endpoint):
 
     r = server._config_del(server.url + _create_url(endpoint))
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_endpoint(server, DATA, endpoint = None):
+def modify_endpoint(server, DATA, endpoint = None) -> bool:
     '''Modify a endpoint object and it's properties in Kepware UA Server. If a "endpoint" is not provided as an input,
     you need to identify the endpoint in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the endpoint that is to be modified.
@@ -102,18 +101,19 @@ def modify_endpoint(server, DATA, endpoint = None):
         try:
             r = server._config_update(server.url + _create_url(DATA['common.ALLTYPES_NAME']), DATA)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No UA Endpoint identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No UA Endpoint identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
+
         # except Exception as e:
         #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     else:
         r = server._config_update(server.url + _create_url(endpoint), DATA)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_endpoint(server, endpoint):
+def get_endpoint(server, endpoint) -> dict:
     '''Returns the properties of the endpoint object. Returned object is JSON.
     
     INPUTS:
@@ -122,7 +122,7 @@ def get_endpoint(server, endpoint):
     "endpoint" - name of endpoint
     
     RETURNS:
-    JSON - data for the endpoint requested
+    dict - data for the endpoint requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -132,14 +132,14 @@ def get_endpoint(server, endpoint):
     r = server._config_get(server.url + _create_url(endpoint))
     return r.payload
 
-def get_all_endpoints(server):
+def get_all_endpoints(server) -> list:
     '''Returns list of all endpoint objects and their properties. Returned object is JSON list.
     
     INPUTS:
     "server" - instance of the "server" class
     
     RETURNS:
-    JSON - data for all endpoints requested
+    list - data for all endpoints requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError

@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# Test Example - Test to exectute various calls for the conenctivity 
+# Connectivity Test - Test to exectute various calls for the basic driver/connectivity 
 # parts of the Kepware configuration API
 
 import os, sys
@@ -16,6 +16,7 @@ import kepconfig.iot_gateway
 import json
 import time
 import datetime
+import pytest
 
 
 # Channel and Device name to be used
@@ -37,41 +38,63 @@ def HTTPErrorHandler(err):
     else:
         print('Different Exception Received: {}'.format(err))
 
-def connectivity_test(server):
-    # Add a Channel using the "Simulator Driver"
+def remove_projectid(DATA):
+    if type(DATA) is dict:
+        DATA.pop('PROJECT_ID', None)
+    elif type(DATA) is list:
+        for item in DATA:
+            item = remove_projectid(item)
+    return DATA
+
+def initialize(server):
+    pass
+
+def complete(server):
+    # Delete all Channels
     try:
-        channel_data = {"common.ALLTYPES_NAME": ch_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
-        print(kepconfig.connectivity.channel.add_channel(server,channel_data))
+        ch_left = kepconfig.connectivity.channel.get_all_channels(server)
+        for x in ch_left:
+            print(kepconfig.connectivity.channel.del_channel(server,x['common.ALLTYPES_NAME']))
     except Exception as err:
         HTTPErrorHandler(err)
+
+@pytest.fixture(scope="module")
+def server(kepware_server):
+    server = kepware_server
+    
+    # Initialize any configuration before testing in module
+    initialize(server)
+
+    # Everything below yield is run after module tests are completed
+    yield server
+    complete(server)
+
+# def connectivity_test(server):
+def test_channel_add(server):
+    # Add a Channel using the "Simulator Driver"
+    channel_data = {"common.ALLTYPES_NAME": ch_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
+    assert kepconfig.connectivity.channel.add_channel(server,channel_data)
     
     # Add multi channels with one failure
-    try:
-        channel_data = [
-            {"common.ALLTYPES_NAME": ch_name+"1","servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"},
-            {"common.ALLTYPES_NAME": "_" + ch_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
-        ]
-        print(kepconfig.connectivity.channel.add_channel(server,channel_data))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    channel_data = [
+        {"common.ALLTYPES_NAME": ch_name+"1","servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"},
+        {"common.ALLTYPES_NAME": "_" + ch_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
+    ]
+    assert type(kepconfig.connectivity.channel.add_channel(server,channel_data)) == list
 
+def test_device_add(server):
     # Add a Device to the created Channel
-    try:
-        device_data = {"common.ALLTYPES_NAME": dev_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
-        print(kepconfig.connectivity.device.add_device(server,ch_name,device_data))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    device_data = {"common.ALLTYPES_NAME": dev_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
+    assert kepconfig.connectivity.device.add_device(server,ch_name,device_data)
     
     # Add multi devices with one failure
-    try:
-        device_data = [
-            {"common.ALLTYPES_NAME": dev_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"},
-            {"common.ALLTYPES_NAME": dev_name+"1","servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
-        ]
-        print(kepconfig.connectivity.device.add_device(server,ch_name,device_data))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    device_data = [
+        {"common.ALLTYPES_NAME": dev_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"},
+        {"common.ALLTYPES_NAME": dev_name+"1","servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
+    ]
+    assert type(kepconfig.connectivity.device.add_device(server,ch_name,device_data)) == list
 
+def test_all_tag_tg_add(server):
     # Add a collection of Tags and Tag Group objects
     all_tags_data = {
         "tags": [
@@ -103,10 +126,7 @@ def connectivity_test(server):
             }
         ]
     }
-    try:
-        print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data)
 
     # Add a collection with bad tag
     all_tags_data = {
@@ -143,10 +163,7 @@ def connectivity_test(server):
             }
         ]
     }
-    try:
-        print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data)) == list
     
     # Add a collection with bad tag_group child
     all_tags_data = {
@@ -182,10 +199,7 @@ def connectivity_test(server):
             }
         ]
     }
-    try:
-        print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data)) == list
 
     # Add a collection with bad tag and tag_group child
     all_tags_data = {
@@ -226,11 +240,9 @@ def connectivity_test(server):
 
         ]
     }
-    try:
-        print(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.add_all_tags(server, ch_name + '.' + dev_name, all_tags_data)) == list
 
+def test_tag_add(server):
     # Add tag to an existing tag group
     tag_info = [
         {
@@ -243,10 +255,8 @@ def connectivity_test(server):
         }
     ]
     tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-    try:
-        print(kepconfig.connectivity.tag.add_tag(server, tag_path, tag_info))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.connectivity.tag.add_tag(server, tag_path, tag_info)
+
 
     # Add tag to at device level (test for no "tag path")
     tag_info = [
@@ -255,16 +265,14 @@ def connectivity_test(server):
                 "servermain.TAG_ADDRESS": "R0"
         },
         {
-                "common.ALLTYPES_NAME": "Temp2",
+                "common.ALLTYPES_NAME": "Temp_",
                 "servermain.TAG_ADDRESS": "R1"
         }
     ]
     tag_path = '{}.{}'.format(ch_name, dev_name)
-    try:
-        print(kepconfig.connectivity.tag.add_tag(server, tag_path, tag_info))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.connectivity.tag.add_tag(server, tag_path, tag_info)
 
+def test_tag_group_add(server):
     # Add tag group to an existing tag group
     tag_group_info = [
         {
@@ -272,10 +280,8 @@ def connectivity_test(server):
         }
     ]
     tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
-    try: 
-        print(kepconfig.connectivity.tag.add_tag_group(server, tag_path, tag_group_info))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.connectivity.tag.add_tag_group(server, tag_path, tag_group_info)
+
     # Add tag group to at device level (test for no "tag path")
     tag_group_info = [
         {
@@ -286,157 +292,139 @@ def connectivity_test(server):
         }
     ]
     tag_path = '{}.{}'.format(ch_name, dev_name)
-    try:
-        print(kepconfig.connectivity.tag.add_tag_group(server, tag_path, tag_group_info))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.connectivity.tag.add_tag_group(server, tag_path, tag_group_info)
 
     #
     # Examples of reading properties for various objects (channels, devices, tags, etc)
     #
-
+def test_channel_get(server):
     # Get Channel
-    try:
-        print(kepconfig.connectivity.channel.get_channel(server,ch_name))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.channel.get_channel(server,ch_name)) == dict
 
     # Get all Channels
-    try:
-        print(kepconfig.connectivity.channel.get_all_channels(server))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.channel.get_all_channels(server)) == list
 
+def test_channel_struct_get(server):
+    assert type(kepconfig.connectivity.channel.get_channel_structure(server,ch_name)) == dict
+
+def test_device_get(server):
     # Get Device
     device_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-    try:
-        print(kepconfig.connectivity.device.get_device(server, device_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.device.get_device(server, device_path)) == dict
+
 
     # Get all Devices
-    try:
-        print(kepconfig.connectivity.device.get_all_devices(server, ch_name))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.device.get_all_devices(server, ch_name)) == list
 
+def test_device_tag_struct_only_get(server):
+    # Get ProjectID
+    # props = server.get_project_properties()
+    # proj_id = props['PROJECT_ID']
+    dev_path = '{}.{}'.format(ch_name, dev_name)
+    assert type(kepconfig.connectivity.device.get_all_tags_tag_groups(server, dev_path)) == dict
+
+def test_device_tag_all_get(server):
+    # Get ProjectID
+    # props = server.get_project_properties()
+    # proj_id = props['PROJECT_ID']
+    dev_path = '{}.{}'.format(ch_name, dev_name)
+    assert type(kepconfig.connectivity.device.get_device_structure(server, dev_path)) == dict
+
+def test_tag_get(server):
     # Get Tag
     tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-    try:
-        print(kepconfig.connectivity.tag.get_tag(server, tag_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.get_tag(server, tag_path)) == dict
 
     # Get All Tags
     tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-    try:
-        print(kepconfig.connectivity.tag.get_all_tags(server, tag_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.get_all_tags(server, tag_path)) == list
+    
+    #
+    # TEST for GETs at Device level (no tag_path)
+    #
+    # Get Tag
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'temp')
+    assert type(kepconfig.connectivity.tag.get_tag(server, tag_path)) == dict
 
+    # Get All Tags
+    tag_path = '{}.{}'.format(ch_name, dev_name)
+    assert type(kepconfig.connectivity.tag.get_all_tags(server, tag_path)) == list
+
+def test_tag_group_get(server):
     # Get Tag Group
     tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-    try:
-        print(kepconfig.connectivity.tag.get_tag_group(server, tag_group_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.get_tag_group(server, tag_group_path)) == dict
+
 
     # Get All Tag Groups
     tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
-    try:
-        print(kepconfig.connectivity.tag.get_all_tag_groups(server,tag_group_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.get_all_tag_groups(server,tag_group_path)) == list
 
     #
     # TEST for GETs at Device level (no tag_path)
     #
 
-    # Get Tag
-    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'temp')
-    try: 
-        print(kepconfig.connectivity.tag.get_tag(server, tag_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
-
-    # Get All Tags
-    tag_path = '{}.{}'.format(ch_name, dev_name)
-    try:
-        print(kepconfig.connectivity.tag.get_all_tags(server, tag_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
-
     # Get Tag Group
     tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
-    try:
-        print(kepconfig.connectivity.tag.get_tag_group(server, tag_group_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.get_tag_group(server, tag_group_path)) == dict
 
     # Get All Tag Groups
     tag_group_path = '{}.{}'.format(ch_name, dev_name)
-    try:
-        print(kepconfig.connectivity.tag.get_all_tag_groups(server,tag_group_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert type(kepconfig.connectivity.tag.get_all_tag_groups(server,tag_group_path)) == list
 
+def test_tag_struct_get(server):
+    # Get ProjectID
+    # props = server.get_project_properties()
+    # proj_id = props['PROJECT_ID']
+    tag_path = '{}.{}'.format(ch_name, dev_name)
+    assert type(kepconfig.connectivity.tag.get_full_tag_structure(server, tag_path, recursive=True)) == dict
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
+    assert type(kepconfig.connectivity.tag.get_full_tag_structure(server, tag_path)) == dict
+
+
+def test_channel_modify(server):
     # Channel Modify - Modify the description of the Channel that was created. "Force" will force the 
     # update to the Kepware Server, if not provided in the JSON data.
     channel_data = {
     }
     channel_data['common.ALLTYPES_DESCRIPTION'] = 'This is the test channel created'
-    try:
-        print (kepconfig.connectivity.channel.modify_channel(server, channel_data, channel=ch_name, force=True))
-    except Exception as err:
-        HTTPErrorHandler(err)
-    
-     #
-    # Examples of deleting various objects (channels, devices, tags, etc)
-    #
+    assert kepconfig.connectivity.channel.modify_channel(server, channel_data, channel=ch_name, force=True)
 
+def test_auto_tag_gen(server):
+    # Add a Channel and Device using the "Controllogix Driver"
+    channel_data = {
+        "common.ALLTYPES_NAME": "Logix",
+        "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Allen-Bradley Controllogix Ethernet",
+        "devices": [
+            {
+                "common.ALLTYPES_NAME": "Logix",
+                "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Allen-Bradley Controllogix Ethernet",
+                "servermain.DEVICE_MODEL": 0,
+                "servermain.DEVICE_ID_STRING": "<127.0.0.1>,1,0"
+            }
+        ]
+    }
+    assert kepconfig.connectivity.channel.add_channel(server,channel_data)
+    job = kepconfig.connectivity.device.auto_tag_gen(server,"Logix.Logix")
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    job = kepconfig.connectivity.device.auto_tag_gen(server,"Logix.Logix", 60)
+    assert type(job) == kepconfig.connection.KepServiceResponse
+
+def test_tag_del(server):
     # Delete Tag
     tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
-    try:
-        print(kepconfig.connectivity.tag.del_tag(server, tag_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
-        
+    assert kepconfig.connectivity.tag.del_tag(server, tag_path)
+
+def test_tag_group_del(server):       
     # Delete Tag Group
     tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
-    try:
-        print(kepconfig.connectivity.tag.del_tag_group(server, tag_group_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    assert kepconfig.connectivity.tag.del_tag_group(server, tag_group_path)
 
+def test_device_del(server):
     # Delete Device
-    # device_path = '{}.{}'.format(ch_name, dev_name)
-    try:
-        print(kepconfig.connectivity.device.del_device(server, device_path))
-    except Exception as err:
-        HTTPErrorHandler(err)
+    device_path = '{}.{}'.format(ch_name, dev_name)
+    assert kepconfig.connectivity.device.del_device(server, device_path)
 
+def test_channel_del(server):
     # Delete Channel
-    try:
-        print(kepconfig.connectivity.channel.del_channel(server,ch_name))
-    except Exception as err:
-        HTTPErrorHandler(err)
-    
-    # Delete all Channels
-    try:
-        ch_left = kepconfig.connectivity.channel.get_all_channels(server)
-        for x in ch_left:
-            print(kepconfig.connectivity.channel.del_channel(server,x['common.ALLTYPES_NAME']))
-    except Exception as err:
-        HTTPErrorHandler(err)
-
-if __name__ == "__main__":
-    time_start = time.perf_counter()
-
-    # This creates a server reference that is used to target all modifications of 
-    # the Kepware configuration
-    server = kepconfig.connection.server(host = 'localhost', port = 57412, user = 'Administrator', pw = '', https = False)
-
-    connectivity_test(server)
-
-    time_end = time.perf_counter()
-    print('Complete {}! {} - Took {} seconds'.format(os.path.basename(__file__),time.asctime(), time_end - time_start))
+    assert kepconfig.connectivity.channel.del_channel(server,ch_name)

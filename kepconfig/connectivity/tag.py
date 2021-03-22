@@ -1,14 +1,15 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2020, PTC Inc. and/or all its affiliates. All rights reserved.
+# Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
 
 
-r""":mod:`tag` exposes an API to allow modifications (add, delete, modify) to 
+r"""`tag` exposes an API to allow modifications (add, delete, modify) to 
 tag and tag group objects within the Kepware Configuration API
 """
 
+from ..error import KepError, KepHTTPError
 from typing import Union
 import kepconfig
 from . import channel, device
@@ -58,8 +59,6 @@ def add_tag(server, tag_path, DATA) -> Union[bool, list]:
     List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     tags added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -73,11 +72,11 @@ def add_tag(server, tag_path, DATA) -> Union[bool, list]:
                 url += _create_tag_groups_url(tag_group=tg)
         url += _create_tags_url()
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_add(url, DATA)
     if r.code == 201: return True 
     elif r.code == 207:
@@ -86,7 +85,7 @@ def add_tag(server, tag_path, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
 def add_tag_group(server, tag_group_path, DATA) -> Union[bool, list]:
     '''Add "tag_group" objects to a specific path in Kepware. To be used to 
@@ -108,8 +107,6 @@ def add_tag_group(server, tag_group_path, DATA) -> Union[bool, list]:
     List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     tag groups added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -123,11 +120,11 @@ def add_tag_group(server, tag_group_path, DATA) -> Union[bool, list]:
                 url += _create_tag_groups_url(tag_group=tg)
         url += _create_tag_groups_url()
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_add(url, DATA)
     if r.code == 201: return True 
     elif r.code == 207:
@@ -136,7 +133,7 @@ def add_tag_group(server, tag_group_path, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
 def add_all_tags(server, ch_dev_path, DATA) -> Union[bool, list]:
     '''Add "tag" and "tag group" objects to a device in Kepware. To be used to 
@@ -192,7 +189,7 @@ def add_all_tags(server, ch_dev_path, DATA) -> Union[bool, list]:
         # mixed results from both tags and tag groups
         return [tags_result, tag_groups_result]
 
-def modify_tag(server, full_tag_path, DATA, force = False):
+def modify_tag(server, full_tag_path, DATA, force = False) -> bool:
     '''Modify a "tag" object and it's properties in Kepware.
 
     INPUTS:
@@ -222,16 +219,16 @@ def modify_tag(server, full_tag_path, DATA, force = False):
             url += _create_tag_groups_url(tag_group=path_obj['tag_path'][x])
         url += _create_tags_url(tag=path_obj['tag_path'][len(path_obj['tag_path'])-1])
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_update(url, tag_data)
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_tag_group(server, tag_group_path, DATA, force = False):
+def modify_tag_group(server, tag_group_path, DATA, force = False) -> bool:
     '''Modify a "tag group" object and it's properties in Kepware.
 
     INPUTS:
@@ -258,16 +255,16 @@ def modify_tag_group(server, tag_group_path, DATA, force = False):
         for tg in path_obj['tag_path']:
             url += _create_tag_groups_url(tag_group=tg)
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_update(url, tag_group_data)
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_tag(server, full_tag_path):
+def del_tag(server, full_tag_path) -> bool:
     '''Delete "tag" object at a specific path in Kepware.
 
     INPUTS:
@@ -291,16 +288,16 @@ def del_tag(server, full_tag_path):
             url += _create_tag_groups_url(tag_group=path_obj['tag_path'][x])
         url += _create_tags_url(tag=path_obj['tag_path'][len(path_obj['tag_path'])-1])
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_del(url)
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_tag_group(server, tag_group_path):
+def del_tag_group(server, tag_group_path) -> bool:
     '''Delete "tag group" object at a specific path in Kepware.
 
     INPUTS:
@@ -323,16 +320,16 @@ def del_tag_group(server, tag_group_path):
         for tg in path_obj['tag_path']:
             url += _create_tag_groups_url(tag_group=tg)
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as err:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(err)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(err))
+        raise KepError(err_msg)
     r = server._config_del(url)
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_tag(server, full_tag_path):
+def get_tag(server, full_tag_path) -> dict:
     '''Returns the properties of the "tag" object at a specific path in Kepware. 
     Returned object is JSON. 
 
@@ -343,7 +340,7 @@ def get_tag(server, full_tag_path):
     notation string including the tag such as "channel1.device1.tag_group1.tag1"
 
     RETURNS:
-    JSON - data for the tag requested
+    dict - data for the tag requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -357,15 +354,15 @@ def get_tag(server, full_tag_path):
             url += _create_tag_groups_url(tag_group=path_obj['tag_path'][x])
         url += _create_tags_url(tag=path_obj['tag_path'][len(path_obj['tag_path'])-1])
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_get(url)
     return r.payload
 
-def get_all_tags(server, full_tag_path):
+def get_all_tags(server, full_tag_path) -> list:
     '''Returns the properties of all "tag" object at a specific path in Kepware. 
     Returned object is JSON list.
 
@@ -376,7 +373,7 @@ def get_all_tags(server, full_tag_path):
     notation string including the tag such as "channel1.device1.tag_group1"
     
     RETURNS:
-    JSON - data for the tags requested
+    list - data for the tags requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -391,15 +388,15 @@ def get_all_tags(server, full_tag_path):
                 url += _create_tag_groups_url(tag_group=tg)
         url += _create_tags_url()
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_get(url)
     return r.payload
 
-def get_tag_group(server, tag_group_path):
+def get_tag_group(server, tag_group_path) -> dict:
     '''Returns the properties of the "tag group" object at a specific 
     path in Kepware. Returned object is JSON.
 
@@ -410,7 +407,7 @@ def get_tag_group(server, tag_group_path):
     notation string such as "channel1.device1.tag_group1"
 
     RETURNS:
-    JSON - data for the tag group requested
+    dict - data for the tag group requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -422,15 +419,15 @@ def get_tag_group(server, tag_group_path):
         for tg in path_obj['tag_path']:
             url += _create_tag_groups_url(tag_group=tg)
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_get(url)
     return r.payload
 
-def get_all_tag_groups(server, tag_group_path):
+def get_all_tag_groups(server, tag_group_path) -> list:
     '''Returns the properties of all "tag group" objects at a specific 
     path in Kepware. Returned object is JSON list. 
 
@@ -441,7 +438,7 @@ def get_all_tag_groups(server, tag_group_path):
     notation string such as "channel1.device1.tag_group1"
 
     RETURNS:
-    JSON - data for the tag groups requested
+    list - data for the tag groups requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -455,10 +452,64 @@ def get_all_tag_groups(server, tag_group_path):
                 url += _create_tag_groups_url(tag_group=tg)
         url += _create_tag_groups_url()
     except KeyError as err:
-        print('Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No key {} identified | Function: {}'.format(err, inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     except Exception as e:
-        print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e)))
-        return False
+        err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+        raise KepError(err_msg)
     r = server._config_get(url)
     return r.payload
+
+def get_full_tag_structure(server, path, recursive = False) -> dict:
+    '''Returns the properties of all "tag" and "tag group" objects at a specific 
+    path in Kepware. Returned object is a dict of tag list and tag group list.
+
+    Ex.
+    {
+        'tags': [tag1_dict, tag2_dict,...],
+        'tag_groups':[tag_group1_dict, tag_group2_dict,...]
+    } 
+
+    If recursive is TRUE, then the call will iterate through all tag groups and get the tags and 
+    tag groups of all tag group children.This would be the equivilant of asking for all tags and tag groups
+    that exist below the "path" location. The returned object would look like below, nested based on how many 
+    levels the tag_group namespace has tags or tag_groups:
+
+    Ex.
+    {
+        'tags': [tag1_dict, tag2_dict,...],
+        'tag_groups':[
+            {
+                tag_group1_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            }, 
+            {
+                tag_group2_properties,
+                'tags': [tag1_dict, tag2_dict,...]
+                'tag_groups':[sub_group1, subgroup2,...]
+            },...]
+    } 
+
+    INPUTS:
+    "server" - instance of the "server" class
+    
+    "path" - path identifying location to retreive the tag structure. Standard Kepware address decimal 
+    notation string such as "channel1.device1.tag_group1" and must container at least the channel and device.
+
+    RETURNS:
+    dict - data for the tag structure requested at "path" location
+
+    EXCEPTIONS:
+    KepHTTPError - If urllib provides an HTTPError
+    KepURLError - If urllib provides an URLError
+    '''
+    r = {}
+        
+    r['tags'] = get_all_tags(server, path)
+    r['tag_groups'] = get_all_tag_groups(server, path)
+    if recursive:
+        for group in r['tag_groups']:
+            res = get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME'])
+            group.update(res)
+    return r

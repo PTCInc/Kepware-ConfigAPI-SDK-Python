@@ -4,11 +4,12 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`log_items` exposes an API to allow modifications (add, delete, modify) to 
+r"""`log_items` exposes an API to allow modifications (add, delete, modify) to 
 log item (tag) objects in a Datalogger log group within the Kepware Configuration API
 """
 from typing import Union
 from . import log_group as Log_Group
+from ..error import KepError, KepHTTPError
 
 LOG_ITEMS_ROOT = '/log_items'
 
@@ -42,8 +43,6 @@ def add_log_item(server, log_group, DATA) -> Union[bool, list]:
     List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     log items added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -57,9 +56,9 @@ def add_log_item(server, log_group, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_log_item(server, log_group, log_item):
+def del_log_item(server, log_group, log_item) -> bool:
     '''Delete a "log item" object of a log group in Kepware's Datalogger.
     
     INPUTS:
@@ -78,9 +77,9 @@ def del_log_item(server, log_group, log_item):
     '''
     r = server._config_del(server.url + Log_Group._create_url(log_group) + _create_url(log_item))
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_log_item(server, log_group, DATA, log_item = None, force = False):
+def modify_log_item(server, log_group, DATA, log_item = None, force = False) -> bool:
     '''Modify a log_item object and it's properties in Kepware. If a "log_item" is not provided as an input,
     you need to identify the log_item in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the log_item that is to be modified.
@@ -110,18 +109,18 @@ def modify_log_item(server, log_group, DATA, log_item = None, force = False):
         try:
             r = server._config_update(server.url + Log_Group._create_url(log_group) + _create_url(log_item_data['common.ALLTYPES_NAME']), log_item_data)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No log item identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg ='Error: No log item identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except:
         #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
         r = server._config_update(server.url + Log_Group._create_url(log_group) + _create_url(log_item), log_item_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_log_item(server, log_group, log_item):
+def get_log_item(server, log_group, log_item) -> dict:
     '''Returns the properties of the log item object. Returned object is JSON.
     
     INPUTS:
@@ -132,7 +131,7 @@ def get_log_item(server, log_group, log_item):
     "log_item" - name of log item to retrieve properties for
 
     RETURNS:
-    JSON - data for the log item requested
+    dict - data for the log item requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -141,7 +140,7 @@ def get_log_item(server, log_group, log_item):
     r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url(log_item))
     return r.payload
 
-def get_all_log_items(server, log_group):
+def get_all_log_items(server, log_group) -> list:
     '''Returns the properties of all log item objects for a log group. Returned object is JSON list.
     
     INPUTS:
@@ -150,7 +149,7 @@ def get_all_log_items(server, log_group):
     "log_group" - name of log group
 
     RETURNS:
-    JSON - data for the log items requested
+    list - data for the log items requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError

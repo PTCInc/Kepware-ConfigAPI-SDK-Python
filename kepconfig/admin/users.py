@@ -4,10 +4,11 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`users` exposes an API to allow modifications (add, delete, modify) to 
+r"""`users` exposes an API to allow modifications (add, delete, modify) to 
 users within the Kepware Administration User Management through the Kepware Configuration API
 """
 from typing import Union
+from ..error import KepError, KepHTTPError
 
 
 USERS_ROOT = '/admin/server_users'
@@ -41,8 +42,6 @@ def add_user(server, DATA) -> Union[bool, list]:
     List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     users added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -56,9 +55,9 @@ def add_user(server, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_user(server, user):
+def del_user(server, user) -> bool:
     '''Delete a "user" object in Kepware User Manager
     
     INPUTS:
@@ -76,9 +75,9 @@ def del_user(server, user):
 
     r = server._config_del(server.url + _create_url(user))
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_user(server, DATA, user = None):
+def modify_user(server, DATA, user = None) -> bool:
     '''Modify a user object and it's properties in Kepware User Manager. If a "user" is not provided as an input,
     you need to identify the user in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the user that is to be modified.
@@ -103,18 +102,18 @@ def modify_user(server, DATA, user = None):
         try:
             r = server._config_update(server.url + _create_url(DATA['common.ALLTYPES_NAME']), DATA)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No User identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No User identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except Exception as e:
         #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     else:
         r = server._config_update(server.url + _create_url(user), DATA)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_user(server, user):
+def get_user(server, user) -> dict:
     '''Returns the properties of the user object. Returned object is JSON.
     
     INPUTS:
@@ -123,7 +122,7 @@ def get_user(server, user):
     "user" - name of user
     
     RETURNS:
-    JSON - data for the user requested
+    dict - data for the user requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -133,14 +132,14 @@ def get_user(server, user):
     r = server._config_get(server.url + _create_url(user))
     return r.payload
 
-def get_all_users(server):
+def get_all_users(server) -> list:
     '''Returns list of all user objects and their properties. Returned object is JSON list.
     
     INPUTS:
     "server" - instance of the "server" class
     
     RETURNS:
-    JSON - data for all users requested
+    list - data for all users requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -150,7 +149,7 @@ def get_all_users(server):
     r = server._config_get(server.url + _create_url())
     return r.payload
 
-def enable_user(server, user):
+def enable_user(server, user) -> bool:
     '''Enable the user. Returned object is JSON.
     
     INPUTS:
@@ -168,7 +167,7 @@ def enable_user(server, user):
     DATA = {ENABLE_PROPERTY: True}
     return modify_user(server, DATA, user)
 
-def disable_user(server, user):
+def disable_user(server, user) -> bool:
     '''Disable the user. Returned object is JSON.
     
     INPUTS:

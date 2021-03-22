@@ -4,12 +4,13 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r""":mod:`triggers` exposes an API to allow modifications (add, delete, modify) to 
+r"""`triggers` exposes an API to allow modifications (add, delete, modify) to 
 trigger objects in a Datalogger log group within the Kepware Configuration API
 """
 
 from typing import Union
 from . import log_group as Log_Group
+from ..error import KepError, KepHTTPError
 
 TRIGGERS_ROOT = '/triggers'
 
@@ -43,8 +44,6 @@ def add_trigger(server, log_group, DATA) -> Union[bool, list]:
     List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     triggers added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -58,9 +57,9 @@ def add_trigger(server, log_group, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_trigger(server, log_group, trigger):
+def del_trigger(server, log_group, trigger) -> bool:
     '''Delete a "trigger" object of a log group in Kepware's Datalogger.
     
     INPUTS:
@@ -79,9 +78,9 @@ def del_trigger(server, log_group, trigger):
     '''
     r = server._config_del(server.url + Log_Group._create_url(log_group) + _create_url(trigger))
     if r.code == 200: return True
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_trigger(server, log_group, DATA, trigger = None, force = False):
+def modify_trigger(server, log_group, DATA, trigger = None, force = False)  -> bool:
     '''Modify a trigger object and it's properties in Kepware. If a "trigger" is not provided as an input,
     you need to identify the trigger in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the trigger that is to be modified.
@@ -111,18 +110,18 @@ def modify_trigger(server, log_group, DATA, trigger = None, force = False):
         try:
             r = server._config_update(server.url + Log_Group._create_url(log_group) + _create_url(trigger_data['common.ALLTYPES_NAME']), trigger_data)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No trigger identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No trigger identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except:
         #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
         r = server._config_update(server.url + Log_Group._create_url(log_group) + _create_url(trigger), trigger_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_trigger(server, log_group, trigger):
+def get_trigger(server, log_group, trigger) -> dict:
     '''Returns the properties of the trigger object. Returned object is JSON.
     
     INPUTS:
@@ -133,7 +132,7 @@ def get_trigger(server, log_group, trigger):
     "trigger" - name of trigger to retrieve properties for
 
     RETURNS:
-    JSON - data for the trigger requested
+    dict - data for the trigger requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -142,7 +141,7 @@ def get_trigger(server, log_group, trigger):
     r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url(trigger))
     return r.payload
 
-def get_all_triggers(server, log_group):
+def get_all_triggers(server, log_group) -> list:
     '''Returns the properties of all trigger objects for a log group. Returned object is JSON list.
     
     INPUTS:
@@ -151,7 +150,7 @@ def get_all_triggers(server, log_group):
     "log_group" - name of log group
 
     RETURNS:
-    JSON - data for the triggers requested
+    list - data for the triggers requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
