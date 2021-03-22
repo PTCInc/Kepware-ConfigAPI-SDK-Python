@@ -13,11 +13,35 @@ import codecs
 import datetime
 from urllib import request, parse, error
 from base64 import b64encode
-from . import error as KepError
+from .error import KepError, KepHTTPError, KepURLError
 import socket
 import ssl
 import sys
 
+class KepServiceResponse:
+    '''A class to represent a return object when calling a "service" API of Kepware. This is
+    used to return the responses when a "service" is executed appropriately
+
+    Properties:
+
+    "code" - HTTP code returned
+    "message" - return from the "service" call
+    "href" - URL reference to the JOB that is created by the service API
+    '''
+
+    def __init__(self, code = '', message = '', href = ''):
+        self.code = code
+        self.message = message
+        self.href = href
+    
+    def __str__(self):
+        return '{"code": %s, "message": %s, "href": %s}' % (self.code, self.message, self.href)
+
+class _HttpDataAbstract:
+    def __init__(self):
+        self.payload = ''
+        self.code = ''
+        self.reason = ''
 
 class server:
     '''A class to represent a connection to an instance of Kepware. This object is used to 
@@ -108,7 +132,7 @@ class server:
 
 
 
-    def reinitialize(self, job_ttl = None):
+    def reinitialize(self, job_ttl = None) -> KepServiceResponse:
         '''Executes a Reinitialize call to the Kepware instance.
 
         RETURNS:
@@ -126,7 +150,7 @@ class server:
         except Exception as err:
             raise err
         
-    def get_trans_log(self, start = None, end = None, limit = None):
+    def get_trans_log(self, start = None, end = None, limit = None) -> list:
         ''' Get the Transaction Log from the Kepware instance.
 
         "start" (optional) - datetime.datetime type and should be UTC
@@ -140,7 +164,7 @@ class server:
         r = self._config_get(url)
         return r.payload
 
-    def get_event_log(self, limit = None, start = None, end = None):
+    def get_event_log(self, limit = None, start = None, end = None) -> list:
         ''' Get the Event Log from the Kepware instance.
 
         "start" (optional) - datetime.datetime type and should be UTC
@@ -154,11 +178,11 @@ class server:
         r = self._config_get(url)
         return r.payload
     
-    def get_project_properties(self):
+    def get_project_properties(self) -> dict:
         ''' Get the Project Properties of the Kepware instance.
         
         RETURNS:
-        JSON - Dict of all the project properties
+        dict - Dict of all the project properties
 
         EXCEPTIONS:
         KepHTTPError - If urllib provides an HTTPError
@@ -168,7 +192,7 @@ class server:
         r = self._config_get(self.url + '/project')
         return r.payload
     
-    def modify_project_properties(self, DATA, force = False):
+    def modify_project_properties(self, DATA, force = False) -> bool:
         ''' Modify the Project Properties of the Kepware instance.
 
         INPUTS:
@@ -188,7 +212,7 @@ class server:
         prop_data = self._force_update_check(force, DATA)
         r = self._config_update(self.url + '/project', prop_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
     #Function used to Add an object to Kepware (HTTP POST)
     def _config_add(self, url, DATA):
@@ -262,7 +286,7 @@ class server:
             r = self._config_update(url, TTL)
             job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
             return job
-        except KepError.KepHTTPError as err:
+        except KepHTTPError as err:
             if err.code == 429:
                 job = KepServiceResponse()
                 job.code = err.code
@@ -298,10 +322,10 @@ class server:
         except error.HTTPError as err:
             payload = json.loads(codecs.decode(err.read(),'utf-8-sig'))
             # print('HTTP Code: {}\n{}'.format(err.code,payload), file=sys.stderr)
-            raise KepError.KepHTTPError(err.url, err.code, err.msg, err.hdrs, payload)
+            raise KepHTTPError(err.url, err.code, err.msg, err.hdrs, payload)
         except error.URLError as err:
             # print('URLError: {} URL: {}'.format(err.reason, request_obj.get_full_url()), file=sys.stderr)
-            raise KepError.KepURLError(err.reason, request_obj.get_full_url())
+            raise KepURLError(err.reason, request_obj.get_full_url())
 
     # Fucntion used to ensure special characters are handled in the URL
     # Ex: Space will be turned to %20
@@ -340,27 +364,3 @@ class server:
         return query
 
 
-class KepServiceResponse:
-    '''A class to represent a return object when calling a "service" API of Kepware. This is
-    used to return the responses when a "service" is executed appropriately
-
-    Properties:
-
-    "code" - HTTP code returned
-    "message" - return from the "service" call
-    "href" - URL reference to the JOB that is created by the service API
-    '''
-
-    def __init__(self, code = '', message = '', href = ''):
-        self.code = code
-        self.message = message
-        self.href = href
-    
-    def __str__(self):
-        return '{"code": %s, "message": %s, "href": %s}' % (self.code, self.message, self.href)
-
-class _HttpDataAbstract:
-    def __init__(self):
-        self.payload = ''
-        self.code = ''
-        self.reason = ''

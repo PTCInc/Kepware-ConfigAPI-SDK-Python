@@ -12,6 +12,7 @@ Iot Gateway agent objects within the Kepware Configuration API
 # from .. import connection 
 from typing import Union
 from .. import iot_gateway as IOT
+from ..error import KepError, KepHTTPError
 import inspect
 
 IOT_ROOT_URL = '/project/_iot_gateway'
@@ -71,8 +72,6 @@ def add_iot_agent(server, DATA, agent_type = None) -> Union[bool, list]:
     List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     iot agents added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -82,10 +81,10 @@ def add_iot_agent(server, DATA, agent_type = None) -> Union[bool, list]:
         try:
             r = server._config_update(server.url + _create_url(DATA['iot_gateway.AGENTTYPES_TYPE']), DATA)
             if r.code == 201: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            # print('Error: No agent identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No agent identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except:
         #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
@@ -97,9 +96,9 @@ def add_iot_agent(server, DATA, agent_type = None) -> Union[bool, list]:
                 if item['code'] != 201:
                     errors.append(item)
             return errors
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_iot_agent(server, agent, agent_type):
+def del_iot_agent(server, agent, agent_type) -> bool:
     '''Delete a "agent" object in Kepware. This will delete all children as well
     
     INPUTS:
@@ -118,9 +117,9 @@ def del_iot_agent(server, agent, agent_type):
     '''
     r = server._config_del(server.url + _create_url(agent_type, agent))
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_iot_agent(server, DATA, agent = None, agent_type = None, force = False):
+def modify_iot_agent(server, DATA, agent = None, agent_type = None, force = False) -> bool:
     '''Modify a agent object and it's properties in Kepware. If a "agent" is not provided as an input,
     you need to identify the agent in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the agent that is to be modified.
@@ -150,24 +149,24 @@ def modify_iot_agent(server, DATA, agent = None, agent_type = None, force = Fals
         if 'iot_gateway.AGENTTYPES_TYPE' in DATA:
             agent_type = DATA['iot_gateway.AGENTTYPES_TYPE']
         else:
-            # print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, 'No Agent type defined.'))
-            return False
+            err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, 'No Agent type defined.')
+            raise KepError(err_msg)
     if agent == None:
         try:
             r = server._config_update(server.url + _create_url(agent_type, agent_data['common.ALLTYPES_NAME']), agent_data)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No agent identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No agent identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except:
         #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
         r = server._config_update(server.url + _create_url(agent_type, agent), agent_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_iot_agent(server, agent, agent_type):
+def get_iot_agent(server, agent, agent_type) -> dict:
     '''Returns the properties of the agent object. Returned object is JSON.
     
     INPUTS:
@@ -178,7 +177,7 @@ def get_iot_agent(server, agent, agent_type):
     "agent_type" - agent type
 
     RETURNS:
-    JSON - data for the IoT Agent requested
+    dict - data for the IoT Agent requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -187,7 +186,7 @@ def get_iot_agent(server, agent, agent_type):
     r = server._config_get(server.url + _create_url(agent_type, agent))
     return r.payload
 
-def get_all_iot_agents(server, agent_type):
+def get_all_iot_agents(server, agent_type) -> list:
     '''Returns the properties of all agent objects for a specific agent type. Returned object is JSON list.
     
     INPUTS:
@@ -196,7 +195,7 @@ def get_all_iot_agents(server, agent_type):
     "agent_type" - agent type
 
     RETURNS:
-    JSON - data for the IoT Agents requested
+    list - data for the IoT Agents requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError

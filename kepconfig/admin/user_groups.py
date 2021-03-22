@@ -8,6 +8,7 @@ r"""`user_groups` exposes an API to allow modifications (add, delete, modify) to
 user_groups within the Kepware Administration User Manager through the Kepware Configuration API
 """
 from typing import Union
+from ..error import KepHTTPError, KepError
 
 
 USERGROUPS_ROOT = '/admin/server_usergroups'
@@ -41,8 +42,6 @@ def add_user_group(server, DATA) -> Union[bool, list]:
     List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     user groups added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -56,9 +55,9 @@ def add_user_group(server, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_user_group(server, user_group):
+def del_user_group(server, user_group) -> bool:
     '''Delete a "user_group" object in Kepware User Manager
     
     INPUTS:
@@ -76,9 +75,9 @@ def del_user_group(server, user_group):
 
     r = server._config_del(server.url + _create_url(user_group))
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_user_group(server, DATA, user_group = None):
+def modify_user_group(server, DATA, user_group = None) -> bool:
     '''Modify a user_group object and it's properties in Kepware User Manager. If a "user_group" is not provided as an input,
     you need to identify the user_group in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the user_group that is to be modified.
@@ -105,8 +104,8 @@ def modify_user_group(server, DATA, user_group = None):
             if r.code == 200: return True 
             else: return False
         except KeyError as err:
-            print('Error: No User Group identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No User Group identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except Exception as e:
         #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     else:
@@ -114,7 +113,7 @@ def modify_user_group(server, DATA, user_group = None):
         if r.code == 200: return True 
         else: return False
 
-def get_user_group(server, user_group):
+def get_user_group(server, user_group) -> dict:
     '''Returns the properties of the user_group object. Returned object is JSON.
     
     INPUTS:
@@ -123,7 +122,7 @@ def get_user_group(server, user_group):
     "user_group" - name of user_group
     
     RETURNS:
-    JSON - data for the user_group requested
+    dict - data for the user_group requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -133,14 +132,14 @@ def get_user_group(server, user_group):
     r = server._config_get(server.url + _create_url(user_group))
     return r.payload
 
-def get_all_user_groups(server):
+def get_all_user_groups(server) -> list:
     '''Returns list of all user_group objects and their properties. Returned object is JSON list.
     
     INPUTS:
     "server" - instance of the "server" class
     
     RETURNS:
-    JSON - data for all user_groups requested
+    list - data for all user_groups requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -150,7 +149,7 @@ def get_all_user_groups(server):
     r = server._config_get(server.url + _create_url())
     return r.payload
 
-def enable_user_group(server, user_group):
+def enable_user_group(server, user_group) -> bool:
     '''Enable the user group. Returned object is JSON.
     
     INPUTS:
@@ -168,7 +167,7 @@ def enable_user_group(server, user_group):
     DATA = {ENABLE_PROPERTY: True}
     return modify_user_group(server, DATA, user_group)
 
-def disable_user_group(server, user_group):
+def disable_user_group(server, user_group) -> bool:
     '''Disable the user group. Returned object is JSON.
     
     INPUTS:

@@ -11,6 +11,7 @@ channel objects within the Kepware Configuration API
 
  
 import inspect
+from ..error import KepHTTPError, KepError
 from typing import Union
 from. import device
 
@@ -46,8 +47,6 @@ def add_channel(server, DATA) -> Union[bool, list]:
     
     List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     channels added that failed.
-
-    False - If a non-expected "2xx successful" code is returned
         
 
     EXCEPTIONS:
@@ -63,9 +62,10 @@ def add_channel(server, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: 
+        raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_channel(server, channel):
+def del_channel(server, channel) -> bool:
     '''Delete a "channel" object in Kepware. This will delete all children as well
     
     INPUTS:
@@ -83,9 +83,10 @@ def del_channel(server, channel):
 
     r = server._config_del(server.url + _create_url(channel))
     if r.code == 200: return True 
-    else: return False
+    else: 
+        raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_channel(server, DATA, channel = None, force = False):
+def modify_channel(server, DATA, channel = None, force = False) -> bool:
     '''Modify a channel object and it's properties in Kepware. If a "channel" is not provided as an input,
     you need to identify the channel in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the channel that is to be modified.
@@ -112,18 +113,19 @@ def modify_channel(server, DATA, channel = None, force = False):
         try:
             r = server._config_update(server.url + _create_url(channel_data['common.ALLTYPES_NAME']), channel_data)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No Channel identified in DATA | Key Error: {}'.format(err))
-            return False
+            err_msg = 'Error: No Channel identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
         # except Exception as e:
         #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     else:
         r = server._config_update(server.url + _create_url(channel), channel_data)
         if r.code == 200: return True 
-        else: return False
+        else: 
+            raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_channel(server, channel):
+def get_channel(server, channel)  -> dict:
     '''Returns the properties of the channel object. Returned object is JSON.
     
     INPUTS:
@@ -132,7 +134,7 @@ def get_channel(server, channel):
     "channel" - name of channel
     
     RETURNS:
-    JSON - data for the channel requested
+    dict - data for the channel requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -142,14 +144,14 @@ def get_channel(server, channel):
     r = server._config_get(server.url + _create_url(channel))
     return r.payload
 
-def get_all_channels(server):
+def get_all_channels(server) -> list:
     '''Returns list of all channel objects and their properties. Returned object is JSON list.
     
     INPUTS:
     "server" - instance of the "server" class
     
     RETURNS:
-    JSON - data for the channel requested
+    list - data for the channel requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -159,7 +161,7 @@ def get_all_channels(server):
     r = server._config_get(server.url + _create_url())
     return r.payload
 
-def get_channel_structure(server, channel):
+def get_channel_structure(server, channel) -> dict:
     '''Returns the properties of "channel" and includes all "devices" and the "tag" and "tag group" objects for a 
     channel in Kepware. Returned object is a dict of channel properties including a device list with 
     tag lists and tag group lists.
@@ -195,27 +197,16 @@ def get_channel_structure(server, channel):
 
     RETURNS:
     dict - data for the device structure requested for "channel"
-    FALSE - If the call fails
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
 
-    try:
-        channel_properties = get_channel(server, channel)
-        device_list = device.get_all_devices(server,channel)
-        if type(device_list) is not list or type(channel_properties) is not dict:
-            return False
-        else:
-            for dev in device_list:
-                device_properties = []
-                dev_struct = device.get_device_structure(server,channel + '.' + dev['common.ALLTYPES_NAME'])
-                if type(dev_struct) is dict:
-                    device_properties.append(dev_struct)
-                else:
-                    return False
-            return {**channel_properties,'device': device_properties}
-    except Exception as err:
-        # pass on exceptions
-        raise err
+    channel_properties = get_channel(server, channel)
+    device_list = device.get_all_devices(server,channel)
+    for dev in device_list:
+        device_properties = []
+        dev_struct = device.get_device_structure(server,channel + '.' + dev['common.ALLTYPES_NAME'])
+        device_properties.append(dev_struct)
+    return {**channel_properties,'device': device_properties}

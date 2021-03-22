@@ -9,7 +9,8 @@ r"""`device` exposes an API to allow modifications (add, delete, modify) to
 device objects within the Kepware Configuration API
 """
 
-from kepconfig.connection import KepServiceResponse
+from ..connection import KepServiceResponse
+from ..error import KepHTTPError, KepError
 from typing import Union
 import kepconfig
 from . import channel, tag
@@ -50,8 +51,6 @@ def add_device(server, dev_channel, DATA) -> Union[bool, list]:
     List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     devices added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
@@ -65,9 +64,10 @@ def add_device(server, dev_channel, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: 
+        raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_device(server, device_path):
+def del_device(server, device_path) -> bool:
     '''Delete a "device" object in Kepware. This will delete all children as well.
 
     INPUTS:
@@ -88,12 +88,12 @@ def del_device(server, device_path):
     try:
         r = server._config_del(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
     except KeyError as err:
-        print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
 
-def modify_device(server, device_path, DATA, force = False):
+def modify_device(server, device_path, DATA, force = False) -> bool:
     '''Modify a device object and it's properties in Kepware.
 
     INPUTS:
@@ -120,14 +120,14 @@ def modify_device(server, device_path, DATA, force = False):
     try:
         r = server._config_update(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']), device_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
     except KeyError as err:
-            print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
-            return False
+            err_msg = 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
+            raise KepError(err_msg)
     # except Exception as e:
     #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
 
-def get_device(server, device_path):
+def get_device(server, device_path) -> dict:
     '''Returns the properties of the device object. Returned object is JSON.
 
     INPUTS:
@@ -137,7 +137,7 @@ def get_device(server, device_path):
     device such as "channel1.device1"
 
     RETURNS:
-    JSON - data for the device requested
+    dict - data for the device requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -149,20 +149,20 @@ def get_device(server, device_path):
         r = server._config_get(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
         return r.payload
     except KeyError as err:
-        print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
-        return False
+        err_msg = 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
     # except Exception as err:
     #     print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(err)))
     #     raise err
 
-def get_all_devices(server, dev_channel):
+def get_all_devices(server, dev_channel) -> list:
     '''Returns list of all device objects and their properties within a channel. Returned object is JSON list.
     
     INPUTS:
     "dev_channel" - channel the device object exists
 
     RETURNS:
-    JSON - data for the devices requested
+    list - data for the devices requested
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
@@ -194,12 +194,10 @@ def auto_tag_gen(server, device_path, job_ttl = None) -> KepServiceResponse:
         job = server._kep_service_execute(url, job_ttl)
         return job
     except KeyError as err:
-        print('Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name))
-        return False
-    except Exception as err:
-        raise err
+        err_msg = 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
+        raise KepError(err_msg)
 
-def get_all_tags_tag_groups(server, device_path):
+def get_all_tags_tag_groups(server, device_path) -> dict:
     '''Returns the properties of all "tag" and "tag group" objects for as specific
     device in Kepware. Returned object is a dict of tag list and tag group list.
 
@@ -230,21 +228,16 @@ def get_all_tags_tag_groups(server, device_path):
 
     RETURNS:
     dict - data for the tag structure requested at "device_path" location
-    FALSE - If the call fails
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
 
-    try:
-        r = tag.get_full_tag_structure(server, device_path,recursive=True)
-        return r
-    except Exception as err:
-        # pass on exceptions
-        raise err
+    r = tag.get_full_tag_structure(server, device_path,recursive=True)
+    return r
 
-def get_device_structure(server, device_path):
+def get_device_structure(server, device_path) -> dict:
     '''Returns the properties of "device" and includes all "tag" and "tag group" objects for as specific
     device in Kepware. Returned object is a dict of device properties including a tag list and tag group list.
 
@@ -276,20 +269,12 @@ def get_device_structure(server, device_path):
 
     RETURNS:
     dict - data for the device structure requested at "device_path" location
-    FALSE - If the call fails
 
     EXCEPTIONS:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
 
-    try:
-        tags = tag.get_full_tag_structure(server, device_path,recursive=True)
-        device_properties = get_device(server,device_path)
-        if type(tags) is not dict or type(device_properties) is not dict:
-            return False
-        else:
-            return {**device_properties, **tags}
-    except Exception as err:
-        # pass on exceptions
-        raise err
+    tags = tag.get_full_tag_structure(server, device_path,recursive=True)
+    device_properties = get_device(server,device_path)
+    return {**device_properties, **tags}
