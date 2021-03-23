@@ -1,5 +1,7 @@
 # Kepware Configuration API SDK for Python
 
+[![PyPI version](https://badge.fury.io/py/kepconfig.svg)](https://badge.fury.io/py/kepconfig)
+
 This is a package SDK to create Python modules to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP).
 
 ## Prerequisites
