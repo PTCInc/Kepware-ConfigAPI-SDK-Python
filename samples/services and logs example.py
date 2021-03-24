@@ -71,12 +71,13 @@ try:
 except Exception as err:
     ErrorHandler(err)
 # Get Event Log from Kepware instance.
+# Time parameters need to be UTC values.
 try:
     print("{} - {}".format("Here is the last Event Log Entry", json.dumps(server.get_event_log(1, None, None), indent=4)))
 except Exception as err:
     ErrorHandler(err)
 try:
-    print("{} - {}".format("Here are the last 25 entries of the Event Log", json.dumps(server.get_event_log(25, datetime.datetime.fromisoformat('2019-11-03T23:35:23.000'), datetime.datetime.now()), indent=4)))
+    print("{} - {}".format("Here are the last 25 entries of the Event Log", json.dumps(server.get_event_log(25, datetime.datetime.fromisoformat('2019-11-03T23:35:23.000'), datetime.datetime.utcnow()), indent=4)))
 except Exception as err:
     ErrorHandler(err)
 
