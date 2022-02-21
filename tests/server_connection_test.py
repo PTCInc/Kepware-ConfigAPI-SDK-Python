@@ -82,4 +82,4 @@ def test_project_props(server):
 def test_event_log(server):
     assert type(server.get_event_log(25, None, None)) == list
     
-    assert type(server.get_event_log(25, datetime.datetime.fromisoformat('2019-11-03T23:35:23.000'), datetime.datetime.now())) == list
+    assert type(server.get_event_log(None, datetime.datetime.fromisoformat('2022-02-21T14:23:23.000'), datetime.datetime.utcnow())) == list
