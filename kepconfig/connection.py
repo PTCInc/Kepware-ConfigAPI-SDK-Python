@@ -37,6 +37,25 @@ class KepServiceResponse:
     def __str__(self):
         return '{"code": %s, "message": %s, "href": %s}' % (self.code, self.message, self.href)
 
+class KepServiceStatus:
+    '''A class to represent a status object when checking on a "service" API job state in Kepware. This is
+    used to return the status of a "service" job
+
+    Properties:
+
+    "complete" - Boolean of service job completion status
+    "status" - Status code of job
+    "message" - Error message if service job fails
+    
+    '''
+    def __init__(self, complete = '', status = '', message = ''):
+        self.status = status
+        self.message = message
+        self.complete = complete
+    
+    def __str__(self):
+        return '{"complete": %s, "status": %s, "message": %s}' % (self.complete, self.status, self.message)
+
 class _HttpDataAbstract:
     def __init__(self):
         self.payload = ''
@@ -62,9 +81,12 @@ class server:
 
     Methods:
 
-    "reinitialize()" - Reinitialize the Kepware server
+    "reinitialize()" - reinitialize the Kepware server
     "get_trans_log()" - retrieve the Configuration API transaction logs
     "get_event_log()" - retrieve the Kepware Event Log
+    "get_project_properties()" - retrieve the Kepware Project Properties
+    "modify_project_properties()" - modify the Kepware Project Properties
+    "service_status()" - retrive service job status
     '''
     __root_url = '/config'
     __version_url = '/v1'
@@ -213,6 +235,30 @@ class server:
         r = self._config_update(self.url + '/project', prop_data)
         if r.code == 200: return True 
         else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
+    
+    def service_status(self, resp: KepServiceResponse):
+        '''Returns the status of a service job. Used to verify if a service call
+        has completed or not.
+
+        INPUT:
+        "resp" - KepServiceResponse instance with job information
+
+        RETURNS:
+        KepServiceStatus instance with job status
+
+        EXCEPTIONS:
+        
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+        # need to remove part of job href
+        loc = resp.href.find(self.__root_url + self.__version_url)
+        job_url = resp.href[loc + len(self.__root_url + self.__version_url):]
+
+        r = self._config_get(self.url + job_url)
+        job = KepServiceStatus(r.payload['servermain.JOB_COMPLETE'],r.payload['servermain.JOB_STATUS'], r.payload['servermain.JOB_STATUS_MSG'])
+        return job
+
 
     #Function used to Add an object to Kepware (HTTP POST)
     def _config_add(self, url, DATA):
@@ -279,7 +325,7 @@ class server:
                         pass
         return DATA
     # General service call handler
-    def _kep_service_execute(self, url, TTL):
+    def _kep_service_execute(self, url, TTL = None):
         try:
             if TTL != None:
                 TTL = {"servermain.JOB_TIME_TO_LIVE_SECONDS": TTL}
