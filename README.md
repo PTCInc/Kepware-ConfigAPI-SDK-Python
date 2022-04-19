@@ -20,9 +20,9 @@ SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following 
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
 | **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
 | **Datalogger** <br /> *(Log Groups, Items, Mapping, Triggers, Reset Mapping Service)* | Y | Y |
-| **Administration** <br /> *(User Groups, Users, UA Endpoints)* | Y* | Y |
+| **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y* | Y |
 
-Note (*) - UA Endpoints supported for Kepware Edge only
+Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only
 
 Driver specific features:
 

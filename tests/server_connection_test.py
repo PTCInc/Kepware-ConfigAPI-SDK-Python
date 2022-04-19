@@ -32,7 +32,7 @@ def complete(server):
     pass
 
 @pytest.fixture(scope="module")
-def server(kepware_server):
+def server(kepware_server: kepconfig.connection.server):
     server = kepware_server
     
     # Initialize any configuration before testing in module
@@ -42,7 +42,7 @@ def server(kepware_server):
     yield server
     complete(server)
     
-def test_connection_params(server):
+def test_connection_params(server: kepconfig.connection.server):
 
     server.SSL_trust_all_certs = True
     assert server.SSL_trust_all_certs == True
@@ -54,13 +54,17 @@ def test_connection_params(server):
     server.SSL_ignore_hostname = False
     assert server.SSL_ignore_hostname == False
 
-def test_reinitialize(server):
+def test_reinitialize_service_status(server: kepconfig.connection.server):
     job = server.reinitialize()
     assert type(job) == kepconfig.connection.KepServiceResponse
+    time.sleep(1)
+    status = server.service_status(job)
+    assert type(status) == kepconfig.connection.KepServiceStatus
     job = server.reinitialize(60)
     assert type(job) == kepconfig.connection.KepServiceResponse
 
-def test_project_props(server):
+
+def test_project_props(server: kepconfig.connection.server):
     # Get Project Properties
     assert type(server.get_project_properties()) == dict
 
@@ -79,7 +83,7 @@ def test_project_props(server):
     }
     assert server.modify_project_properties(project_prop, force = True)
 
-def test_event_log(server):
+def test_event_log(server: kepconfig.connection.server):
     assert type(server.get_event_log(25, None, None)) == list
     
-    assert type(server.get_event_log(25, datetime.datetime.fromisoformat('2019-11-03T23:35:23.000'), datetime.datetime.now())) == list
+    assert type(server.get_event_log(None, datetime.datetime.fromisoformat('2022-02-21T14:23:23.000'), datetime.datetime.utcnow())) == list
