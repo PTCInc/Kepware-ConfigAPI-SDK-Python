@@ -45,7 +45,7 @@ def release():
         if ans.lower() in ("y", "yes"):
             # os.system("rm -rf dist/*") #Linux
             os.system("RMDIR /S /Q dist") #Windows
-            os.system("python setup.py sdist bdist_wheel")
+            os.system("python -m build")
 
             # Test PyPi Server
             os.system("twine upload --repository testpypi dist/*")
