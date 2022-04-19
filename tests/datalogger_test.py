@@ -154,9 +154,9 @@ def HTTPErrorHandler(err):
     else:
         print('Different Exception Received: {}'.format(err))
 		
-def initialize(server: kepconfig.connection.server):
+def initialize(server):
 	try:
-		server._config_get(server.url + datalogger.log_group._create_url())
+		server._config_get(server.url +"/project/_datalogger")
 	except Exception as err:
 		pytest.skip("DataLogger plug-in is not installed", allow_module_level=True)
 
