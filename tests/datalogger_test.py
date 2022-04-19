@@ -154,7 +154,7 @@ def HTTPErrorHandler(err):
     else:
         print('Different Exception Received: {}'.format(err))
 		
-def initialize(server):
+def initialize(server: kepconfig.connection.server):
 	try:
 		server._config_get(server.url +"/project/_datalogger")
 	except Exception as err:
