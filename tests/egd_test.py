@@ -117,7 +117,7 @@ egd_device = {
     }]
 }
 
-def initialize(server):
+def initialize(server: kepconfig.connection.server):
     try:
         server._config_get(server.url +"/doc/drivers/GE Ethernet Global Data/channels")
     except Exception as err:

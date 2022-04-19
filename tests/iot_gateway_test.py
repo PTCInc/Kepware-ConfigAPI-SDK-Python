@@ -25,11 +25,10 @@ rserver_agent_name = 'REST Server'
 twx_agent_name = 'Thingworx'
 iot_item_name ="System__Date"
 
-agent_list = [
-        [mqtt_agent_name, kepconfig.iot_gateway.MQTT_CLIENT_AGENT],
-        [rest_agent_name, kepconfig.iot_gateway.REST_CLIENT_AGENT], 
-        [rserver_agent_name, kepconfig.iot_gateway.REST_SERVER_AGENT]
-        ]
+# used to test which agents are installed to test against.
+agent_list_avail = []
+
+agent_list = []
 
 agent_data = {
             "common.ALLTYPES_NAME": 'TempName',
@@ -71,8 +70,15 @@ def HTTPErrorHandler(err):
     else:
         print('Different Exception Received: {}'.format(err))
 
-def initialize(server):
-    pass
+def initialize(server: kepconfig.connection.server):
+    try:
+        agent_list_avail = server._config_get(server.url +"/project/_iot_gateway?content=type_definition").payload
+        for agent in agent_list_avail['child_collections']:
+            if agent == 'mqtt_clients': agent_list.append([mqtt_agent_name, kepconfig.iot_gateway.MQTT_CLIENT_AGENT])
+            if agent == 'rest_clients': agent_list.append([rest_agent_name, kepconfig.iot_gateway.REST_CLIENT_AGENT])
+            if agent == 'rest_servers': agent_list.append([rserver_agent_name, kepconfig.iot_gateway.REST_SERVER_AGENT])
+    except Exception as err:
+        pytest.skip("IoT gateway plug-in is not installed", allow_module_level=True)
 
 def complete(server):
     # Delete all Agents
