@@ -16,8 +16,6 @@ import datetime
 ch_name = 'ControlLogix_Channel'
 dev_name = 'Device1'
 device_IP = '192.168.1.100'
-# Service Response Global
-r = {}
 
 def ErrorHandler(err):
     # Generic Handler for exception errors
@@ -42,15 +40,7 @@ server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrat
 # This Reinitializes Kepware's Server Runtime process, similar to manually reinitializing
 # using the Configuration UI or the Administrator tool.
 try:
-    r = server.reinitialize()
-    print('{} - {}'.format("Execute Reinitialize Service", r))
-except Exception as err:
-    ErrorHandler(err)
-
-# This reads the Reinitialize Service Job Status using the returned KepServiceResponse
-
-try:
-    print('{} - {}'.format("Read Reinitialize Service Status", server.service_status(r)))
+    print('{} - {}'.format("Execute Reinitialize Service", server.reinitialize()))
 except Exception as err:
     ErrorHandler(err)
 
@@ -77,17 +67,9 @@ except Exception as err:
 
 # Execute the "TagGeneration" service available in the Kepware Configuration API
 try:
-    r = device.auto_tag_gen(server, '{}.{}'.format(ch_name, dev_name))
-    print("{} - {}".format("Executing ATG for Controllogix Device", r))
+    print("{} - {}".format("Executing ATG for Controllogix Device", device.auto_tag_gen(server, '{}.{}'.format(ch_name, dev_name))))
 except Exception as err:
     ErrorHandler(err)
-
-# This reads the TagGeneration Service Job Status using the returned KepServiceResponse
-try:
-    print('{} - {}'.format("Read Service Status", server.service_status(r)))
-except Exception as err:
-    ErrorHandler(err)
-
 # Get Event Log from Kepware instance.
 # Time parameters need to be UTC values.
 try:

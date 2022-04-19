@@ -45,16 +45,6 @@ uaendpoint3 = {
     "libadminsettings.UACONFIGMANAGER_ENDPOINT_PORT": 49333
 }
 
-default_lls_config = {
-    "libadminsettings.LICENSING_SERVER_PORT": 7070,
-    "libadminsettings.LICENSING_SERVER_NAME": "",
-    "libadminsettings.LICENSING_CHECK_PERIOD_MINS": 5,
-    "libadminsettings.LICENSING_SERVER_SSL_PORT": 1443,
-    "libadminsettings.LICENSING_SERVER_ALLOW_INSECURE_COMMS": False,
-    "libadminsettings.LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS": False,
-    "libadminsettings.LICENSING_CLIENT_ALIAS": ""
-}
-
 def HTTPErrorHandler(err):
     if err.__class__ is KepHTTPError:
         print(err.code)
@@ -84,9 +74,6 @@ def complete(server):
             admin.user_groups.del_user_group(server,ug['common.ALLTYPES_NAME'])
         except Exception as err:
             pass
-    
-    admin.lls.update_lls_config(server,admin.lls.lls_config(default_lls_config))
-    
 
 @pytest.fixture(scope="module")
 def server(kepware_server):
@@ -99,12 +86,9 @@ def server(kepware_server):
     yield server
     complete(server)
     
-def test_uaserver(server):
-    try:
-        server._config_get(server.url + admin.ua_server._create_url())
-    except Exception as err:
-        pytest.skip("UA Endpoints not configurable.")
 
+def test_uaserver(server):
+    
     assert admin.ua_server.add_endpoint(server,uaendpoint1)
     
     assert admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
@@ -216,24 +200,3 @@ def test_users(server):
     assert admin.users.del_user(server, user1['common.ALLTYPES_NAME'])
     
     assert admin.users.del_user(server, user2['common.ALLTYPES_NAME'])
-
-def test_LLS(server):
-
-    assert type(admin.lls.get_lls_config(server)) == admin.lls.lls_config
-
-    lls_config = {"libadminsettings.LICENSING_SERVER_PORT": 80,
-    "libadminsettings.LICENSING_SERVER_NAME": "test_host",
-    "libadminsettings.LICENSING_CHECK_PERIOD_MINS": 20,
-    "libadminsettings.LICENSING_SERVER_SSL_PORT": 7777,
-    "libadminsettings.LICENSING_SERVER_ALLOW_INSECURE_COMMS": True,
-    "libadminsettings.LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS": True,
-    "libadminsettings.LICENSING_CLIENT_ALIAS": "Dumb"}
-
-    r = admin.lls.lls_config(lls_config)
-    assert type(r) == admin.lls.lls_config
-
-    assert admin.lls.update_lls_config(server, r)
-
-    assert admin.lls.enable_lls(server)
-
-    assert admin.lls.disable_lls(server)
