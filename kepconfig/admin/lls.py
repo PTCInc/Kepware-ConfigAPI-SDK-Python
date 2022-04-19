@@ -55,6 +55,9 @@ class lls_config:
             LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS: self.allow_self_signed_certs,
             LICENSING_CLIENT_ALIAS: self.instance_alias_name
         }
+    
+    def __str__(self) -> str:
+        return "{}".format(self._get_dict())
 
 def get_lls_config(server) -> lls_config:
     '''Returns the properties of the Local License server properties. Returned object is lls_config class object.
