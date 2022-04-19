@@ -99,9 +99,12 @@ def server(kepware_server):
     yield server
     complete(server)
     
-
 def test_uaserver(server):
-    
+    try:
+        server._config_get(server.url + admin.ua_server._create_url())
+    except Exception as err:
+        pytest.skip("UA Endpoints not configurable.")
+
     assert admin.ua_server.add_endpoint(server,uaendpoint1)
     
     assert admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
@@ -215,6 +218,7 @@ def test_users(server):
     assert admin.users.del_user(server, user2['common.ALLTYPES_NAME'])
 
 def test_LLS(server):
+
     assert type(admin.lls.get_lls_config(server)) == admin.lls.lls_config
 
     lls_config = {"libadminsettings.LICENSING_SERVER_PORT": 80,
