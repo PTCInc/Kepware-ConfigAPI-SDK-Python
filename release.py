@@ -2,7 +2,7 @@ import re
 import os
 
 file_location = "kepconfig/__init__.py"
-version_re_string = "([0-9]+)\.([0-9]+)\.([0-9]+$|[0-9]+[ab][0-9]+)"
+version_re_string = "([0-9]+)\.([0-9]+)\.([0-9]+(?:[ab][0-9])?)"
 version_search = re.compile(r'__version__ = "'+ version_re_string + '"')
 version_check = re.compile(version_re_string)
 
@@ -12,7 +12,7 @@ def bump_version():
     m = version_search.search(s)
     v1, v2, v3 = m.groups()
     oldv = "{0}.{1}.{2}".format(v1, v2, v3)
-    ans = input("Current version of kepconfig is: {0} \nUpdate new version to? (ctrl-c to exit): ".format(oldv))
+    ans = input("Current version of kepconfig is: {} \nUpdate new version to? (ctrl-c to exit): ".format(oldv))
     if ans:
         m = version_check.search(ans)
         if (m==None):
@@ -22,7 +22,7 @@ def bump_version():
     else:
         print("Please enter updated version number. Exiting...")
         exit()
-    print("\n"+ "Updating " + file_location + " version to {0}.".format(newv))
+    print("\n"+ "Updating " + file_location + " version to {}.".format(newv))
     s = s.replace(oldv, newv)
     with open(file_location, "w") as f:
         f.write(s)
@@ -36,22 +36,24 @@ def release():
         os.system("git add " + file_location)
         os.system('git commit -m \"{} Release\"'.format(v))
         os.system("git tag {0}".format(v))
-        ans = input("Change committed, push to server? (y/n)")
+        ans = input("Change committed, push to server? (Y/n)")
         if ans.lower() in ("y", "yes"):
         #     os.system("git push")
         #     os.system("git push --tags")
             os.system("git push --follow-tags")
-        ans = input("upload to pip?(Y/n)")
-        if ans.lower() in ("y", "yes"):
-            # os.system("rm -rf dist/*") #Linux
-            os.system("RMDIR /S /Q dist") #Windows
-            os.system("python -m build")
+    ans = input("Build dist packages?(Y/n)")
+    if ans.lower() in ("y", "yes"):
+        # os.system("rm -rf dist/*") #Linux
+        os.system("RMDIR /S /Q dist") #Windows
+        os.system("python -m build")
+    ans = input("upload to pip?(Y/n)")
+    if ans.lower() in ("y", "yes"):
 
-            # Test PyPi Server
-            os.system("twine upload --repository testpypi dist/*")
+        # Test PyPi Server
+        os.system("twine upload --repository testpypi dist/*")
 
-            #Production PyPi Server
-            # os.system("twine upload dist/*")
+        #Production PyPi Server
+        # os.system("twine upload dist/*")
 
 
 if __name__ == "__main__":
