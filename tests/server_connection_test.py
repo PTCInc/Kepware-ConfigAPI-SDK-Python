@@ -24,16 +24,40 @@ rest_agent_name = 'REST Client'
 rserver_agent_name = 'REST Server'
 twx_agent_name = 'Thingworx'
 iot_item_name ="System__Date"
+WINFILENAME = 'test\\project.opf'
+WINFILENAMEENCRYPT = 'test\\project.sopf'
+WINFILEPATH = 'C:\\ProgramData\\PTC\\ThingWorx Kepware Server\\V6\\'
+LINUXFILENAME = 'project.lpf'
+LINUXFILENAMEENCRYPT = 'project.slpf'
+LINUXFILEPATH = 'C:\\DockerMounts\\tke1_5\\user_data\\'
+FILEPASSWORD = 'Password'
+
 
 def initialize(server):
     pass
 
 def complete(server):
+    if server_type == 'TKE':
+        file = LINUXFILENAME
+        file_encrypt = LINUXFILENAMEENCRYPT
+        filepath = LINUXFILEPATH
+    else:
+        file = WINFILENAME
+        file_encrypt = WINFILENAMEENCRYPT
+        filepath = WINFILEPATH
+    files = ['{}{}'.format(filepath, file), '{}{}'.format(filepath, file_encrypt)]
+    for x in files:
+        if os.path.exists(x):
+            os.remove(x)
+        else:
+            print("The file does not exist")
     pass
 
 @pytest.fixture(scope="module")
-def server(kepware_server: kepconfig.connection.server):
-    server = kepware_server
+def server(kepware_server: list[kepconfig.connection.server, str]):
+    server = kepware_server[0]
+    global server_type
+    server_type = kepware_server[1]
     
     # Initialize any configuration before testing in module
     initialize(server)
@@ -43,7 +67,7 @@ def server(kepware_server: kepconfig.connection.server):
     complete(server)
     
 def test_connection_params(server: kepconfig.connection.server):
-
+    current = [server.SSL_trust_all_certs,server.SSL_ignore_hostname]
     server.SSL_trust_all_certs = True
     assert server.SSL_trust_all_certs == True
     server.SSL_ignore_hostname = True
@@ -53,6 +77,10 @@ def test_connection_params(server: kepconfig.connection.server):
     assert server.SSL_trust_all_certs == False
     server.SSL_ignore_hostname = False
     assert server.SSL_ignore_hostname == False
+
+    server.SSL_trust_all_certs = current[0]
+    server.SSL_ignore_hostname = current[1]
+    
 
 def test_reinitialize_service_status(server: kepconfig.connection.server):
     job = server.reinitialize()
@@ -87,3 +115,74 @@ def test_event_log(server: kepconfig.connection.server):
     assert type(server.get_event_log(25, None, None)) == list
     
     assert type(server.get_event_log(None, datetime.datetime.fromisoformat('2022-02-21T14:23:23.000'), datetime.datetime.utcnow())) == list
+
+def test_projectsave_service(server: kepconfig.connection.server):
+    if server_type == 'TKE':
+        file = LINUXFILENAME
+        file_encrypt = LINUXFILENAMEENCRYPT
+        filepath = LINUXFILEPATH
+    else:
+        file = WINFILENAME
+        file_encrypt = WINFILENAMEENCRYPT
+        filepath = WINFILEPATH
+
+    # Save non-encrypted file
+    job = server.save_project(file, None, 60)
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    time.sleep(1)
+    status = server.service_status(job)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == kepconfig.connection.KepServiceStatus
+
+    # Save encrypted file
+    job = server.save_project(file_encrypt, FILEPASSWORD, 60)
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    time.sleep(1)
+    status = server.service_status(job)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == kepconfig.connection.KepServiceStatus
+
+def test_projectload_service(server: kepconfig.connection.server):
+    
+    if server_type == 'TKE':
+        file = LINUXFILENAME
+        file_encrypt = LINUXFILENAMEENCRYPT
+        filepath = ''
+    else:
+        file = WINFILENAME
+        file_encrypt = WINFILENAMEENCRYPT
+        filepath = WINFILEPATH
+
+    # Load non-encrypted file
+    job = server.load_project('{}{}'.format(filepath, file), None, 60)
+    assert type(job) == kepconfig.connection.KepServiceResponse
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == kepconfig.connection.KepServiceStatus
+
+    # Load encrypted file
+    job = server.load_project('{}{}'.format(filepath, file_encrypt), FILEPASSWORD, 60)
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    time.sleep(1)
+    status = server.service_status(job)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == kepconfig.connection.KepServiceStatus
