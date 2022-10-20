@@ -118,6 +118,8 @@ egd_device = {
 }
 
 def initialize(server: kepconfig.connection.server):
+    if server_type == 'TKE': pytest.skip("EGD not configurable in {}.".format(server_type), allow_module_level=True)
+    
     try:
         server._config_get(server.url +"/doc/drivers/GE Ethernet Global Data/channels")
     except Exception as err:
@@ -135,8 +137,10 @@ def complete(server):
             HTTPErrorHandler(err)
 
 @pytest.fixture(scope="module")
-def server(kepware_server):
-    server = kepware_server
+def server(kepware_server: list[kepconfig.connection.server, str]):
+    server = kepware_server[0]
+    global server_type
+    server_type = kepware_server[1]
     
     # Initialize any configuration before testing in module
     initialize(server)

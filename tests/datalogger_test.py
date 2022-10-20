@@ -155,6 +155,8 @@ def HTTPErrorHandler(err):
         print('Different Exception Received: {}'.format(err))
 		
 def initialize(server: kepconfig.connection.server):
+	if server_type == 'TKE': pytest.skip("Datalogger not configurable in {}.".format(server_type), allow_module_level=True)
+	
 	try:
 		server._config_get(server.url + datalogger.log_group._create_url())
 	except Exception as err:
@@ -169,8 +171,10 @@ def complete(server):
 		HTTPErrorHandler(err)	
 
 @pytest.fixture(scope="module")
-def server(kepware_server):
-    server = kepware_server
+def server(kepware_server: list[kepconfig.connection.server, str]):
+    server = kepware_server[0]
+    global server_type
+    server_type = kepware_server[1]
     
     # Initialize any configuration before testing in module
     initialize(server)
