@@ -157,6 +157,10 @@ class server:
     def reinitialize(self, job_ttl = None) -> KepServiceResponse:
         '''Executes a Reinitialize call to the Kepware instance.
 
+        INPUTS:
+
+        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+
         RETURNS:
         KepServiceResponse instance with job information
 
@@ -167,7 +171,7 @@ class server:
         '''
         url = self.url + self.__project_services_url + '/ReinitializeRuntime' 
         try:
-            job = self._kep_service_execute(url,job_ttl)
+            job = self._kep_service_execute(url, None, job_ttl)
             return job
         except Exception as err:
             raise err
@@ -236,6 +240,74 @@ class server:
         if r.code == 200: return True 
         else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
     
+    def save_project(self, filename: str, password: str = None, job_ttl: int = None) -> KepServiceResponse:
+        '''Executes a ProjectSave Service call to the Kepware instance. This saves 
+        a copy of the current project file to disk. The filename
+
+        INPUTS:
+        
+        "filename" - Fully qualified relative file path and name of project file including the file extension.
+        location of project file save defaults: 
+                TKS or KEP (Windows): C:\\PROGRAMDATA\\PTC\\Thingworx Kepware Server\\V6 or 
+                                C:\\PROGRAMDATA\\Kepware\\KEPServerEX\\V6
+                TKE (Linux):    /opt/tkedge/v1/user_data
+
+
+        "password" (optional) - Specify a password with which to load or save an encrypted project file.  
+            This password will be required to load this project file.
+        
+        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+
+        RETURNS:
+        KepServiceResponse instance with job information
+
+        EXCEPTIONS (If not HTTP 200 or 429 returned):
+        
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+        url = self.url + self.__project_services_url + '/ProjectSave'
+        prop_data = {'servermain.PROJECT_FILENAME': filename}
+        if password != None: prop_data['servermain.PROJECT_PASSWORD'] = password
+        try:
+            job = self._kep_service_execute(url, prop_data, job_ttl)
+            return job
+        except Exception as err:
+            raise err
+
+    def load_project(self, filename: str, password: str = None, job_ttl: int = None) -> KepServiceResponse:
+        '''Executes a ProjectLoad Service call to the Kepware instance. This loads 
+        a project file to disk.
+
+        INPUTS:
+        
+        "filename" - Fully qualified path and name of project file including the file extension. Absolute
+        paths required for TKS and KEP while file path is relative for TKE
+            ex: Windows - filename = C:\\filepath\\test.opf
+                Linux - filename = /filepath/test.lpf - Location is /opt/tkedge/v1/user_data/filepath/test.lpf
+
+        "password" (optional) - Specify a password with which to load or save an encrypted project file.
+        
+        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+
+        RETURNS:
+        KepServiceResponse instance with job information
+
+        EXCEPTIONS (If not HTTP 200 or 429 returned):
+        
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+        url = self.url + self.__project_services_url + '/ProjectLoad'
+        prop_data = {'servermain.PROJECT_FILENAME': filename}
+        if password != None: prop_data['servermain.PROJECT_PASSWORD'] = password
+        try:
+            job = self._kep_service_execute(url, prop_data, job_ttl)
+            return job
+        except Exception as err:
+            raise err
+
+
     def service_status(self, resp: KepServiceResponse):
         '''Returns the status of a service job. Used to verify if a service call
         has completed or not.
@@ -325,11 +397,12 @@ class server:
                         pass
         return DATA
     # General service call handler
-    def _kep_service_execute(self, url, TTL = None):
+    def _kep_service_execute(self, url, DATA = None, TTL = None):
         try:
             if TTL != None:
-                TTL = {"servermain.JOB_TIME_TO_LIVE_SECONDS": TTL}
-            r = self._config_update(url, TTL)
+                if DATA == None: DATA = {}
+                DATA["servermain.JOB_TIME_TO_LIVE_SECONDS"]= TTL
+            r = self._config_update(url, DATA)
             job = KepServiceResponse(r.payload['code'],r.payload['message'], r.payload['href'])
             return job
         except KepHTTPError as err:
