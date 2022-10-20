@@ -180,6 +180,8 @@ def auto_tag_gen(server, device_path, job_ttl = None) -> KepServiceResponse:
     "device_path" -  path identifying device. Standard Kepware address decimal notation string including the 
     device such as "channel1.device1"
 
+    "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+
     RETURNS:
     KepServiceReturn with the result of the service either Code 202 (Accepted) or 429 (Too Busy)
 
@@ -191,7 +193,7 @@ def auto_tag_gen(server, device_path, job_ttl = None) -> KepServiceResponse:
     path_obj = kepconfig.path_split(device_path)
     try:
         url = server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL
-        job = server._kep_service_execute(url, job_ttl)
+        job = server._kep_service_execute(url, None, job_ttl)
         return job
     except KeyError as err:
         err_msg = 'Error: No {} identified in {} | Function: {}'.format(err,'device_path', inspect.currentframe().f_code.co_name)
