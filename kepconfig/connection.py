@@ -284,7 +284,7 @@ class server:
         "filename" - Fully qualified path and name of project file including the file extension. Absolute
         paths required for TKS and KEP while file path is relative for TKE
             ex: Windows - filename = C:\\filepath\\test.opf
-                Linux - filename = /filepath/test.lpf - Location is /opt/tkedge/v1/user_data/filepath/test.lpf
+                Linux - filename = filepath/test.lpf - Location is /opt/tkedge/v1/user_data/filepath/test.lpf
 
         "password" (optional) - Specify a password with which to load or save an encrypted project file.
         
