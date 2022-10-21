@@ -7,12 +7,13 @@
 # Admin Test - Test to exectute various calls for the Administrator 
 # parts of the Kepware configuration API
 
+from wsgiref.simple_server import server_version
 from kepconfig.error import KepError, KepHTTPError
 import os, sys
 from typing import Dict, List
 import pytest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# import kepconfig
+import kepconfig
 from kepconfig import admin
 import json
 import time
@@ -27,6 +28,8 @@ rest_agent_name = 'REST Client'
 rserver_agent_name = 'REST Server'
 twx_agent_name = 'Thingworx'
 iot_item_name ="System__Date"
+
+
 
 group1 = {'common.ALLTYPES_NAME': 'Operators'}
 group2 = {'common.ALLTYPES_NAME': 'Group1'}
@@ -89,8 +92,10 @@ def complete(server):
     
 
 @pytest.fixture(scope="module")
-def server(kepware_server):
-    server = kepware_server
+def server(kepware_server: list[kepconfig.connection.server, str]):
+    server = kepware_server[0]
+    global server_type
+    server_type = kepware_server[1]
     
     # Initialize any configuration before testing in module
     initialize(server)
@@ -100,10 +105,7 @@ def server(kepware_server):
     complete(server)
     
 def test_uaserver(server):
-    try:
-        server._config_get(server.url + admin.ua_server._create_url())
-    except Exception as err:
-        pytest.skip("UA Endpoints not configurable.")
+    if server_type == 'TKS': pytest.skip("UA Endpoints not configurable in {}.".format(server_type))
 
     assert admin.ua_server.add_endpoint(server,uaendpoint1)
     

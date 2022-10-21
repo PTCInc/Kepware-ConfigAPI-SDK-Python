@@ -202,5 +202,5 @@ def reset_column_mapping_service(server, log_group, job_ttl = None) -> KepServic
     '''
 
     url = server.url + _create_url(log_group) + SERVICES_ROOT + '/ResetColumnMapping'
-    job = server._kep_service_execute(url, job_ttl)
+    job = server._kep_service_execute(url, None, job_ttl)
     return job

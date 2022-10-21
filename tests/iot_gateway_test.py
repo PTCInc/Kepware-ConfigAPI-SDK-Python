@@ -91,8 +91,10 @@ def complete(server):
             HTTPErrorHandler(err)
 
 @pytest.fixture(scope="module")
-def server(kepware_server):
-    server = kepware_server
+def server(kepware_server: list[kepconfig.connection.server, str]):
+    server = kepware_server[0]
+    global server_type
+    server_type = kepware_server[1]
     
     # Initialize any configuration before testing in module
     initialize(server)
