@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)
 from . import connection, error
 
