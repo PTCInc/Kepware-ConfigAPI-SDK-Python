@@ -45,15 +45,15 @@ def release():
     if ans.lower() in ("y", "yes"):
         # os.system("rm -rf dist/*") #Linux
         os.system("RMDIR /S /Q dist") #Windows
-        os.system("python -m build")
+        os.system("python3.10 -m build")
     ans = input("upload to pip?(Y/n)")
     if ans.lower() in ("y", "yes"):
 
         # Test PyPi Server
-        os.system("twine upload --repository testpypi dist/*")
+        os.system("python -m twine upload --repository testpypi dist/*")
 
         #Production PyPi Server
-        # os.system("twine upload dist/*")
+        # os.system("python -m twine upload dist/*")
 
 
 if __name__ == "__main__":
