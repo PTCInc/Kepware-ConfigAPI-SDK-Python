@@ -38,9 +38,8 @@ def release():
         os.system("git tag {0}".format(v))
         ans = input("Change committed, push to server? (Y/n)")
         if ans.lower() in ("y", "yes"):
-        #     os.system("git push")
-        #     os.system("git push --tags")
-            os.system("git push --follow-tags")
+            os.system("git push --tags")
+            # os.system("git push --follow-tags")
     ans = input("Build dist packages?(Y/n)")
     if ans.lower() in ("y", "yes"):
         # os.system("rm -rf dist/*") #Linux
