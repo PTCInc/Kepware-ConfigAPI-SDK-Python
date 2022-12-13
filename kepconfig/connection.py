@@ -441,10 +441,10 @@ class server:
         except error.HTTPError as err:
             payload = json.loads(codecs.decode(err.read(),'utf-8-sig'))
             # print('HTTP Code: {}\n{}'.format(err.code,payload), file=sys.stderr)
-            raise KepHTTPError(err.url, err.code, err.msg, err.hdrs, payload)
+            raise KepHTTPError(url=err.url, code=err.code, msg=err.msg, hdrs=err.hdrs, payload=payload)
         except error.URLError as err:
             # print('URLError: {} URL: {}'.format(err.reason, request_obj.get_full_url()), file=sys.stderr)
-            raise KepURLError(err.reason, request_obj.get_full_url())
+            raise KepURLError(msg=err.reason, url=request_obj.get_full_url())
 
     # Fucntion used to ensure special characters are handled in the URL
     # Ex: Space will be turned to %20
