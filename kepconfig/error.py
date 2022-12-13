@@ -6,7 +6,7 @@
 
 
 r"""`error` Exception classes raised by Kepconfig.
-Includes KepURLError and KepHTTPError
+Includes KepError, KepURLError and KepHTTPError
 """
 
 __all__ = ['KepError', 'KepURLError', 'KepHTTPError']
@@ -24,10 +24,13 @@ class KepError(Exception):
 class KepURLError(KepError):
     '''Exception class raised by Kepconfig that inherits responses from the urllib URLError exceptions.
     '''
-    def __init__(self, reason, url):
-        KepError.__init__(self)
-        self.reason = reason
+    def __init__(self, url=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.url = url
+    
+    @property
+    def reason(self):
+        return self.msg
 
     def __str__(self):
         return '<urlopen error %s>' % self.reason
@@ -39,8 +42,8 @@ class KepHTTPError(KepError):
     code, headers, and a body.  In some contexts,an application may want to 
     handle an exception like a regular response.
     '''
-    def __init__(self, url, code, msg, hdrs, payload):
-        KepError.__init__(self, msg)
+    def __init__(self, url=None, code=None, hdrs=None, payload=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.url = url
         self.code = code
         self.hdrs = hdrs

@@ -54,7 +54,7 @@ def complete(server):
     pass
 
 @pytest.fixture(scope="module")
-def server(kepware_server: list[kepconfig.connection.server, str]):
+def server(kepware_server):
     server = kepware_server[0]
     global server_type
     server_type = kepware_server[1]
