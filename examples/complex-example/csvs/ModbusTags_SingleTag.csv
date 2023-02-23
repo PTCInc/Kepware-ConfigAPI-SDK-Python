@@ -1,0 +1,2 @@
+Device,Device_IP,TagName,Address,DataType
+ModbusDevice,192.168.0.167,Humidity,40003,8

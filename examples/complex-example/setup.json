@@ -1,0 +1,9 @@
+{
+	"Kepware_IP_Array" : ["127.0.0.1"],
+	"Kepware_Port" : "57412",
+	"configApiUsername" : "administrator",
+	"configApiPassword" : "",
+	"channel_name" : "channelModbus",
+	"path" : "csvs/ModbusTags.csv",
+	"Broker_URL" : "tcp://127.0.0.1:1883"
+}
