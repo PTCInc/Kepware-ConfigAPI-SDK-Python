@@ -220,7 +220,7 @@ def test_users(server):
     assert admin.users.del_user(server, user2['common.ALLTYPES_NAME'])
 
 def test_LLS(server):
-
+    if server_type == 'TKS': pytest.skip("LLS not configurable in {}.".format(server_type))
     assert type(admin.lls.get_lls_config(server)) == admin.lls.lls_config
 
     lls_config = {"libadminsettings.LICENSING_SERVER_PORT": 80,
@@ -239,3 +239,7 @@ def test_LLS(server):
     assert admin.lls.enable_lls(server)
 
     assert admin.lls.disable_lls(server)
+
+    assert type(admin.lls.force_license_check(server)) == kepconfig.connection.KepServiceResponse
+    
+    assert type(admin.lls.force_license_check(server, 10)) == kepconfig.connection.KepServiceResponse

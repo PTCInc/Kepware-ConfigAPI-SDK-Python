@@ -7,11 +7,14 @@
 r"""`lls` exposes an API to allow modifications to Local License Server parameters in 
 the Kepware Administration through the Kepware Configuration API
 """
+from .. import connection
 from typing import Union
 from ..error import KepHTTPError, KepError
+import inspect
 
 
 LLS_ROOT = '/admin'
+FORCE_CHECK_URL = '/project/services/ForceLicenseCheck'
 LICENSING_SERVER_PORT = "libadminsettings.LICENSING_SERVER_PORT"
 LICENSING_SERVER_NAME = "libadminsettings.LICENSING_SERVER_NAME"
 LICENSING_SERVER_ENABLE = "libadminsettings.LICENSING_SERVER_ENABLE"
@@ -59,7 +62,7 @@ class lls_config:
     def __str__(self) -> str:
         return "{}".format(self._get_dict())
 
-def get_lls_config(server) -> lls_config:
+def get_lls_config(server: connection.server) -> lls_config:
     '''Returns the properties of the Local License server properties. Returned object is lls_config class object.
     
     INPUTS:
@@ -76,7 +79,7 @@ def get_lls_config(server) -> lls_config:
     r = server._config_get(server.url + LLS_ROOT)
     return lls_config(r.payload)
 
-def update_lls_config(server, config: lls_config) -> bool:
+def update_lls_config(server: connection.server, config: lls_config) -> bool:
     '''Updates the Local License Server admin properties for Kepware.
     
     INPUTS:
@@ -96,7 +99,7 @@ def update_lls_config(server, config: lls_config) -> bool:
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def enable_lls(server) -> bool:
+def enable_lls(server: connection.server) -> bool:
     '''Enables the Local License Server connection for Kepware.
     
     INPUTS:
@@ -114,7 +117,7 @@ def enable_lls(server) -> bool:
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def disable_lls(server) -> bool:
+def disable_lls(server: connection.server) -> bool:
     '''Disables the Local License Server connection for Kepware.
     
     INPUTS:
@@ -131,3 +134,25 @@ def disable_lls(server) -> bool:
     r = server._config_update(server.url + LLS_ROOT, {LICENSING_SERVER_ENABLE: False})
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
+
+def force_license_check(server: connection.server, job_ttl: int = None):
+    '''Executes a ForceLicenseCheck call to the Kepware instance. This triggers the server to verify the 
+    license state of the license received from the Local License Server.
+
+        INPUTS:
+        "server" - instance of the "server" class
+        
+        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+
+        RETURNS:
+        KepServiceResponse instance with job information
+
+        EXCEPTIONS (If not HTTP 200 or 429 returned):
+        
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+
+    url = f'{server.url}{FORCE_CHECK_URL}'
+    job = server._kep_service_execute(url, None, job_ttl)
+    return job
