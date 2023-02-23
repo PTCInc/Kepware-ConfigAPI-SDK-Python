@@ -46,12 +46,14 @@ def complete(server):
         file_encrypt = WINFILENAMEENCRYPT
         filepath = WINFILEPATH
     files = ['{}{}'.format(filepath, file), '{}{}'.format(filepath, file_encrypt)]
-    for x in files:
-        if os.path.exists(x):
-            os.remove(x)
-        else:
-            print("The file does not exist")
-    pass
+    try:
+        for x in files:
+            if os.path.exists(x):
+                os.remove(x)
+            else:
+                print("The file does not exist")
+    except PermissionError as e:
+        print (e)
 
 @pytest.fixture(scope="module")
 def server(kepware_server):
@@ -127,10 +129,11 @@ def test_projectsave_service(server: kepconfig.connection.server):
         filepath = WINFILEPATH
 
     # Save non-encrypted file
+    time.sleep(1)
     job = server.save_project(file, None, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
     time.sleep(1)
-    status = server.service_status(job)
+    # status = server.service_status(job)
 
     # Wait for service to be completed
     while True:
@@ -140,6 +143,7 @@ def test_projectsave_service(server: kepconfig.connection.server):
         assert type(status) == kepconfig.connection.KepServiceStatus
 
     # Save encrypted file
+    time.sleep(1)
     job = server.save_project(file_encrypt, FILEPASSWORD, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
     time.sleep(1)
@@ -164,6 +168,7 @@ def test_projectload_service(server: kepconfig.connection.server):
         filepath = WINFILEPATH
 
     # Load non-encrypted file
+    time.sleep(1)
     job = server.load_project('{}{}'.format(filepath, file), None, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
 
@@ -175,10 +180,9 @@ def test_projectload_service(server: kepconfig.connection.server):
         assert type(status) == kepconfig.connection.KepServiceStatus
 
     # Load encrypted file
+    time.sleep(1)
     job = server.load_project('{}{}'.format(filepath, file_encrypt), FILEPASSWORD, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
-    time.sleep(1)
-    status = server.service_status(job)
 
     # Wait for service to be completed
     while True:
@@ -186,3 +190,9 @@ def test_projectload_service(server: kepconfig.connection.server):
         status = server.service_status(job)
         if (status.complete == True): break
         assert type(status) == kepconfig.connection.KepServiceStatus
+
+def test_get_status(server: kepconfig.connection.server):
+    assert type(server.get_status()) == list
+
+def test_get_info(server: kepconfig.connection.server):
+    assert type(server.get_info()) == dict
