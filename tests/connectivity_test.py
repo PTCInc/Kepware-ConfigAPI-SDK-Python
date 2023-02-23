@@ -77,6 +77,20 @@ def test_channel_add(server):
     channel_data = {"common.ALLTYPES_NAME": ch_name,"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"}
     assert kepconfig.connectivity.channel.add_channel(server,channel_data)
     
+    # Add a empty Channel objects to validate error handling. Validates low level _config_add() methond in Server class
+    # used by all add methods across the package
+    channel_data = {}
+    # pytest.raises(kepconfig.error.KepError,kepconfig.connectivity.channel.add_channel, {'server': server, 'DATA': channel_data})
+    with pytest.raises(kepconfig.error.KepError) as e:
+        kepconfig.connectivity.channel.add_channel(server,channel_data)
+    assert e.type == kepconfig.error.KepError
+    # assert type(kepconfig.connectivity.channel.add_channel(server,channel_data)) == kepconfig.error.KepError
+
+    channel_data = []
+    with pytest.raises(kepconfig.error.KepError) as e:
+        kepconfig.connectivity.channel.add_channel(server,channel_data)
+    assert e.type == kepconfig.error.KepError
+
     # Add multi channels with one failure
     channel_data = [
         {"common.ALLTYPES_NAME": ch_name+"1","servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator"},

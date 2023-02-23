@@ -152,7 +152,37 @@ class server:
                 self.__ssl_context.verify_mode = ssl.CERT_REQUIRED
 
 
+    def get_status(self) -> dict:
+        '''Executes a health status request to the Kepware instance to report service statuses.
 
+        RETURNS:
+
+        list - list of data for the health status request
+
+        EXCEPTIONS:
+        
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+
+        r = self._config_get(f'{self.url}/status')
+        return r.payload
+    def get_info(self) -> dict:
+        '''Requests product information from the Kepware instance. Provides various information including
+        product name and version information.
+
+        RETURNS:
+
+        dict - data for the product information request
+
+        EXCEPTIONS:
+        
+        KepHTTPError - If urllib provides an HTTPError
+        KepURLError - If urllib provides an URLError
+        '''
+        
+        r = self._config_get(f'{self.url}/about')
+        return r.payload
 
     def reinitialize(self, job_ttl = None) -> KepServiceResponse:
         '''Executes a Reinitialize call to the Kepware instance.
@@ -337,6 +367,9 @@ class server:
         '''Conducts an POST method at *url* to add an object in the Kepware Configuration
         *DATA* is required to be a properly JSON object (dict) of the item to be posted to *url* 
         '''
+        if len(DATA) == 0:
+            err_msg = f'Error: Empty List or Dict in DATA | DATA type: {type(DATA)}'
+            raise KepError(err_msg) 
         data = json.dumps(DATA).encode('utf-8')
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, data, method='POST')
