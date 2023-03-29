@@ -91,7 +91,7 @@ except Exception as err:
 # Get Event Log from Kepware instance.
 # Time parameters need to be UTC values.
 try:
-    print("{} - {}".format("Here is the last Event Log Entry", json.dumps(server.get_event_log(1, None, None), indent=4)))
+    print("{} - {}".format("Here is the last Event Log Entry", json.dumps(server.get_event_log(1), indent=4)))
 except Exception as err:
     ErrorHandler(err)
 try:
@@ -101,7 +101,7 @@ except Exception as err:
 
 #Get Configuration API Transaction Log
 try:
-    print("{} - {}".format("Here is the last API Transaction Log Entry", json.dumps(server.get_trans_log(1, None, None), indent=4)))
+    print("{} - {}".format("Here is the last API Transaction Log Entry", json.dumps(server.get_transaction_log(1), indent=4)))
 except Exception as err:
     ErrorHandler(err)
 
