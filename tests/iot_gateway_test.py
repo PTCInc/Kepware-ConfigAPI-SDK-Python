@@ -116,7 +116,7 @@ def test_agent_add(server):
         with pytest.raises(KepError):
             assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent)
 
-        # Add Agent with bad name (error)
+        # Add Agent with bad name (HTTP 207 return with list)
         agent = [
             {
             "common.ALLTYPES_NAME": agent_name + "1"
@@ -148,7 +148,12 @@ def test_agent_get(server):
 
         # Get All Agents
         assert type(kepconfig.iot_gateway.agent.get_all_iot_agents(server, agent_type)) == list
- 
+
+        # Test Get with Options
+        # Get All Agents
+        ret = kepconfig.iot_gateway.agent.get_all_iot_agents(server, agent_type, options= {'filter': '1'})
+        assert type(ret) == list
+        assert len(ret) == 1
 
 def test_iot_item_add(server):       
     for agent_name, agent_type in agent_list:
@@ -205,6 +210,12 @@ def test_iot_item_get(server):
 
         # Read All IoT Items
         assert type(kepconfig.iot_gateway.iot_items.get_all_iot_items(server, agent_name, agent_type)) == list
+
+        # Test Get with Options
+        # Read All IoT Items
+        ret = kepconfig.iot_gateway.iot_items.get_all_iot_items(server, agent_name, agent_type, options= {'filter': 'Date'})
+        assert type(ret) == list
+        assert len(ret) == 1
 
 def test_iot_item_del(server):        
     for agent_name, agent_type in agent_list:

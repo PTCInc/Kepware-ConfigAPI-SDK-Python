@@ -9,7 +9,7 @@ r"""`device` exposes an API to allow modifications (add, delete, modify) to
 device objects within the Kepware Configuration API
 """
 
-from ..connection import KepServiceResponse
+from ..connection import KepServiceResponse, server
 from ..error import KepHTTPError, KepError
 from typing import Union
 import kepconfig
@@ -30,17 +30,17 @@ def _create_url(device = None):
     else:
         return '{}/{}'.format(DEVICE_ROOT,device)
 
-def add_device(server, dev_channel, DATA) -> Union[bool, list]:
+def add_device(server, channel_name, DATA) -> Union[bool, list]:
     '''Add a "device" object to a channel in Kepware. Can be used to pass children of a device object 
     such as tags and tag groups. This allows you to create a device and tags 
     all in one function, if desired.
 
-    Additionally it can be used to pass a list of channelsdevices and it's children to be added all at once.
+    Additionally it can be used to pass a list of devices and it's children to be added all at once.
 
     INPUTS:
     "server" - instance of the "server" class
 
-    "dev_channel" - channel the device object exists
+    "channel_name" - channel the device object exists
 
     "DATA" - properly JSON object (dict) of the device and it's children 
     expected by Kepware Configuration API
@@ -56,7 +56,7 @@ def add_device(server, dev_channel, DATA) -> Union[bool, list]:
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_add(server.url + channel._create_url(dev_channel) + _create_url(), DATA)
+    r = server._config_add(server.url + channel._create_url(channel_name) + _create_url(), DATA)
     if r.code == 201: return True
     elif r.code == 207:
         errors = [] 
@@ -155,11 +155,14 @@ def get_device(server, device_path) -> dict:
     #     print('Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(err)))
     #     raise err
 
-def get_all_devices(server, dev_channel) -> list:
+def get_all_devices(server: server, channel_name: str, *, options: dict = None) -> list:
     '''Returns list of all device objects and their properties within a channel. Returned object is JSON list.
     
     INPUTS:
-    "dev_channel" - channel the device object exists
+    channel_name - channel the device object exists
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of devices. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
 
     RETURNS:
     list - data for the devices requested
@@ -168,7 +171,7 @@ def get_all_devices(server, dev_channel) -> list:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    r = server._config_get(server.url + channel._create_url(dev_channel) + _create_url())
+    r = server._config_get(f'{server.url}{channel._create_url(channel_name)}{_create_url()}', params= options)
     return r.payload
 
 def auto_tag_gen(server, device_path, job_ttl = None) -> KepServiceResponse:

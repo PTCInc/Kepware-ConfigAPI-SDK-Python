@@ -9,6 +9,7 @@ users within the Kepware Administration User Management through the Kepware Conf
 """
 from typing import Union
 from ..error import KepError, KepHTTPError
+from ..connection import server
 
 
 USERS_ROOT = '/admin/server_users'
@@ -132,11 +133,14 @@ def get_user(server, user) -> dict:
     r = server._config_get(server.url + _create_url(user))
     return r.payload
 
-def get_all_users(server) -> list:
+def get_all_users(server: server, *, options: dict = None) -> list:
     '''Returns list of all user objects and their properties. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of users. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'.
     
     RETURNS:
     list - data for all users requested
@@ -146,7 +150,7 @@ def get_all_users(server) -> list:
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_get(server.url + _create_url())
+    r = server._config_get(f'{server.url}{_create_url()}', params= options)
     return r.payload
 
 def enable_user(server, user) -> bool:

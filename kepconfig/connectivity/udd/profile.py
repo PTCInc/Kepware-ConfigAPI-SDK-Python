@@ -9,12 +9,12 @@ r"""`profile` exposes an API to allow modifications (add, delete, modify) to
 profile objects for the UDD Profile Library plug-in within the Kepware Configuration API
 """
 
-from kepconfig import connection
+from ...connection import server
 from typing import Union
 
 PROFILE_ROOT = '/project/_profile_library/profiles'
 
-def add_profile(server: connection.server, DATA: Union[dict, list]) -> Union[bool, list]:
+def add_profile(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a "profile" or a list of "profile" objects to the UDD Profile Library plug-in for Kepware. 
 
     Additionally it can be used to pass a list of exchanges and it's children to be added all at once.
@@ -52,7 +52,7 @@ def add_profile(server: connection.server, DATA: Union[dict, list]) -> Union[boo
         return errors
     else: return False
 
-def del_profile(server: connection.server, profile_name: str) -> bool:
+def del_profile(server: server, profile_name: str) -> bool:
     '''Delete a "profile" object in UDD Profile Library plug-in for Kepware.
     
     INPUTS:
@@ -75,7 +75,7 @@ def del_profile(server: connection.server, profile_name: str) -> bool:
     if r.code == 200: return True 
     else: return False
 
-def modify_profile(server: connection.server, DATA: dict, profile_name: str = None, force: bool = False) -> bool:
+def modify_profile(server: server, DATA: dict, profile_name: str = None, force: bool = False) -> bool:
     '''Modify a profile object and it's properties in Kepware. If a "profile_name" is not provided as an input,
     you need to identify the profile in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the profile that is to be modified.
@@ -116,7 +116,7 @@ def modify_profile(server: connection.server, DATA: dict, profile_name: str = No
         if r.code == 200: return True 
         else: return False
 
-def get_profile(server: connection.server, profile_name: str = None) -> Union[dict, list]:
+def get_profile(server: server, profile_name: str = None, *, options: dict = None) -> Union[dict, list]:
     '''Returns the properties of the profile object or a list of all profiles and their 
     properties. Returned object is JSON.
     
@@ -125,6 +125,9 @@ def get_profile(server: connection.server, profile_name: str = None) -> Union[di
     "server" - instance of the "server" class
 
     "profile_name" - (optional) name of exchange. If not defined, get all profiles
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of profiles. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when profile_name is not defined.
     
     RETURNS:
 
@@ -136,17 +139,20 @@ def get_profile(server: connection.server, profile_name: str = None) -> Union[di
     KepURLError - If urllib provides an URLError
     '''
     if profile_name == None:
-        r = server._config_get(f'{server.url}{PROFILE_ROOT}')
+        r = server._config_get(f'{server.url}{PROFILE_ROOT}', params= options)
     else:
         r = server._config_get(f'{server.url}{PROFILE_ROOT}/{profile_name}')
     return r.payload
 
-def get_all_profiles(server: connection.server):
+def get_all_profiles(server: server, *, options: dict = None):
     '''Returns list of all profile objects and their properties. Returned object is JSON list.
     
     INPUTS:
 
-    "server" - instance of the "server" class
+    server - instance of the "server" class
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of profiles. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
     
     RETURNS:
 
@@ -157,4 +163,4 @@ def get_all_profiles(server: connection.server):
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    return get_profile(server)
+    return get_profile(server, options= options)

@@ -89,8 +89,20 @@ def test_profile_get(server: kepconfig.connection.server):
     # Get All Profiles
     assert type(uddprofile.get_all_profiles(server)) == list
 
+    # Test Get with Options
+    # Get All Profiles
+    ret = uddprofile.get_all_profiles(server, options={'filter': '1'})
+    assert type(ret) == list
+    assert len(ret) == 1
+
     # Get All Profiles - alternate
     assert type(uddprofile.get_profile(server)) == list
+
+    # Test Get with Options
+    # Get All Profiles - alternate
+    ret = uddprofile.get_profile(server, options={'filter': '1'})
+    assert type(ret) == list
+    assert len(ret) == 1
 
     # Get one profile
     assert type(uddprofile.get_profile(server, profile1['common.ALLTYPES_NAME'])) == dict

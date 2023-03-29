@@ -16,7 +16,6 @@ from base64 import b64encode
 from .error import KepError, KepHTTPError, KepURLError
 import socket
 import ssl
-import sys
 
 class KepServiceResponse:
     '''A class to represent a return object when calling a "service" API of Kepware. This is
@@ -82,7 +81,7 @@ class server:
     Methods:
 
     "reinitialize()" - reinitialize the Kepware server
-    "get_trans_log()" - retrieve the Configuration API transaction logs
+    "get_transaction_log()" - retrieve the Configuration API transaction logs
     "get_event_log()" - retrieve the Kepware Event Log
     "get_project_properties()" - retrieve the Kepware Project Properties
     "modify_project_properties()" - modify the Kepware Project Properties
@@ -206,32 +205,38 @@ class server:
         except Exception as err:
             raise err
         
-    def get_trans_log(self, start = None, end = None, limit = None) -> list:
+    def get_transaction_log(self, limit: int = None, start: datetime.datetime = None, end: datetime.datetime = None) -> list:
         ''' Get the Transaction Log from the Kepware instance.
 
-        "start" (optional) - datetime.datetime type and should be UTC
+        limit (optional) -  number of event log entries to request
+        
+        start (optional) - datetime.datetime type and should be UTC
 
-        "end" (optional) - datetime.datetime type and should be UTC
+        end (optional) - datetime.datetime type and should be UTC
 
-        "limit" (optional) -  number of event log entries to request
         '''
         query = self.__create_query(start, end, limit)
-        url = self.url + self.__trans_log_url + '?' + parse.urlencode(query)
-        r = self._config_get(url)
+        url = f'{self.url}{self.__trans_log_url}'
+        r = self._config_get(url, params= query)
         return r.payload
 
-    def get_event_log(self, limit = None, start = None, end = None) -> list:
+    def get_event_log(self, limit: int = None, start: datetime.datetime = None, end: datetime.datetime = None, *, options: dict = None) -> list:
         ''' Get the Event Log from the Kepware instance.
 
-        "start" (optional) - datetime.datetime type and should be UTC
+        start (optional) - datetime.datetime type and should be UTC
 
-        "end" (optional) - datetime.datetime type and should be UTC
+        end (optional) - datetime.datetime type and should be UTC
 
-        "limit" (optional) - number of event log entries to request
+        limit (optional) - number of event log entries to request
+
+        options - (optional) Dict of parameters to filter, sort or pagenate the list of transactions. Options are 'event', 
+        'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
         '''
         query = self.__create_query(start, end, limit)
-        url = self.url + self.__event_log_url + '?' + parse.urlencode(query)
-        r = self._config_get(url)
+        if options is not None:
+            query = {**query, **options}
+        url = f'{self.url}{self.__event_log_url}'
+        r = self._config_get(url, params= query)
         return r.payload
     
     def get_project_properties(self) -> dict:
@@ -399,8 +404,15 @@ class server:
         return r
 
     #Function used to Read an object from Kepware (HTTP GET) and return the JSON response
-    def _config_get(self, url):
-        '''Conducts an GET method at *url* to retrieve an objects properties in the Kepware Configuration.'''
+    def _config_get(self, url, *, params = None):
+        '''
+        Conducts an GET method at *url* to retrieve an objects properties with query parameters in 
+        the Kepware Configuration.
+        '''
+        # Add parameters when necessary
+        if params is not None and params != {}:
+            qparams = parse.urlencode(params)
+            url = f'{url}?{qparams}'
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, method='GET')
         r = self.__connect(q)

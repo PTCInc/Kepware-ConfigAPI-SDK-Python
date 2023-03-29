@@ -9,7 +9,8 @@ r"""`names` exposes an API to allow modifications (add, delete, modify) to
 name resolution objects for EGD devices within the Kepware Configuration API
 """
 
-import kepconfig
+from ... import path_split
+from ...connection import server
 from typing import Union
 from .. import channel, device
 
@@ -21,7 +22,7 @@ def _create_url(device_path, name = None):
 
     Returns the name resolution specific url when a value is passed.
     '''
-    path_obj = kepconfig.path_split(device_path)
+    path_obj = path_split(device_path)
     device_root = channel._create_url(path_obj['channel']) + device._create_url(path_obj['device'])
 
     if name == None:
@@ -137,18 +138,21 @@ def modify_name_resolution(server, device_path, DATA, name = None, force = False
         if r.code == 200: return True 
         else: return False
 
-def get_name_resolution(server, device_path, name = None) -> Union[dict, list]:
+def get_name_resolution(server: server, device_path: str, name: str = None, *, options: dict = None) -> Union[dict, list]:
     '''Returns the properties of the name resolution object or a list of all name resolutions.
     Returned object is JSON.
     
     INPUTS:
 
-    "server" - instance of the "server" class
+    server - instance of the "server" class
 
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
+    device_path - path to exchanges and their ranges. Standard Kepware address decimal 
     notation string such as "channel1.device1"
 
-    "name" - name of name resolution
+    name - name of name resolution
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of name resolutions. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when name is not defined.
     
     RETURNS:
 
@@ -161,7 +165,7 @@ def get_name_resolution(server, device_path, name = None) -> Union[dict, list]:
     '''
 
     if name == None:
-        r = server._config_get(server.url + _create_url(device_path))
+        r = server._config_get(f'{server.url}{_create_url(device_path)}', params= options)
     else:
-        r = server._config_get(server.url + _create_url(device_path, name))
+        r = server._config_get(f'{server.url}{_create_url(device_path, name)}')
     return r.payload

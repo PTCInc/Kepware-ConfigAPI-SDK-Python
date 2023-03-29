@@ -11,6 +11,7 @@ range objects in exchanges for EGD devices within the Kepware Configuration API
 
 from typing import Union
 from .. import egd as EGD
+from ...connection import server
 
 RANGES_ROOT = '/ranges'
 
@@ -150,21 +151,24 @@ def modify_range(server, device_path, ex_type, exchange_name, DATA, range_name =
         if r.code == 200: return True 
         else: return False
 
-def get_range(server, device_path, ex_type, exchange_name, range_name = None) -> Union[dict, list]:
+def get_range(server: server, device_path: str, ex_type: str, exchange_name: str, range_name: str = None, *, options: dict = None) -> Union[dict, list]:
     '''Returns the properties of the range object or a list of all ranges. Returned object is JSON.
     
     INPUTS:
 
-    "server" - instance of the "server" class
+    server - instance of the "server" class
 
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
+    device_path - path to exchanges and their ranges. Standard Kepware address decimal 
     notation string such as "channel1.device1"
 
-    "ex_type" - type of exchange either consumer or producer
+    ex_type - type of exchange either consumer or producer
 
-    "exchange_name" - name of exchange that range is located
+    exchange_name - name of exchange that range is located
 
-    "range_name" - name of range
+    range_name - name of range
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of ranges. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when range_name is not defined.
     
     RETURNS:
 
@@ -176,7 +180,7 @@ def get_range(server, device_path, ex_type, exchange_name, range_name = None) ->
     KepURLError - If urllib provides an URLError
     '''
     if range_name == None:
-        r = server._config_get(server.url + _create_url(device_path, ex_type, exchange_name))
+        r = server._config_get(f'{server.url}{_create_url(device_path, ex_type, exchange_name)}', params= options)
     else:
-        r = server._config_get(server.url + _create_url(device_path, ex_type, exchange_name, range_name))
+        r = server._config_get(f'{server.url}{_create_url(device_path, ex_type, exchange_name, range_name)}')
     return r.payload

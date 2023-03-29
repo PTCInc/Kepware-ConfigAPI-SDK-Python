@@ -11,6 +11,7 @@ Iot Gateway agent objects within the Kepware Configuration API
 
 # from .. import connection 
 from typing import Union
+from ..connection import server
 from .. import iot_gateway as IOT
 from ..error import KepError, KepHTTPError
 import inspect
@@ -186,13 +187,16 @@ def get_iot_agent(server, agent, agent_type) -> dict:
     r = server._config_get(server.url + _create_url(agent_type, agent))
     return r.payload
 
-def get_all_iot_agents(server, agent_type) -> list:
+def get_all_iot_agents(server: server, agent_type: str, *, options: dict = None) -> list:
     '''Returns the properties of all agent objects for a specific agent type. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
 
-    "agent_type" - agent type
+    agent_type - agent type
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of IoT agents. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
 
     RETURNS:
     list - data for the IoT Agents requested
@@ -201,5 +205,5 @@ def get_all_iot_agents(server, agent_type) -> list:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    r = server._config_get(server.url + _create_url(agent_type))
+    r = server._config_get(f'{server.url}{_create_url(agent_type)}', params= options)
     return r.payload

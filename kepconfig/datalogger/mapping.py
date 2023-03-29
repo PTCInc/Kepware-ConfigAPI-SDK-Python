@@ -10,6 +10,7 @@ column mapping objects in a Datalogger log group within the Kepware Configuratio
 
 from . import log_group as Log_Group
 from ..error import KepError, KepHTTPError
+from ..connection import server
 
 MAPPING_ROOT = '/column_mappings'
 
@@ -86,13 +87,16 @@ def get_mapping(server, log_group, mapping) -> dict:
     r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url(mapping))
     return r.payload
 
-def get_all_mappings(server, log_group) -> list:
+def get_all_mappings(server: server, log_group: str, *, options: dict = None) -> list:
     '''Returns the properties of all column mapping objects for a log group. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
 
-    "log_group" - name of log group
+    log_group - name of log group
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of mapping items. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
 
     RETURNS:
     list - data for the column mappings requested
@@ -101,5 +105,5 @@ def get_all_mappings(server, log_group) -> list:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url())
+    r = server._config_get(f'{server.url}{Log_Group._create_url(log_group)}{_create_url()}', params= options)
     return r.payload

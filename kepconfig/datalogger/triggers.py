@@ -11,6 +11,7 @@ trigger objects in a Datalogger log group within the Kepware Configuration API
 from typing import Union
 from . import log_group as Log_Group
 from ..error import KepError, KepHTTPError
+from ..connection import server
 
 TRIGGERS_ROOT = '/triggers'
 
@@ -141,13 +142,16 @@ def get_trigger(server, log_group, trigger) -> dict:
     r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url(trigger))
     return r.payload
 
-def get_all_triggers(server, log_group) -> list:
+def get_all_triggers(server: server, log_group: str, *, options: dict = None) -> list:
     '''Returns the properties of all trigger objects for a log group. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
 
-    "log_group" - name of log group
+    log_group - name of log group
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of trigger items. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
 
     RETURNS:
     list - data for the triggers requested
@@ -156,5 +160,5 @@ def get_all_triggers(server, log_group) -> list:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url())
+    r = server._config_get(f'{server.url}{Log_Group._create_url(log_group)}{_create_url()}', params= options)
     return r.payload

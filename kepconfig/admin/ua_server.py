@@ -9,6 +9,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 """
 from typing import Union
 from ..error import KepHTTPError, KepError
+from ..connection import server
 
 
 UA_ROOT = '/admin/ua_endpoints'
@@ -132,11 +133,14 @@ def get_endpoint(server, endpoint) -> dict:
     r = server._config_get(server.url + _create_url(endpoint))
     return r.payload
 
-def get_all_endpoints(server) -> list:
+def get_all_endpoints(server: server, *, options: dict = None) -> list:
     '''Returns list of all endpoint objects and their properties. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of UA endpoints. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'.
     
     RETURNS:
     list - data for all endpoints requested
@@ -146,5 +150,5 @@ def get_all_endpoints(server) -> list:
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_get(server.url + _create_url())
+    r = server._config_get(f'{server.url}{_create_url()}', params= options)
     return r.payload

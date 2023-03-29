@@ -129,6 +129,9 @@ def test_uaserver(server):
     
     assert type(admin.ua_server.get_all_endpoints(server)) == list
     
+    #Check options for get call 
+    assert type(admin.ua_server.get_all_endpoints(server, options= {'filter': '3'})) == list
+    
     assert admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
     
     assert admin.ua_server.del_endpoint(server,uaendpoint2['common.ALLTYPES_NAME'])
@@ -161,6 +164,9 @@ def test_user_groups(server):
     assert type(admin.user_groups.get_user_group(server,group1['common.ALLTYPES_NAME'])) == dict
     
     assert type(admin.user_groups.get_all_user_groups(server)) == list
+
+    #Check options for get call 
+    assert type(admin.user_groups.get_all_user_groups(server, options= {'filter': 'Oper'})) == list
     
     assert admin.user_groups.disable_user_group(server, group1['common.ALLTYPES_NAME'])
 
@@ -210,6 +216,9 @@ def test_users(server):
     assert type(admin.users.get_user(server,user1['common.ALLTYPES_NAME'])) == dict
     
     assert type(admin.users.get_all_users(server)) == list
+
+    #Check options for get call 
+    assert type(admin.users.get_all_users(server, options= {'filter': 'Client1'})) == list
     
     assert admin.users.disable_user(server, user1['common.ALLTYPES_NAME'])
 

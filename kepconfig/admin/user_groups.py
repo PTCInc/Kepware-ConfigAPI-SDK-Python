@@ -9,6 +9,7 @@ user_groups within the Kepware Administration User Manager through the Kepware C
 """
 from typing import Union
 from ..error import KepHTTPError, KepError
+from ..connection import server
 
 
 USERGROUPS_ROOT = '/admin/server_usergroups'
@@ -132,12 +133,15 @@ def get_user_group(server, user_group) -> dict:
     r = server._config_get(server.url + _create_url(user_group))
     return r.payload
 
-def get_all_user_groups(server) -> list:
+def get_all_user_groups(server: server, *, options: dict = None) -> list:
     '''Returns list of all user_group objects and their properties. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
     
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of user groups. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'.
+
     RETURNS:
     list - data for all user_groups requested
 
@@ -146,7 +150,7 @@ def get_all_user_groups(server) -> list:
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_get(server.url + _create_url())
+    r = server._config_get(f'{server.url}{_create_url()}', params= options)
     return r.payload
 
 def enable_user_group(server, user_group) -> bool:

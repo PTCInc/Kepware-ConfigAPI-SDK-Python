@@ -9,7 +9,8 @@ r"""`exchange` exposes an API to allow modifications (add, delete, modify) to
 exchange objects for EGD devices within the Kepware Configuration API
 """
 
-import kepconfig
+from ... import path_split
+from ...connection import server
 from typing import Union
 from .. import egd as EGD, channel, device
 
@@ -22,7 +23,7 @@ def _create_url(device_path, ex_type, exchange_name = None):
 
     Returns the exchange specific url when a value is passed as the exchange name.
     '''
-    path_obj = kepconfig.path_split(device_path)
+    path_obj = path_split(device_path)
     device_root = channel._create_url(path_obj['channel']) + device._create_url(path_obj['device'])
 
     if exchange_name == None:
@@ -154,20 +155,23 @@ def modify_exchange(server, device_path, ex_type, DATA, exchange_name = None, fo
         if r.code == 200: return True 
         else: return False
 
-def get_exchange(server, device_path, ex_type, exchange_name = None) -> Union[dict, list]:
+def get_exchange(server: server, device_path: str, ex_type: str, exchange_name: str = None, *, options: dict = None) -> Union[dict, list]:
     '''Returns the properties of the exchange object or a list of all exchanges and their 
     properties for the type input. Returned object is JSON.
     
     INPUTS:
 
-    "server" - instance of the "server" class
+    server - instance of the "server" class
 
-    "device_path" - path to exchanges. Standard Kepware address decimal 
+    device_path - path to exchanges. Standard Kepware address decimal 
     notation string such as "channel1.device1"
 
-    "ex_type" - type of exchange either consumer or producer
+    ex_type - type of exchange either consumer or producer
 
-    "exchange_name" - name of exchange
+    exchange_name - (optional) name of exchange. If not defined, get all exchanges
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of exchanges. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when exchange_name is not defined.
     
     RETURNS:
 
@@ -179,21 +183,24 @@ def get_exchange(server, device_path, ex_type, exchange_name = None) -> Union[di
     KepURLError - If urllib provides an URLError
     '''
     if exchange_name == None:
-        r = server._config_get(server.url + _create_url(device_path, ex_type))
+        r = server._config_get(f'{server.url}{_create_url(device_path, ex_type)}', params= options)
     else:
-        r = server._config_get(server.url + _create_url(device_path, ex_type, exchange_name))
+        r = server._config_get(f'{server.url}{_create_url(device_path, ex_type, exchange_name)}')
     return r.payload
 
-def get_all_exchanges(server, device_path):
+def get_all_exchanges(server: server, device_path: str, *, options: dict = None) -> list[list, list]:
     '''Returns list of all exchange objects and their properties. Returned object is JSON list.
     
     INPUTS:
 
-    "server" - instance of the "server" class
+    server - instance of the "server" class
 
-    "device_path" - path to exchanges. Standard Kepware address decimal 
+    device_path - path to exchanges. Standard Kepware address decimal 
     notation string such as "channel1.device1"
     
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of exchanges. Options are 'filter', 
+    'sortOrder', and 'sortProperty' only.
+
     RETURNS:
 
     List - [list of consumer exchanges, list of producer exchanges] - list of lists for all 
@@ -205,6 +212,6 @@ def get_all_exchanges(server, device_path):
     KepURLError - If urllib provides an URLError
     '''
     exchange_list = []
-    exchange_list.append(get_exchange(server, device_path, EGD.CONSUMER_EXCHANGE))
-    exchange_list.append(get_exchange(server, device_path, EGD.PRODUCER_EXCHANGE))
+    exchange_list.append(get_exchange(server, device_path, EGD.CONSUMER_EXCHANGE, options= options))
+    exchange_list.append(get_exchange(server, device_path, EGD.PRODUCER_EXCHANGE, options= options))
     return exchange_list

@@ -183,6 +183,12 @@ def get_exchange(server, exchange_type, exchanges):
     assert type(ret) == list, 'Unexpected data type return. {}'.format(type(ret))
     assert remove_projectid(ret) == exchanges
 
+    # Test Get with Options
+    # Get All exchanges for exchange type
+    ret = kepconfig.connectivity.egd.exchange.get_exchange(server, ch_name + '.' + dev_name, exchange_type, options= {'filter':'1'})
+    assert type(ret) == list, 'Unexpected data type return. {}'.format(type(ret))
+    assert len(ret) == 1
+
     # Get All exchanges for device
     ret = kepconfig.connectivity.egd.exchange.get_all_exchanges(server, ch_name + '.' + dev_name)
     assert type(ret) == list
@@ -224,6 +230,12 @@ def get_range(server, exchange_type, exchange_name, ranges):
     ret = kepconfig.connectivity.egd.range.get_range(server, ch_name + '.' + dev_name, exchange_type, exchange_name)
     assert type(ret) == list, 'Unexpected data type return. {}'.format(type(ret))
     assert remove_projectid(ret) == ranges
+    
+    # Test Get with Options
+    # Get All ranges for Exchange
+    ret = kepconfig.connectivity.egd.range.get_range(server, ch_name + '.' + dev_name, exchange_type, exchange_name, options= {'filter': '0'})
+    assert type(ret) == list, 'Unexpected data type return. {}'.format(type(ret))
+    assert len(ret) == 1
 
 def modify_range(server, exchange_type, exchange_name, range_name):
 
@@ -249,15 +261,21 @@ def create_name(server, names):
 
 def get_name(server, names):
 
-    # Get a specific range
+    # Get a specific name
     ret = kepconfig.connectivity.egd.name.get_name_resolution(server, ch_name + '.' + dev_name, names[0]['common.ALLTYPES_NAME'])
     assert type(ret) == dict, 'Unexpected data type return. {}'.format(type(ret))
     assert remove_projectid(ret) == names[0]
 
-    # Get All ranges for Exchange
+    # Get All names for the device
     ret = kepconfig.connectivity.egd.name.get_name_resolution(server, ch_name + '.' + dev_name)
     assert type(ret) == list, 'Unexpected data type return. {}'.format(type(ret))
     assert remove_projectid(ret) == names
+
+    # Test Get with Options
+    # Get All names for the device
+    ret = kepconfig.connectivity.egd.name.get_name_resolution(server, ch_name + '.' + dev_name, options= {'filter': '1'})
+    assert type(ret) == list, 'Unexpected data type return. {}'.format(type(ret))
+    assert len(ret) == 1
 
 def modify_name(server, name):
 

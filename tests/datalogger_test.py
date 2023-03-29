@@ -213,6 +213,11 @@ def test_log_group_get(server):
 	
 	assert type(datalogger.log_group.get_all_log_groups(server)) == list
 
+	# Test Get with Options
+	r = datalogger.log_group.get_all_log_groups(server, options= {'filter': '2'})
+	assert type(r) == list
+	assert len(r) == 1
+
 def test_log_item_add(server):
 	assert datalogger.log_items.add_log_item(server, log_group_name, log_item1)
 
@@ -239,17 +244,26 @@ def test_log_item_get(server):
 
 	assert type(datalogger.log_items.get_all_log_items(server, log_group_name)) == list
 
+	# Test Get with Options
+	r = datalogger.log_items.get_all_log_items(server, log_group_name, options= {'filter': '2'})
+	assert type(r) == list
+	assert len(r) == 1
+
 	# Execute mapping test before deleting items
 	# Modify group to wide format
 	assert datalogger.log_group.modify_log_group(server, {"datalogger.LOG_GROUP_TABLE_FORMAT": 1}, log_group_name, force=True)
 
 def test_mapping_get(server):
-	mapping_list = []
-	mapping_list = datalogger.mapping.get_all_mappings(server, log_group_name)
+	r = datalogger.mapping.get_all_mappings(server, log_group_name)
 
-	assert type(mapping_list) == list
+	assert type(r) == list
 
-	assert type(datalogger.mapping.get_mapping(server, log_group_name, mapping_list[0]['common.ALLTYPES_NAME'])) == dict
+	# Test Get with Options
+	r = datalogger.mapping.get_all_mappings(server, log_group_name, options= {'filter': '2'})
+	assert type(r) == list
+	assert len(r) == 1
+
+	assert type(datalogger.mapping.get_mapping(server, log_group_name, r[0]['common.ALLTYPES_NAME'])) == dict
 
 def test_mapping_modify(server):
 	mapping_list = []
@@ -294,6 +308,11 @@ def test_trigger_modify(server):
 def test_trigger_get(server):
 	assert type(datalogger.triggers.get_trigger(server, log_group_name,trigger1['common.ALLTYPES_NAME'])) == dict
 	assert type(datalogger.triggers.get_all_triggers(server, log_group_name)) == list
+
+	# Test Get with Options
+	r = datalogger.triggers.get_all_triggers(server, log_group_name, options= {'filter': '2'})
+	assert type(r) == list
+	assert len(r) == 1
 
 def test_trigger_del(server):
 	# Delete triggers

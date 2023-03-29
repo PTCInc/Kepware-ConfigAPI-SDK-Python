@@ -11,9 +11,10 @@ channel objects within the Kepware Configuration API
 
  
 import inspect
+from ..connection import server
 from ..error import KepHTTPError, KepError
 from typing import Union
-from. import device
+from . import device
 
 CHANNEL_ROOT = '/project/channels'
 
@@ -29,7 +30,7 @@ def _create_url(channel = None):
     else:
         return '{}/{}'.format(CHANNEL_ROOT,channel)
 
-def add_channel(server, DATA) -> Union[bool, list]:
+def add_channel(server: server, DATA) -> Union[bool, list]:
     '''Add a "channel" or multiple "channel" objects to Kepware. Can be used to pass children of a channel object 
     such as devices and tags/tag groups. This allows you to create a channel, it's devices and tags 
     all in one function, if desired.
@@ -65,7 +66,7 @@ def add_channel(server, DATA) -> Union[bool, list]:
     else: 
         raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_channel(server, channel) -> bool:
+def del_channel(server: server, channel) -> bool:
     '''Delete a "channel" object in Kepware. This will delete all children as well
     
     INPUTS:
@@ -86,7 +87,7 @@ def del_channel(server, channel) -> bool:
     else: 
         raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_channel(server, DATA, channel = None, force = False) -> bool:
+def modify_channel(server: server, DATA, channel = None, force = False) -> bool:
     '''Modify a channel object and it's properties in Kepware. If a "channel" is not provided as an input,
     you need to identify the channel in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
     assume that is the channel that is to be modified.
@@ -125,7 +126,7 @@ def modify_channel(server, DATA, channel = None, force = False) -> bool:
         else: 
             raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_channel(server, channel)  -> dict:
+def get_channel(server: server, channel)  -> dict:
     '''Returns the properties of the channel object. Returned object is JSON.
     
     INPUTS:
@@ -144,24 +145,30 @@ def get_channel(server, channel)  -> dict:
     r = server._config_get(server.url + _create_url(channel))
     return r.payload
 
-def get_all_channels(server) -> list:
+def get_all_channels(server: server, *, options: dict = None) -> list:
     '''Returns list of all channel objects and their properties. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    
+    server - instance of the "server" class
+    
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of channels. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
     
     RETURNS:
     list - data for the channel requested
 
     EXCEPTIONS:
+
     KepHTTPError - If urllib provides an HTTPError
+
     KepURLError - If urllib provides an URLError
     '''
 
-    r = server._config_get(server.url + _create_url())
+    r = server._config_get(server.url + _create_url(), params= options)
     return r.payload
 
-def get_channel_structure(server, channel) -> dict:
+def get_channel_structure(server: server, channel) -> dict:
     '''Returns the properties of "channel" and includes all "devices" and the "tag" and "tag group" objects for a 
     channel in Kepware. Returned object is a dict of channel properties including a device list with 
     tag lists and tag group lists.

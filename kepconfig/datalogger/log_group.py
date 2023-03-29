@@ -8,7 +8,7 @@ r"""`log_group` exposes an API to allow modifications (add, delete, modify) to
 log group objects in DataLogger within the Kepware Configuration API
 """
 from typing import Union
-from ..connection import KepServiceResponse
+from ..connection import KepServiceResponse, server
 from ..error import KepError, KepHTTPError
 
 ENABLE_PROPERTY = 'datalogger.LOG_GROUP_ENABLED'
@@ -133,11 +133,15 @@ def get_log_group(server, log_group) -> dict:
     r = server._config_get(server.url + _create_url(log_group))
     return r.payload
 
-def get_all_log_groups(server) -> list:
+def get_all_log_groups(server: server, *, options: dict = None) -> list:
     '''Returns the properties of all log group objects for Kepware's Datalogger. Returned object is JSON list.
     
     INPUTS:
-    "server" - instance of the "server" class
+    
+    server - instance of the "server" class
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of log groups. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
 
     RETURNS:
     list - data for the log groups requested
@@ -146,7 +150,7 @@ def get_all_log_groups(server) -> list:
     KepHTTPError - If urllib provides an HTTPError
     KepURLError - If urllib provides an URLError
     '''
-    r = server._config_get(server.url + _create_url())
+    r = server._config_get(f'{server.url}{_create_url()}', params= options)
     return r.payload
 
 def enable_log_group(server, log_group) -> bool:

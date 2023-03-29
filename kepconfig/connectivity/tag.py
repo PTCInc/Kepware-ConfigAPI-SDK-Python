@@ -9,6 +9,7 @@ r"""`tag` exposes an API to allow modifications (add, delete, modify) to
 tag and tag group objects within the Kepware Configuration API
 """
 
+from ..connection import server
 from ..error import KepError, KepHTTPError
 from typing import Union
 import kepconfig
@@ -362,15 +363,18 @@ def get_tag(server, full_tag_path) -> dict:
     r = server._config_get(url)
     return r.payload
 
-def get_all_tags(server, full_tag_path) -> list:
+def get_all_tags(server: server, full_tag_path: str, *, options: dict = None) -> list:
     '''Returns the properties of all "tag" object at a specific path in Kepware. 
     Returned object is JSON list.
 
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
     
-    "full_tag_path" - path identifying location to retreive tag list. Standard Kepware address decimal 
+    full_tag_path - path identifying location to retreive tag list. Standard Kepware address decimal 
     notation string including the tag such as "channel1.device1.tag_group1"
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of tags. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
     
     RETURNS:
     list - data for the tags requested
@@ -382,7 +386,7 @@ def get_all_tags(server, full_tag_path) -> list:
 
     path_obj = kepconfig.path_split(full_tag_path)
     try:
-        url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
+        url = f"{server.url}{channel._create_url(path_obj['channel'])}{device._create_url(path_obj['device'])}"
         if 'tag_path' in path_obj:
             for tg in path_obj['tag_path']:
                 url += _create_tag_groups_url(tag_group=tg)
@@ -393,7 +397,7 @@ def get_all_tags(server, full_tag_path) -> list:
     except Exception as e:
         err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
         raise KepError(err_msg)
-    r = server._config_get(url)
+    r = server._config_get(url, params= options)
     return r.payload
 
 def get_tag_group(server, tag_group_path) -> dict:
@@ -427,15 +431,18 @@ def get_tag_group(server, tag_group_path) -> dict:
     r = server._config_get(url)
     return r.payload
 
-def get_all_tag_groups(server, tag_group_path) -> list:
+def get_all_tag_groups(server:server, tag_group_path: str, *, options: dict = None) -> list:
     '''Returns the properties of all "tag group" objects at a specific 
     path in Kepware. Returned object is JSON list. 
 
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
     
-    "tag_group_path" - path identifying location to retreive tag group list. Standard Kepware address decimal 
+    tag_group_path - path identifying location to retreive tag group list. Standard Kepware address decimal 
     notation string such as "channel1.device1.tag_group1"
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of tags. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
 
     RETURNS:
     list - data for the tag groups requested
@@ -446,7 +453,7 @@ def get_all_tag_groups(server, tag_group_path) -> list:
     '''
     path_obj = kepconfig.path_split(tag_group_path)
     try:
-        url = server.url+channel._create_url(path_obj['channel'])+device._create_url(path_obj['device'])
+        url = f"{server.url}{channel._create_url(path_obj['channel'])}{device._create_url(path_obj['device'])}"
         if 'tag_path' in path_obj:
             for tg in path_obj['tag_path']:
                 url += _create_tag_groups_url(tag_group=tg)
@@ -457,10 +464,10 @@ def get_all_tag_groups(server, tag_group_path) -> list:
     except Exception as e:
         err_msg = 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
         raise KepError(err_msg)
-    r = server._config_get(url)
+    r = server._config_get(url, params= options)
     return r.payload
 
-def get_full_tag_structure(server, path, recursive = False) -> dict:
+def get_full_tag_structure(server: server, path: str, *, recursive = False, options: dict = None) -> dict:
     '''Returns the properties of all "tag" and "tag group" objects at a specific 
     path in Kepware. Returned object is a dict of tag list and tag group list.
 
@@ -492,10 +499,13 @@ def get_full_tag_structure(server, path, recursive = False) -> dict:
     } 
 
     INPUTS:
-    "server" - instance of the "server" class
+    server - instance of the "server" class
     
-    "path" - path identifying location to retreive the tag structure. Standard Kepware address decimal 
+    path - path identifying location to retreive the tag structure. Standard Kepware address decimal 
     notation string such as "channel1.device1.tag_group1" and must container at least the channel and device.
+
+    options - (optional) Dict of parameters to filter, sort or pagenate the list of tags and tag groups. Options are 'filter', 
+    'sortOrder', and 'sortProperty' only.
 
     RETURNS:
     dict - data for the tag structure requested at "path" location
@@ -506,10 +516,15 @@ def get_full_tag_structure(server, path, recursive = False) -> dict:
     '''
     r = {}
         
-    r['tags'] = get_all_tags(server, path)
-    r['tag_groups'] = get_all_tag_groups(server, path)
+    # Remove pagination options, if present. Not useful with this method since it is designed to get the full tree of items.
+    if options is not None:
+        remove_list = ['pageNumber','pageSize']
+        [options.pop(x) for x in remove_list]
+    
+    r['tags'] = get_all_tags(server, path, options= options)
+    r['tag_groups'] = get_all_tag_groups(server, path, options= options)
     if recursive:
         for group in r['tag_groups']:
-            res = get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME'])
+            res = get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME'], options= options)
             group.update(res)
     return r
