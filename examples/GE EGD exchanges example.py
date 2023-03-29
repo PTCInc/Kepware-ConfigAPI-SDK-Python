@@ -10,7 +10,7 @@
 
 
 from kepconfig import connection, error
-from kepconfig.connectivity import channel, device, tag, egd
+from kepconfig.connectivity import channel, egd
 
 # Channel and Device name to be used
 ch_name = 'EGD'

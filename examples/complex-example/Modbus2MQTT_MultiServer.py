@@ -25,7 +25,7 @@
 import csv
 import json
 import kepconfig
-from kepconfig.connectivity import channel, device, tag
+from kepconfig.connectivity import channel, device
 import kepconfig.iot_gateway as IoT
 
 def ErrorHandler(err):

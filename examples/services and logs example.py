@@ -99,6 +99,11 @@ try:
 except Exception as err:
     ErrorHandler(err)
 
+try:
+    print("{} - {}".format("Here are only the Information entries of the Event Log", json.dumps(server.get_event_log(None, datetime.datetime.fromisoformat('2019-11-03T23:35:23.000'), datetime.datetime.utcnow(), options= {'event': 'Information'}), indent=4)))
+except Exception as err:
+    ErrorHandler(err)
+
 #Get Configuration API Transaction Log
 try:
     print("{} - {}".format("Here is the last API Transaction Log Entry", json.dumps(server.get_transaction_log(1), indent=4)))
