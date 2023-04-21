@@ -4,6 +4,8 @@
 
 This is a package to help create Python applications to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP).
 
+**API reference documentation is available on [Github Pages](https://ptcinc.github.io/Kepware-ConfigAPI-SDK-Python)**
+
 ## Prerequisites
 
 Package supported and tested on Python 3.9 or later. Older versions support earlier Python 3 environments but have less functionality. All HTTP communication is handled by the [urllib](https://docs.python.org/3/library/urllib.html#module-urllib) Python standard library.

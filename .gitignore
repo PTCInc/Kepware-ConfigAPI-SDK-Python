@@ -14,7 +14,7 @@ _new*
 _test*
 _build*
 _dev*
-/docs
+# /docs
 mkdocs.yml
 
 # Byte-compiled / optimized / DLL files
