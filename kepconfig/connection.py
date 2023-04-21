@@ -4,8 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
-r"""`connection` exposes an API that manages the RESTful requests 
-for the Kepware Configuration API. 
+r"""`connection` exposes an `server` class that manages the connection
+information and RESTful requests for the Kepware Configuration API Library.
 """
 
 import json
@@ -16,77 +16,38 @@ from base64 import b64encode
 from .error import KepError, KepHTTPError, KepURLError
 import socket
 import ssl
-import sys
+from .structures import KepServiceResponse, KepServiceStatus, _HttpDataAbstract
 
-class KepServiceResponse:
-    '''A class to represent a return object when calling a "service" API of Kepware. This is
-    used to return the responses when a "service" is executed appropriately
-
-    Properties:
-
-    "code" - HTTP code returned
-    "message" - return from the "service" call
-    "href" - URL reference to the JOB that is created by the service API
-    '''
-
-    def __init__(self, code = '', message = '', href = ''):
-        self.code = code
-        self.message = message
-        self.href = href
-    
-    def __str__(self):
-        return '{"code": %s, "message": %s, "href": %s}' % (self.code, self.message, self.href)
-
-class KepServiceStatus:
-    '''A class to represent a status object when checking on a "service" API job state in Kepware. This is
-    used to return the status of a "service" job
-
-    Properties:
-
-    "complete" - Boolean of service job completion status
-    "status" - Status code of job
-    "message" - Error message if service job fails
-    
-    '''
-    def __init__(self, complete = '', status = '', message = ''):
-        self.status = status
-        self.message = message
-        self.complete = complete
-    
-    def __str__(self):
-        return '{"complete": %s, "status": %s, "message": %s}' % (self.complete, self.status, self.message)
-
-class _HttpDataAbstract:
-    def __init__(self):
-        self.payload = ''
-        self.code = ''
-        self.reason = ''
 
 class server:
     '''A class to represent a connection to an instance of Kepware. This object is used to 
     create the Authentication and server parameters to taget a Kepware instance. An instance of this is 
     used in all configuration calls done.
 
-    Properties:
-
-    "host" - host name or IP address
-    "port" - port of Configuration API
-    "username" - username to conduct "Basic Authentication"
-    "password" - password to conduct "Basic Authentication"
-    "url" (STATIC) - base URL for the server connection
-    "SSL_on" - Identify to use HTTPS connection (Default: False)
-    "SSL_ignore_hostname" - During certificate validation ignore the hostname check
-    "SSL_trust_all_certs" (insecure) - During certificate validation trust any certificate - if True, 
+    :param host: host name or IP address
+    :param port: port of Configuration API
+    :param username: username to conduct "Basic Authentication"
+    :param password: password to conduct "Basic Authentication"
+    :param https: Sets `SSL_on` to use HTTPS connection (Default: False)
+    :param SSL_on: Identify to use HTTPS connection (Default: False)
+    :param SSL_ignore_hostname: During certificate validation ignore the hostname check
+    :param SSL_trust_all_certs: (insecure) - During certificate validation trust any certificate - if True, 
         will "set SSL_ignore_hostname" to true
+    :param url: base URL for the server connection
 
-    Methods:
+    **Methods**
 
-    "reinitialize()" - reinitialize the Kepware server
-    "get_trans_log()" - retrieve the Configuration API transaction logs
-    "get_event_log()" - retrieve the Kepware Event Log
-    "get_project_properties()" - retrieve the Kepware Project Properties
-    "modify_project_properties()" - modify the Kepware Project Properties
-    "service_status()" - retrive service job status
+    :meth:`reinitialize`: reinitialize the Kepware server
+
+    :meth:`get_transaction_log`: retrieve the Configuration API transaction logs
+
+    :meth:`get_event_log`: retrieve the Kepware Event Log
+
+    :meth:`get_project_properties`: retrieve the Kepware Project Properties
+
+    :meth:`modify_project_properties` - modify the Kepware Project Properties
+
+    :meth:`service_status` - retrive service job status
     '''
     __root_url = '/config'
     __version_url = '/v1'
@@ -96,7 +57,7 @@ class server:
 
 
 
-    def __init__(self,  host = None, port = None, user = None, pw = None, https = False):
+    def __init__(self,  host: str, port: int, user: str, pw: str, https: bool = False):
         self.host = host
         self.port = port
         self.username = user
@@ -110,7 +71,7 @@ class server:
             proto = 'https'
         else:
             proto = 'http'
-        return  '{}://{}:{}{}{}'.format(proto, self.host, self.port, self.__root_url, self.__version_url)
+        return  f'{proto}://{self.host}:{self.port}{self.__root_url}{self.__version_url}'
     
     @property
     def SSL_on(self):
@@ -118,6 +79,7 @@ class server:
     
     @SSL_on.setter
     def SSL_on(self, val):
+        
         if isinstance(val, bool):
             self.__SSL_on = val
 
@@ -152,22 +114,39 @@ class server:
                 self.__ssl_context.verify_mode = ssl.CERT_REQUIRED
 
 
+    def get_status(self) -> dict:
+        '''Executes a health status request to the Kepware instance to report service statuses.
 
+        :return: List of data for the health status request
 
-    def reinitialize(self, job_ttl = None) -> KepServiceResponse:
-        '''Executes a Reinitialize call to the Kepware instance.
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
+        '''
 
-        INPUTS:
+        r = self._config_get(f'{self.url}/status')
+        return r.payload
+    def get_info(self) -> dict:
+        '''Requests product information from the Kepware instance. Provides various information including
+        product name and version information.
 
-        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
-
-        RETURNS:
-        KepServiceResponse instance with job information
-
-        EXCEPTIONS (If not HTTP 200 or 429 returned):
+        :return: dict of data for the product information request
         
-        KepHTTPError - If urllib provides an HTTPError
-        KepURLError - If urllib provides an URLError
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
+        '''
+        
+        r = self._config_get(f'{self.url}/about')
+        return r.payload
+
+    def reinitialize(self, job_ttl: int = None) -> KepServiceResponse:
+        '''Executes a Reinitialize service call to the Kepware instance.
+
+        :param job_ttl: *(optional)* Determines the number of seconds a job instance will exist following completion.
+
+        :return: `KepServiceResponse` instance with job information
+
+        :raises KepHTTPError: If urllib provides an HTTPError (If not HTTP code 202 [Accepted] or 429 [Too Busy] returned)
+        :raises KepURLError: If urllib provides an URLError
         '''
         url = self.url + self.__project_services_url + '/ReinitializeRuntime' 
         try:
@@ -176,63 +155,62 @@ class server:
         except Exception as err:
             raise err
         
-    def get_trans_log(self, start = None, end = None, limit = None) -> list:
+    def get_transaction_log(self, limit: int = None, start: datetime.datetime = None, end: datetime.datetime = None) -> list:
         ''' Get the Transaction Log from the Kepware instance.
 
-        "start" (optional) - datetime.datetime type and should be UTC
+        :param limit: *(optional)* number of transaction log entries to request
+        :param start: *(optional)* start time of query as `datetime.datetime` type and should be UTC
+        :param end: *(optional)* end time of query as `datetime.datetime` type and should be UTC
 
-        "end" (optional) - datetime.datetime type and should be UTC
-
-        "limit" (optional) -  number of event log entries to request
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
         '''
         query = self.__create_query(start, end, limit)
-        url = self.url + self.__trans_log_url + '?' + parse.urlencode(query)
-        r = self._config_get(url)
+        url = f'{self.url}{self.__trans_log_url}'
+        r = self._config_get(url, params= query)
         return r.payload
 
-    def get_event_log(self, limit = None, start = None, end = None) -> list:
+    def get_event_log(self, limit: int = None, start: datetime.datetime = None, end: datetime.datetime = None, *, options: dict = None) -> list:
         ''' Get the Event Log from the Kepware instance.
 
-        "start" (optional) - datetime.datetime type and should be UTC
+        :param limit: *(optional)* number of event log entries to request
+        :param start: *(optional)* start time of query as `datetime.datetime` type and should be UTC
+        :param end: *(optional)* end time of query as `datetime.datetime` type and should be UTC
+        :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of transactions. Options are `event`, 
+        `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`
 
-        "end" (optional) - datetime.datetime type and should be UTC
-
-        "limit" (optional) - number of event log entries to request
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
         '''
         query = self.__create_query(start, end, limit)
-        url = self.url + self.__event_log_url + '?' + parse.urlencode(query)
-        r = self._config_get(url)
+        if options is not None:
+            query = {**query, **options}
+        url = f'{self.url}{self.__event_log_url}'
+        r = self._config_get(url, params= query)
         return r.payload
     
     def get_project_properties(self) -> dict:
         ''' Get the Project Properties of the Kepware instance.
         
-        RETURNS:
-        dict - Dict of all the project properties
+        :return: Dict of all the project properties
 
-        EXCEPTIONS:
-        KepHTTPError - If urllib provides an HTTPError
-        KepURLError - If urllib provides an URLError
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
         '''
 
         r = self._config_get(self.url + '/project')
         return r.payload
     
-    def modify_project_properties(self, DATA, force = False) -> bool:
+    def modify_project_properties(self, DATA: dict, force: bool = False) -> bool:
         ''' Modify the Project Properties of the Kepware instance.
 
-        INPUTS:
-
-        "DATA" - properly JSON object (dict) of the project properties to be modified
-
-        "force" (optional) - if True, will force the configuration update to the Kepware server
+        :param DATA: Dict of the project properties to be modified
+        :param force: *(optional)* if True, will force the configuration update to the Kepware server
         
-        RETURNS:
-        True - If a "HTTP 200 - OK" is received from Kepware
+        :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-        EXCEPTIONS:
-        KepHTTPError - If urllib provides an HTTPError
-        KepURLError - If urllib provides an URLError
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
         '''
 
         prop_data = self._force_update_check(force, DATA)
@@ -244,27 +222,22 @@ class server:
         '''Executes a ProjectSave Service call to the Kepware instance. This saves 
         a copy of the current project file to disk. The filename
 
-        INPUTS:
-        
-        "filename" - Fully qualified relative file path and name of project file including the file extension.
-        location of project file save defaults: 
+        :param filename: Relative file path and name of project file including the file extension to save.
+        Location of relative project file paths:
+         
                 TKS or KEP (Windows): C:\\PROGRAMDATA\\PTC\\Thingworx Kepware Server\\V6 or 
                                 C:\\PROGRAMDATA\\Kepware\\KEPServerEX\\V6
                 TKE (Linux):    /opt/tkedge/v1/user_data
 
 
-        "password" (optional) - Specify a password with which to load or save an encrypted project file.  
+        :param password: *(optional)* Specify a password with which to  save an encrypted project file with.  
             This password will be required to load this project file.
-        
-        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+        :param job_ttl: *(optional)* Determines the number of seconds a job instance will exist following completion.
 
-        RETURNS:
-        KepServiceResponse instance with job information
+        :return: `KepServiceResponse` instance with job information
 
-        EXCEPTIONS (If not HTTP 200 or 429 returned):
-        
-        KepHTTPError - If urllib provides an HTTPError
-        KepURLError - If urllib provides an URLError
+        :raises KepHTTPError: If urllib provides an HTTPError (If not HTTP code 202 [Accepted] or 429 [Too Busy] returned)
+        :raises KepURLError: If urllib provides an URLError
         '''
         url = self.url + self.__project_services_url + '/ProjectSave'
         prop_data = {'servermain.PROJECT_FILENAME': filename}
@@ -281,22 +254,19 @@ class server:
 
         INPUTS:
         
-        "filename" - Fully qualified path and name of project file including the file extension. Absolute
-        paths required for TKS and KEP while file path is relative for TKE
-            ex: Windows - filename = C:\\filepath\\test.opf
+        :param filename: Fully qualified or relative path and name of project file including the file extension. Absolute
+        paths required for TKS and KEP while file path is relative for TKE:
+
+                Windows - filename = C:\\filepath\\test.opf
                 Linux - filename = filepath/test.lpf - Location is /opt/tkedge/v1/user_data/filepath/test.lpf
 
-        "password" (optional) - Specify a password with which to load or save an encrypted project file.
-        
-        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+        :param password: *(optional)* Specify a password with which to load an encrypted project file.          
+        :param job_ttl: *(optional)* Determines the number of seconds a job instance will exist following completion.
 
-        RETURNS:
-        KepServiceResponse instance with job information
+        :return: `KepServiceResponse` instance with job information
 
-        EXCEPTIONS (If not HTTP 200 or 429 returned):
-        
-        KepHTTPError - If urllib provides an HTTPError
-        KepURLError - If urllib provides an URLError
+        :raises KepHTTPError: If urllib provides an HTTPError (If not HTTP code 202 [Accepted] or 429 [Too Busy] returned)
+        :raises KepURLError: If urllib provides an URLError
         '''
         url = self.url + self.__project_services_url + '/ProjectLoad'
         prop_data = {'servermain.PROJECT_FILENAME': filename}
@@ -312,16 +282,12 @@ class server:
         '''Returns the status of a service job. Used to verify if a service call
         has completed or not.
 
-        INPUT:
-        "resp" - KepServiceResponse instance with job information
+        :param resp: `KepServiceResponse` instance with job information
 
-        RETURNS:
-        KepServiceStatus instance with job status
+        :return: `KepServiceStatus` instance with job status
 
-        EXCEPTIONS:
-        
-        KepHTTPError - If urllib provides an HTTPError
-        KepURLError - If urllib provides an URLError
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
         '''
         # need to remove part of job href
         loc = resp.href.find(self.__root_url + self.__version_url)
@@ -337,6 +303,9 @@ class server:
         '''Conducts an POST method at *url* to add an object in the Kepware Configuration
         *DATA* is required to be a properly JSON object (dict) of the item to be posted to *url* 
         '''
+        if len(DATA) == 0:
+            err_msg = f'Error: Empty List or Dict in DATA | DATA type: {type(DATA)}'
+            raise KepError(err_msg) 
         data = json.dumps(DATA).encode('utf-8')
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, data, method='POST')
@@ -366,8 +335,15 @@ class server:
         return r
 
     #Function used to Read an object from Kepware (HTTP GET) and return the JSON response
-    def _config_get(self, url):
-        '''Conducts an GET method at *url* to retrieve an objects properties in the Kepware Configuration.'''
+    def _config_get(self, url, *, params = None):
+        '''
+        Conducts an GET method at *url* to retrieve an objects properties with query parameters in 
+        the Kepware Configuration.
+        '''
+        # Add parameters when necessary
+        if params is not None and params != {}:
+            qparams = parse.urlencode(params)
+            url = f'{url}?{qparams}'
         url_obj = self.__url_validate(url)
         q = request.Request(url_obj, method='GET')
         r = self.__connect(q)
@@ -375,6 +351,12 @@ class server:
 
     
     def _force_update_check(self, force, DATA):
+        '''
+        This will validate if the modify call needs to be forced or not. If forced, the dict DATA needs
+        to have the 'FORCE_UPDATE' property with a value of True. If forced is not requested, it is necessary
+        to provide the current 'PROJECT_ID'. If 'PROJECT_ID' is not present in DATA, this will automatically 
+        retreive it from the active server.
+        '''
         if force == True:
             DATA['FORCE_UPDATE'] = True
         else:

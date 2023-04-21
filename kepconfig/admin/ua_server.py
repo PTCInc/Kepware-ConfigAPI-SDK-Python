@@ -9,6 +9,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 """
 from typing import Union
 from ..error import KepHTTPError, KepError
+from ..connection import server
 
 
 UA_ROOT = '/admin/ua_endpoints'
@@ -25,25 +26,19 @@ def _create_url(endpoint = None):
     else:
         return '{}/{}'.format(UA_ROOT,endpoint)
 
-def add_endpoint(server, DATA) -> Union[bool, list]:
-    '''Add an "endpoint" or multiple "endpoint" objects to Kepware UA Server by passing a 
+def add_endpoint(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
+    '''Add an `"endpoint"` or multiple `"endpoint"` objects to Kepware UA Server by passing a 
     list of endpoints to be added all at once.
 
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param DATA: Dict or List of Dicts of the UA Endpoints to add
 
-    "DATA" - properly JSON object (dict) of the endpoint
-    expected by Kepware Configuration API
-
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware
-
-    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     endpoints added that failed.
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_add(server.url + _create_url(), DATA)
@@ -56,47 +51,37 @@ def add_endpoint(server, DATA) -> Union[bool, list]:
         return errors
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_endpoint(server, endpoint) -> bool:
-    '''Delete a "endpoint" object in Kepware UA Server
+def del_endpoint(server: server, endpoint: str) -> bool:
+    '''Delete an `"endpoint"` object in Kepware UA Server
     
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "endpoint" - name of endpoint
+    :param server: instance of the `server` class
+    :param endpoint: name of endpoint to delete
     
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_del(server.url + _create_url(endpoint))
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_endpoint(server, DATA, endpoint = None) -> bool:
-    '''Modify a endpoint object and it's properties in Kepware UA Server. If a "endpoint" is not provided as an input,
-    you need to identify the endpoint in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
+def modify_endpoint(server: server, DATA: dict, endpoint: str = None) -> bool:
+    '''Modify a `"endpoint"` object and it's properties in Kepware UA Server. If a `"endpoint"` is not provided as an input,
+    you need to identify the endpoint in the *'common.ALLTYPES_NAME'* property field in the `"DATA"`. It will 
     assume that is the endpoint that is to be modified.
 
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "DATA" - properly JSON object (dict) of the endpoint properties to be modified.
-
-    "endpoint" (optional) - name of endpoint to modify. Only needed if not existing in  "DATA"
+    :param server: instance of the `server` class
+    :param DATA: Dict of the UA endpoint properties to be modified.
+    :param endpoint: *(optional)* name of endpoint to modify. Only needed if not existing in `"DATA"`
     
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
-    
-    # channel_data = server._force_update_check(force, DATA)
+
     if endpoint == None:
         try:
             r = server._config_update(server.url + _create_url(DATA['common.ALLTYPES_NAME']), DATA)
@@ -105,46 +90,38 @@ def modify_endpoint(server, DATA, endpoint = None) -> bool:
         except KeyError as err:
             err_msg = 'Error: No UA Endpoint identified in DATA | Key Error: {}'.format(err)
             raise KepError(err_msg)
-
-        # except Exception as e:
-        #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
     else:
         r = server._config_update(server.url + _create_url(endpoint), DATA)
         if r.code == 200: return True 
         else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_endpoint(server, endpoint) -> dict:
-    '''Returns the properties of the endpoint object. Returned object is JSON.
+def get_endpoint(server: server, endpoint: str) -> dict:
+    '''Returns the properties of the `"endpoint"` object.
     
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "endpoint" - name of endpoint
+    :param server: instance of the `server` class
+    :param endpoint: name of endpoint to retrieve
     
-    RETURNS:
-    dict - data for the endpoint requested
+    :return: Dict of properties for the UA endpoint requested
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_get(server.url + _create_url(endpoint))
     return r.payload
 
-def get_all_endpoints(server) -> list:
-    '''Returns list of all endpoint objects and their properties. Returned object is JSON list.
+def get_all_endpoints(server: server, *, options: dict = None) -> list:
+    '''Returns list of all `"endpoint"` objects and their properties.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of UA endpoints. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize.
     
-    RETURNS:
-    list - data for all endpoints requested
+    :return: List of properties for all UA endpoints requested
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
-    r = server._config_get(server.url + _create_url())
+    r = server._config_get(f'{server.url}{_create_url()}', params= options)
     return r.payload

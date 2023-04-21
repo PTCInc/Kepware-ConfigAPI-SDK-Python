@@ -13,7 +13,6 @@ import kepconfig
 import time
 import datetime
 import pytest
-# import connectivity, admin, iot_gateway, datalogger
 
 
 # Channel and Device name to be used
@@ -29,7 +28,7 @@ WINFILENAMEENCRYPT = 'test\\project.sopf'
 WINFILEPATH = 'C:\\ProgramData\\PTC\\ThingWorx Kepware Server\\V6\\'
 LINUXFILENAME = 'project.lpf'
 LINUXFILENAMEENCRYPT = 'project.slpf'
-LINUXFILEPATH = 'C:\\DockerMounts\\tke1_5\\user_data\\'
+LINUXFILEPATH = 'C:\\DockerMounts\\tke1_6\\user_data\\'
 FILEPASSWORD = 'Password'
 
 
@@ -46,12 +45,14 @@ def complete(server):
         file_encrypt = WINFILENAMEENCRYPT
         filepath = WINFILEPATH
     files = ['{}{}'.format(filepath, file), '{}{}'.format(filepath, file_encrypt)]
-    for x in files:
-        if os.path.exists(x):
-            os.remove(x)
-        else:
-            print("The file does not exist")
-    pass
+    try:
+        for x in files:
+            if os.path.exists(x):
+                os.remove(x)
+            else:
+                print("The file does not exist")
+    except PermissionError as e:
+        print (e)
 
 @pytest.fixture(scope="module")
 def server(kepware_server):
@@ -116,6 +117,17 @@ def test_event_log(server: kepconfig.connection.server):
     
     assert type(server.get_event_log(None, datetime.datetime.fromisoformat('2022-02-21T14:23:23.000'), datetime.datetime.utcnow())) == list
 
+    # With Options
+    r = server.get_event_log(None, datetime.datetime.fromisoformat('2022-02-21T14:23:23.000'), datetime.datetime.utcnow(), options= {'pageSize': '1'})
+    assert type(r) == list
+    # Length of 2 - 1 for item, 1 for pagination information
+    assert len(r) == 2
+
+def test_transaction_log(server: kepconfig.connection.server):
+    assert type(server.get_transaction_log(25, None, None)) == list
+    
+    assert type(server.get_transaction_log(None, datetime.datetime.fromisoformat('2022-02-21T14:23:23.000'), datetime.datetime.utcnow())) == list
+
 def test_projectsave_service(server: kepconfig.connection.server):
     if server_type == 'TKE':
         file = LINUXFILENAME
@@ -127,10 +139,11 @@ def test_projectsave_service(server: kepconfig.connection.server):
         filepath = WINFILEPATH
 
     # Save non-encrypted file
+    time.sleep(1)
     job = server.save_project(file, None, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
     time.sleep(1)
-    status = server.service_status(job)
+    # status = server.service_status(job)
 
     # Wait for service to be completed
     while True:
@@ -140,6 +153,7 @@ def test_projectsave_service(server: kepconfig.connection.server):
         assert type(status) == kepconfig.connection.KepServiceStatus
 
     # Save encrypted file
+    time.sleep(1)
     job = server.save_project(file_encrypt, FILEPASSWORD, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
     time.sleep(1)
@@ -164,6 +178,7 @@ def test_projectload_service(server: kepconfig.connection.server):
         filepath = WINFILEPATH
 
     # Load non-encrypted file
+    time.sleep(1)
     job = server.load_project('{}{}'.format(filepath, file), None, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
 
@@ -175,10 +190,9 @@ def test_projectload_service(server: kepconfig.connection.server):
         assert type(status) == kepconfig.connection.KepServiceStatus
 
     # Load encrypted file
+    time.sleep(1)
     job = server.load_project('{}{}'.format(filepath, file_encrypt), FILEPASSWORD, 60)
     assert type(job) == kepconfig.connection.KepServiceResponse
-    time.sleep(1)
-    status = server.service_status(job)
 
     # Wait for service to be completed
     while True:
@@ -186,3 +200,9 @@ def test_projectload_service(server: kepconfig.connection.server):
         status = server.service_status(job)
         if (status.complete == True): break
         assert type(status) == kepconfig.connection.KepServiceStatus
+
+def test_get_status(server: kepconfig.connection.server):
+    assert type(server.get_status()) == list
+
+def test_get_info(server: kepconfig.connection.server):
+    assert type(server.get_info()) == dict

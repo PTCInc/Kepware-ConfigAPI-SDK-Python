@@ -1,7 +1,7 @@
 import re
 import os
 
-file_location = "kepconfig/__init__.py"
+file_location = "./kepconfig/__init__.py"
 version_re_string = "([0-9]+)\.([0-9]+)\.([0-9]+(?:[ab][0-9])?)"
 version_search = re.compile(r'__version__ = "'+ version_re_string + '"')
 version_check = re.compile(version_re_string)
@@ -44,16 +44,17 @@ def release():
     if ans.lower() in ("y", "yes"):
         # os.system("rm -rf dist/*") #Linux
         os.system("RMDIR /S /Q dist") #Windows
-        os.system("python3.10 -m build")
-    ans = input("upload to pip?(Y/n)")
+        os.system("python -m build")
+    ans = input("Upload to pip?(Y/n)")
     if ans.lower() in ("y", "yes"):
+        ans = input("Push to production?(Y=production pypi/n=test pypi)")
+        if ans.lower() in ("y", "yes"):
+            #Production PyPi Server
+            os.system("python -m twine upload dist/*")
+        else:
+            # Test PyPi Server
+            os.system("python -m twine upload --repository testpypi dist/*")
 
-        # Test PyPi Server
-        os.system("python -m twine upload --repository testpypi dist/*")
-
-        #Production PyPi Server
-        # os.system("python -m twine upload dist/*")
-
-
+        
 if __name__ == "__main__":
     release()

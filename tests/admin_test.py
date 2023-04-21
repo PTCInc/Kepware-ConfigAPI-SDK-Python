@@ -129,6 +129,9 @@ def test_uaserver(server):
     
     assert type(admin.ua_server.get_all_endpoints(server)) == list
     
+    #Check options for get call 
+    assert type(admin.ua_server.get_all_endpoints(server, options= {'filter': '3'})) == list
+    
     assert admin.ua_server.del_endpoint(server,uaendpoint1['common.ALLTYPES_NAME'])
     
     assert admin.ua_server.del_endpoint(server,uaendpoint2['common.ALLTYPES_NAME'])
@@ -144,11 +147,11 @@ def test_user_groups(server):
 # Group 2 fails since it already exists
     assert type(admin.user_groups.add_user_group(server,[group2, group3])) == list
     
-    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False},
-            group1['common.ALLTYPES_NAME'])
+    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False}, 
+                                               user_group= group1['common.ALLTYPES_NAME'])
     
-    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": True},
-            group1['common.ALLTYPES_NAME'])
+    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": True}, 
+                                               user_group= group1['common.ALLTYPES_NAME'])
 
     # Bad Inputs
     with pytest.raises(KepError):
@@ -161,6 +164,9 @@ def test_user_groups(server):
     assert type(admin.user_groups.get_user_group(server,group1['common.ALLTYPES_NAME'])) == dict
     
     assert type(admin.user_groups.get_all_user_groups(server)) == list
+
+    #Check options for get call 
+    assert type(admin.user_groups.get_all_user_groups(server, options= {'filter': 'Oper'})) == list
     
     assert admin.user_groups.disable_user_group(server, group1['common.ALLTYPES_NAME'])
 
@@ -199,7 +205,7 @@ def test_users(server):
 # User 2 fails since it already exists
     assert type(admin.users.add_user(server,[user2, user3])) == list
     
-    assert admin.users.modify_user(server,{"libadminsettings.USERMANAGER_USER_ENABLED": False}, user1['common.ALLTYPES_NAME'])
+    assert admin.users.modify_user(server,{"libadminsettings.USERMANAGER_USER_ENABLED": False}, user= user1['common.ALLTYPES_NAME'])
     
     # Bad Inputs
     with pytest.raises(KepError):
@@ -210,6 +216,9 @@ def test_users(server):
     assert type(admin.users.get_user(server,user1['common.ALLTYPES_NAME'])) == dict
     
     assert type(admin.users.get_all_users(server)) == list
+
+    #Check options for get call 
+    assert type(admin.users.get_all_users(server, options= {'filter': 'Client1'})) == list
     
     assert admin.users.disable_user(server, user1['common.ALLTYPES_NAME'])
 
@@ -220,7 +229,7 @@ def test_users(server):
     assert admin.users.del_user(server, user2['common.ALLTYPES_NAME'])
 
 def test_LLS(server):
-
+    if server_type == 'TKS': pytest.skip("LLS not configurable in {}.".format(server_type))
     assert type(admin.lls.get_lls_config(server)) == admin.lls.lls_config
 
     lls_config = {"libadminsettings.LICENSING_SERVER_PORT": 80,
@@ -239,3 +248,7 @@ def test_LLS(server):
     assert admin.lls.enable_lls(server)
 
     assert admin.lls.disable_lls(server)
+
+    assert type(admin.lls.force_license_check(server)) == kepconfig.connection.KepServiceResponse
+    
+    assert type(admin.lls.force_license_check(server, 10)) == kepconfig.connection.KepServiceResponse

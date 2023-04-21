@@ -4,5 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
-__path__ = __import__("pkgutil").extend_path(__path__, __name__)
+r"""`admin` module provides functionality to manage Kepware Administration based 
+properties available through the Kepware Configuration API
+"""
+
 from . import users, user_groups,ua_server, lls

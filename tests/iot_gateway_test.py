@@ -116,7 +116,7 @@ def test_agent_add(server):
         with pytest.raises(KepError):
             assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent)
 
-        # Add Agent with bad name (error)
+        # Add Agent with bad name (HTTP 207 return with list)
         agent = [
             {
             "common.ALLTYPES_NAME": agent_name + "1"
@@ -133,13 +133,26 @@ def test_agent_modify(server):
         # Modify Agent
         agent = {}
         agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
-        assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_name, agent_type)
+        assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent= agent_name, agent_type= agent_type)
+
+        # Modify Agent with name and type in data
+        agent = {}
+        agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
+        agent['common.ALLTYPES_NAME'] = agent_name
+        agent['iot_gateway.AGENTTYPES_TYPE'] = agent_type
+        assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent= agent_name, agent_type= agent_type)
 
         # Modify Agent without type (error)
         agent = {}
         agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
         with pytest.raises(KepError):
-            assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_name)
+            assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent= agent_name)
+        
+        # Modify Agent without name (error)
+        agent = {}
+        agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
+        with pytest.raises(KepError):
+            assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_type= agent_type)
         
 def test_agent_get(server):
     for agent_name, agent_type in agent_list:
@@ -148,7 +161,12 @@ def test_agent_get(server):
 
         # Get All Agents
         assert type(kepconfig.iot_gateway.agent.get_all_iot_agents(server, agent_type)) == list
- 
+
+        # Test Get with Options
+        # Get All Agents
+        ret = kepconfig.iot_gateway.agent.get_all_iot_agents(server, agent_type, options= {'filter': '1'})
+        assert type(ret) == list
+        assert len(ret) == 1
 
 def test_iot_item_add(server):       
     for agent_name, agent_type in agent_list:
@@ -196,7 +214,7 @@ def test_iot_item_modify(server):
         modify_iot_item = {
                 "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 2000,
         }
-        assert kepconfig.iot_gateway.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item_name, force = True)
+        assert kepconfig.iot_gateway.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item=iot_item_name, force = True)
 
 def test_iot_item_get(server):        
     for agent_name, agent_type in agent_list:
@@ -205,6 +223,12 @@ def test_iot_item_get(server):
 
         # Read All IoT Items
         assert type(kepconfig.iot_gateway.iot_items.get_all_iot_items(server, agent_name, agent_type)) == list
+
+        # Test Get with Options
+        # Read All IoT Items
+        ret = kepconfig.iot_gateway.iot_items.get_all_iot_items(server, agent_name, agent_type, options= {'filter': 'Date'})
+        assert type(ret) == list
+        assert len(ret) == 1
 
 def test_iot_item_del(server):        
     for agent_name, agent_type in agent_list:

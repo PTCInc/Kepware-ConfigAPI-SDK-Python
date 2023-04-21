@@ -71,17 +71,17 @@ user2 = {
 
 def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepError:
-        print(err.msg)
-    elif err.__class__ is error.KepHTTPError:
+    if isinstance(err,  error.KepHTTPError):
         print(err.code)
         print(err.msg)
         print(err.url)
         print(err.hdrs)
         print(err.payload)
-    elif err.__class__ is error.KepURLError:
+    elif isinstance(err,  error.KepURLError):
         print(err.url)
         print(err.reason)
+    elif isinstance(err, error.KepError):
+        print(err.msg)
     else:
         print('Different Exception Received: {}'.format(err))
 
@@ -109,7 +109,7 @@ modify_group = {
 }
 
 try:
-    print("{} - {}".format("Modify User Group properties to prevent 'Writes'",user_groups.modify_user_group(server, modify_group, group1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Modify User Group properties to prevent 'Writes'",user_groups.modify_user_group(server, modify_group, user_group= group1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 
@@ -140,7 +140,7 @@ modify_pass = {
 }
 
 try:
-    print("{} - {}".format("Updated a user password", users.modify_user(server,modify_pass, user1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Updated a user password", users.modify_user(server,modify_pass, user= user1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 

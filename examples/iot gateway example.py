@@ -10,30 +10,29 @@
 
 from kepconfig import connection, error
 from kepconfig.connectivity import channel
-import kepconfig.iot_gateway as IoT
-from kepconfig.iot_gateway import agent, iot_items
+import kepconfig.iot_gateway as iot
 
 # Agent name and Type to be used - constants from kepconfig.iotgateway 
 # can be used to identify the type of agent
 agent_name = 'MQTT Agent 1'
-agent_type = IoT.MQTT_CLIENT_AGENT
+agent_type = iot.MQTT_CLIENT_AGENT
 
 #Tag Address to add to the IoT agent
 iot_item_name = "Channel1.Device1.Tag1"
 
 def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepError:
-        print(err.msg)
-    elif err.__class__ is error.KepHTTPError:
+    if isinstance(err,  error.KepHTTPError):
         print(err.code)
         print(err.msg)
         print(err.url)
         print(err.hdrs)
         print(err.payload)
-    elif err.__class__ is error.KepURLError:
+    elif isinstance(err,  error.KepURLError):
         print(err.url)
         print(err.reason)
+    elif isinstance(err, error.KepError):
+        print(err.msg)
     else:
         print('Different Exception Received: {}'.format(err))
 
@@ -100,7 +99,7 @@ agent_data = {
 	"iot_gateway.MQTT_CLIENT_PASSWORD": ""
 }
 try:
-    print("{} - {}".format("Add the MQTT Agent", agent.add_iot_agent(server, agent_data, agent_type)))
+    print("{} - {}".format("Add the MQTT Agent", iot.agent.add_iot_agent(server, agent_data, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
@@ -109,20 +108,20 @@ agent_data = {
 }
 agent_data['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
 try:
-    print("{} - {}".format("Modify property in the MQTT Agent", agent.modify_iot_agent(server,agent_data, agent_name, agent_type)))
+    print("{} - {}".format("Modify property in the MQTT Agent", iot.agent.modify_iot_agent(server,agent_data, agent= agent_name, agent_type= agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
 # Get Agent the properties for the agent that was created. It will return the 
 # JSON of the properties
 try:
-    print("{} - {}".format("Read properties of the MQTT Agent", agent.get_iot_agent(server, agent_name, agent_type)))
+    print("{} - {}".format("Read properties of the MQTT Agent", iot.agent.get_iot_agent(server, agent_name, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
 # Get a list of all MQTT Agents that are configured
 try:
-    print("{} - {}".format("Getting list of MQTT Agents", agent.get_all_iot_agents(server, agent_type)))
+    print("{} - {}".format("Getting list of MQTT Agents", iot.agent.get_all_iot_agents(server, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
@@ -139,7 +138,7 @@ iot_item_data = {
         "iot_gateway.IOT_ITEM_DATA_TYPE": 5 
         }
 try:
-    print("{} - {}".format("Add new tag to the MQTT Agent", iot_items.add_iot_item(server, iot_item_data, agent_name, agent_type)))
+    print("{} - {}".format("Add new tag to the MQTT Agent", iot.iot_items.add_iot_item(server, iot_item_data, agent_name, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
@@ -150,7 +149,7 @@ modify_iot_item = {
         "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 500
 }
 try:
-    print("{} - {}".format("Modify the tag or IoT Item added", iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type)))
+    print("{} - {}".format("Modify the tag or IoT Item added", iot.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
@@ -162,30 +161,30 @@ modify_iot_item = {
         "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 2000
 }
 try:
-    print("{} - {}".format("Modify the tag or IoT Item added again", iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item_name, force = True)))
+    print("{} - {}".format("Modify the tag or IoT Item added again", iot.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item= iot_item_name, force = True)))
 except Exception as err:
     ErrorHandler(err)
 
 # Read the tag or IoT Item configured in the MQTT Agent
 try:
-    print("{} - {}".format("Read the properties of the IoT Item", iot_items.get_iot_item(server, iot_item_name, agent_name, agent_type)))
+    print("{} - {}".format("Read the properties of the IoT Item", iot.iot_items.get_iot_item(server, iot_item_name, agent_name, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
 # Get a list of all tags or IoT Items configured in the MQTT Agent
 try:
-    print("{} - {}".format("Get a list of all the IoT Items configured in the MQTT Agent", iot_items.get_all_iot_items(server, agent_name, agent_type)))
+    print("{} - {}".format("Get a list of all the IoT Items configured in the MQTT Agent", iot.iot_items.get_all_iot_items(server, agent_name, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
 # Delete a tag or IoT Item configured in the MQTT Agent
 try:
-    print("{} - {}".format("Delete the IoT Item", iot_items.del_iot_item(server, iot_item_name, agent_name, agent_type)))
+    print("{} - {}".format("Delete the IoT Item", iot.iot_items.del_iot_item(server, iot_item_name, agent_name, agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
 # Delete the MQTT Agent
 try:
-    print("{} - {}".format("Delete the MQTT Agent", agent.del_iot_agent(server, agent_name, agent_type)))
+    print("{} - {}".format("Delete the MQTT Agent", iot.agent.del_iot_agent(server, agent_name, agent_type)))
 except Exception as err:
     ErrorHandler(err)

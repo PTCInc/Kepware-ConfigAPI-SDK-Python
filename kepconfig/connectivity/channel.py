@@ -11,9 +11,10 @@ channel objects within the Kepware Configuration API
 
  
 import inspect
+from ..connection import server
 from ..error import KepHTTPError, KepError
 from typing import Union
-from. import device
+from . import device
 
 CHANNEL_ROOT = '/project/channels'
 
@@ -29,29 +30,23 @@ def _create_url(channel = None):
     else:
         return '{}/{}'.format(CHANNEL_ROOT,channel)
 
-def add_channel(server, DATA) -> Union[bool, list]:
-    '''Add a "channel" or multiple "channel" objects to Kepware. Can be used to pass children of a channel object 
+def add_channel(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
+    '''Add a `"channel"` or multiple `"channel"` objects to Kepware. Can be used to pass children of a channel object 
     such as devices and tags/tag groups. This allows you to create a channel, it's devices and tags 
     all in one function, if desired.
 
     Additionally it can be used to pass a list of channels and it's children to be added all at once.
 
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "DATA" - properly JSON object (dict) of the channel and it's children
+    :param server: instance of the `server` class
+    :param DATA: Dict of the channel and it's children
     expected by Kepware Configuration API
 
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware
-    
-    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     channels added that failed.
-        
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_add(server.url + _create_url(), DATA)
@@ -65,20 +60,16 @@ def add_channel(server, DATA) -> Union[bool, list]:
     else: 
         raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_channel(server, channel) -> bool:
-    '''Delete a "channel" object in Kepware. This will delete all children as well
+def del_channel(server: server, channel: str) -> bool:
+    '''Delete a `"channel"` object in Kepware. This will delete all children as well
     
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "channel" - name of channel
+    :param server: instance of the `server` class
+    :param channel: name of channel
     
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_del(server.url + _create_url(channel))
@@ -86,26 +77,20 @@ def del_channel(server, channel) -> bool:
     else: 
         raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_channel(server, DATA, channel = None, force = False) -> bool:
-    '''Modify a channel object and it's properties in Kepware. If a "channel" is not provided as an input,
-    you need to identify the channel in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
+def modify_channel(server: server, DATA: dict, *, channel: str = None, force: bool = False) -> bool:
+    '''Modify a channel object and it's properties in Kepware. If a `"channel"` is not provided as an input,
+    you need to identify the channel in the *'common.ALLTYPES_NAME'* property field in `"DATA"`. It will 
     assume that is the channel that is to be modified.
 
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "DATA" - properly JSON object (dict) of the channel properties to be modified.
-
-    "channel" (optional) - name of channel to modify. Only needed if not existing in  "DATA"
-
-    "force" (optional) - if True, will force the configuration update to the Kepware server
+    :param server: instance of the `server` class
+    :param DATA: Dict of the `channel` properties to be modified
+    :param channel: *(optional)* - name of channel to modify. Only needed if not existing in `"DATA"`
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
     
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     
     channel_data = server._force_update_check(force, DATA)
@@ -125,82 +110,74 @@ def modify_channel(server, DATA, channel = None, force = False) -> bool:
         else: 
             raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_channel(server, channel)  -> dict:
-    '''Returns the properties of the channel object. Returned object is JSON.
+def get_channel(server: server, channel: str)  -> dict:
+    '''Returns the properties of the channel object.
     
-    INPUTS:
-    "server" - instance of the "server" class
-
-    "channel" - name of channel
+    :param server: instance of the `server` class
+    :param channel: name of channel
     
-    RETURNS:
-    dict - data for the channel requested
+    :return: Dict of data for the channel requested
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_get(server.url + _create_url(channel))
     return r.payload
 
-def get_all_channels(server) -> list:
-    '''Returns list of all channel objects and their properties. Returned object is JSON list.
+def get_all_channels(server: server, *, options: dict = None) -> list:
+    '''Returns list of all channel objects and their properties.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of channels. Options are `filter`, 
+        `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`
     
-    RETURNS:
-    list - data for the channel requested
+    :return: List of data for all channels in Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
-    r = server._config_get(server.url + _create_url())
+    r = server._config_get(server.url + _create_url(), params= options)
     return r.payload
 
-def get_channel_structure(server, channel) -> dict:
-    '''Returns the properties of "channel" and includes all "devices" and the "tag" and "tag group" objects for a 
+def get_channel_structure(server: server, channel: str) -> dict:
+    '''Returns the properties of `"channel"` and includes all `"devices"` and the `"tag"` and `"tag group"` objects for a 
     channel in Kepware. Returned object is a dict of channel properties including a device list with 
     tag lists and tag group lists.
 
-    The returned object resembles below, nested based on how many 
+    The returned object resembles the example below, nested based on how many 
     levels the tag_group namespace has tags or tag_groups:
 
-    Ex.
-    {
-        channel_properties,
-        'devices: [
-            {
-                device1_properties,
-                'tags': [tag1_dict, tag2_dict,...],
-                'tag_groups':[
-                    {
-                        tag_group1_properties,
-                        'tags': [tag1_dict, tag2_dict,...]
-                        'tag_groups':[sub_group1, subgroup2,...]
-                    }, 
-                    {
-                        tag_group2_properties,
-                        'tags': [tag1_dict, tag2_dict,...]
-                        'tag_groups':[sub_group1, subgroup2,...]
-                    },...]
-            },...]
-    }       
-
-    INPUTS:
-    "server" - instance of the "server" class
+    Example return:
     
-    "channel" - name of channel
+        {
+            channel_properties,
+            'devices: [
+                {
+                    device1_properties,
+                    'tags': [tag1_dict, tag2_dict,...],
+                    'tag_groups':[
+                        {
+                            tag_group1_properties,
+                            'tags': [tag1_dict, tag2_dict,...]
+                            'tag_groups':[sub_group1, subgroup2,...]
+                        }, 
+                        {
+                            tag_group2_properties,
+                            'tags': [tag1_dict, tag2_dict,...]
+                            'tag_groups':[sub_group1, subgroup2,...]
+                        },...]
+                },...]
+        }       
 
-    RETURNS:
-    dict - data for the device structure requested for "channel"
+    :param server: instance of the `server` class
+    :param channel: name of channel
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :return: Dict of data for the channel structure requested for `"channel"`
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     channel_properties = get_channel(server, channel)

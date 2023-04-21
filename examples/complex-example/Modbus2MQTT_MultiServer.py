@@ -24,23 +24,23 @@
 
 import csv
 import json
-import kepconfig
-from kepconfig.connectivity import channel, device, tag
+from kepconfig import error, connection
+from kepconfig.connectivity import channel, device
 import kepconfig.iot_gateway as IoT
 
 def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is kepconfig.error.KepError:
-        print(err.msg)
-    elif err.__class__ is kepconfig.error.KepHTTPError:
+    if isinstance(err,  error.KepHTTPError):
         print(err.code)
         print(err.msg)
         print(err.url)
         print(err.hdrs)
         print(err.payload)
-    elif err.__class__ is kepconfig.error.KepURLError:
+    elif isinstance(err,  error.KepURLError):
         print(err.url)
         print(err.reason)
+    elif isinstance(err, error.KepError):
+        print(err.msg)
     else:
         print('Different Exception Received: {}'.format(err))
 
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     
     print ("-- Channel and devices and agent creation attempt")
     for Kepware_IP in Kepware_IP_Array:
-        server = kepconfig.connection.server(Kepware_IP, Kepware_Port, user, passw)
+        server = connection.server(Kepware_IP, Kepware_Port, user, passw)
         try:
             print("{} - {}".format("Adding all devices", channel.add_channel(server,all_devices_JSON)))
         except Exception as err:

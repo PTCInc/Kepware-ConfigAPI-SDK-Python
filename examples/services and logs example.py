@@ -21,17 +21,17 @@ r = {}
 
 def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepError:
-        print(err.msg)
-    elif err.__class__ is error.KepHTTPError:
+    if isinstance(err,  error.KepHTTPError):
         print(err.code)
         print(err.msg)
         print(err.url)
         print(err.hdrs)
         print(err.payload)
-    elif err.__class__ is error.KepURLError:
+    elif isinstance(err,  error.KepURLError):
         print(err.url)
         print(err.reason)
+    elif isinstance(err, error.KepError):
+        print(err.msg)
     else:
         print('Different Exception Received: {}'.format(err))
 
@@ -91,7 +91,7 @@ except Exception as err:
 # Get Event Log from Kepware instance.
 # Time parameters need to be UTC values.
 try:
-    print("{} - {}".format("Here is the last Event Log Entry", json.dumps(server.get_event_log(1, None, None), indent=4)))
+    print("{} - {}".format("Here is the last Event Log Entry", json.dumps(server.get_event_log(1), indent=4)))
 except Exception as err:
     ErrorHandler(err)
 try:
@@ -99,9 +99,14 @@ try:
 except Exception as err:
     ErrorHandler(err)
 
+try:
+    print("{} - {}".format("Here are only the Information entries of the Event Log", json.dumps(server.get_event_log(None, datetime.datetime.fromisoformat('2019-11-03T23:35:23.000'), datetime.datetime.utcnow(), options= {'event': 'Information'}), indent=4)))
+except Exception as err:
+    ErrorHandler(err)
+
 #Get Configuration API Transaction Log
 try:
-    print("{} - {}".format("Here is the last API Transaction Log Entry", json.dumps(server.get_trans_log(1, None, None), indent=4)))
+    print("{} - {}".format("Here is the last API Transaction Log Entry", json.dumps(server.get_transaction_log(1), indent=4)))
 except Exception as err:
     ErrorHandler(err)
 

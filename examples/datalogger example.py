@@ -58,20 +58,20 @@ log_item2 = {
 
 def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepError:
-        print(err.msg)
-    elif err.__class__ is error.KepHTTPError:
+    if isinstance(err,  error.KepHTTPError):
         print(err.code)
         print(err.msg)
         print(err.url)
         print(err.hdrs)
         print(err.payload)
-    elif err.__class__ is error.KepURLError:
+    elif isinstance(err,  error.KepURLError):
         print(err.url)
         print(err.reason)
+    elif isinstance(err, error.KepError):
+        print(err.msg)
     else:
         print('Different Exception Received: {}'.format(err))
-
+        
 # This creates a server reference that is used to target all modifications of 
 # the Kepware configuration
 server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
@@ -132,7 +132,7 @@ log_group_mod_properties = {
     "datalogger.LOG_GROUP_UPDATE_RATE_MSEC": 1000
 }
 try:
-    print("{} - {}".format("Modify property in the Log Group", DL.log_group.modify_log_group(server,log_group_mod_properties,log_group1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Modify property in the Log Group", DL.log_group.modify_log_group(server,log_group_mod_properties,log_group= log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 
@@ -174,7 +174,7 @@ modify_log_item = {
     "datalogger.LOG_ITEM_NUMERIC_ID": "0"
 }
 try:
-    print("{} - {}".format("Modify the tag or Log Item added", DL.log_items.modify_log_item(server, log_group1['common.ALLTYPES_NAME'], modify_log_item, log_item1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Modify the tag or Log Item added", DL.log_items.modify_log_item(server, log_group1['common.ALLTYPES_NAME'], modify_log_item, log_item= log_item1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 

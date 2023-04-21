@@ -9,7 +9,9 @@ r"""`names` exposes an API to allow modifications (add, delete, modify) to
 name resolution objects for EGD devices within the Kepware Configuration API
 """
 
-import kepconfig
+from ... import path_split
+from ...connection import server
+from ...error import KepHTTPError, KepError
 from typing import Union
 from .. import channel, device
 
@@ -21,7 +23,7 @@ def _create_url(device_path, name = None):
 
     Returns the name resolution specific url when a value is passed.
     '''
-    path_obj = kepconfig.path_split(device_path)
+    path_obj = path_split(device_path)
     device_root = channel._create_url(path_obj['channel']) + device._create_url(path_obj['device'])
 
     if name == None:
@@ -29,32 +31,22 @@ def _create_url(device_path, name = None):
     else:
         return '{}/{}/{}'.format(device_root, NAMES_ROOT, name)
 
-def add_name_resolution(server, device_path, DATA) -> Union[bool, list]:
-    '''Add a "name resolution" or multiple "name resolution" objects to Kepware. This allows you to 
+def add_name_resolution(server: server, device_path: str, DATA: Union[dict, list]) -> Union[bool, list]:
+    '''Add a `"name resolution"` or multiple `"name resolution"` objects to Kepware. This allows you to 
     create a name resolution or multiple name resolutions all in one function, if desired.
 
-    INPUTS:
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param DATA: Dict or List of Dicts of name resolutions
+    expected by Kepware Configuration API
 
-    "server" - instance of the "server" class
-
-    "device_path" - path to name resolutions. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    "DATA" - properly JSON object (dict) of the range or ranges
-
-    RETURNS:
-
-    True - If a "HTTP 201 - Created" is received from Kepware
-    
-    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     name resolutions added that failed.
 
-    False - If a non-expected "2xx successful" code is returned
-
-    EXCEPTIONS:
-
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_add(server.url + _create_url(device_path), DATA)
@@ -65,60 +57,43 @@ def add_name_resolution(server, device_path, DATA) -> Union[bool, list]:
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: 
+        raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_name_resolution(server, device_path, name) -> bool:
-    '''Delete a "name resolution" object in Kepware.
+def del_name_resolution(server: server, device_path: str, name: str) -> bool:
+    '''Delete a `"name resolution"` object in Kepware.
     
-    INPUTS:
-
-    "server" - instance of the "server" class
-
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    "name resolution" - name of name resolution
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param name: name of name resolution to delete
     
-    RETURNS:
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_del(server.url + _create_url(device_path, name))
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_name_resolution(server, device_path, DATA, name = None, force = False) -> bool:
-    '''Modify a name resolution object and it's properties in Kepware. If a "name" is not provided as an input,
-    you need to identify the name resolution in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
+def modify_name_resolution(server: server, device_path: str, DATA: dict, *, name: str = None, force: bool = False) -> bool:
+    '''Modify a `"name resolution"` object and it's properties in Kepware. If a `"name"` is not provided as an input,
+    you need to identify the name resolution in the *'common.ALLTYPES_NAME'* property field in the `"DATA"`. It will 
     assume that is the name resolution that is to be modified.
 
-    INPUTS:
-
-    "server" - instance of the "server" class
-
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    "DATA" - properly JSON object (dict) of the range properties to be modified.
-
-    "name" (optional) - name of name resolution to modify. Only needed if not existing in  "DATA"
-
-    "force" (optional) - if True, will force the configuration update to the Kepware server
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param DATA: Dict of name resolution properties to be modified
+    :param name: *(optional)* name of name resolution to modify. Only needed if not existing in `"DATA"`
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
     
-    RETURNS:
-    
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     
     name_data = server._force_update_check(force, DATA)
@@ -126,42 +101,34 @@ def modify_name_resolution(server, device_path, DATA, name = None, force = False
         try:
             r = server._config_update(server.url + _create_url(device_path, name_data['common.ALLTYPES_NAME']), name_data)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No name resolution identified in DATA | Key Error: {}'.format(err))
-            return False
-        # except Exception as e:
-        #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+            err_msg = f'Error: No name resolution identified in DATA | Key Error: {type(DATA)}'
+            raise KepError(err_msg) 
     else:
         r = server._config_update(server.url + _create_url(device_path, name), name_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_name_resolution(server, device_path, name = None) -> Union[dict, list]:
-    '''Returns the properties of the name resolution object or a list of all name resolutions.
-    Returned object is JSON.
+def get_name_resolution(server: server, device_path: str, name: str = None, *, options: dict = None) -> Union[dict, list]:
+    '''Returns the properties of the `"name resolution"` object or a list of all name resolutions.
     
-    INPUTS:
-
-    "server" - instance of the "server" class
-
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    "name" - name of name resolution
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param DATA: Dict of name resolution properties to be modified
+    :param name: *(optional)* name of name resolution to retrieve. If not defined, will get all name resolutions
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate when getting a list of profiles. Options are `filter`, 
+        `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`. Only used when `"name"` is not defined.
     
-    RETURNS:
-
-    JSON - data for the name resolution requested or a list of name resolutions and their properties
-
-    EXCEPTIONS:
-
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :return: Dict of the name resolution properties or List of Dicts for all name resolutions and their properties 
+    
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     if name == None:
-        r = server._config_get(server.url + _create_url(device_path))
+        r = server._config_get(f'{server.url}{_create_url(device_path)}', params= options)
     else:
-        r = server._config_get(server.url + _create_url(device_path, name))
+        r = server._config_get(f'{server.url}{_create_url(device_path, name)}')
     return r.payload

@@ -10,7 +10,7 @@
 
 
 from kepconfig import connection, error
-from kepconfig.connectivity import channel, device, tag, egd
+from kepconfig.connectivity import channel, egd
 
 # Channel and Device name to be used
 ch_name = 'EGD'
@@ -27,17 +27,17 @@ egd_device = {
 
 def ErrorHandler(err):
     # Generic Handler for exception errors
-    if err.__class__ is error.KepError:
-        print(err.msg)
-    elif err.__class__ is error.KepHTTPError:
+    if isinstance(err,  error.KepHTTPError):
         print(err.code)
         print(err.msg)
         print(err.url)
         print(err.hdrs)
         print(err.payload)
-    elif err.__class__ is error.KepURLError:
+    elif isinstance(err,  error.KepURLError):
         print(err.url)
         print(err.reason)
+    elif isinstance(err, error.KepError):
+        print(err.msg)
     else:
         print('Different Exception Received: {}'.format(err))
 
@@ -94,7 +94,7 @@ except Exception as err:
 # Modify an Exchange
 try:
     print("{} - {}".format("Modify Consumer Exchange:", egd.exchange.modify_exchange(server, ch_name + '.' + dev_name, egd.CONSUMER_EXCHANGE, 
-        {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2}, consumer_exchange['common.ALLTYPES_NAME'])))
+        {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2},exchange_name= consumer_exchange['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 
