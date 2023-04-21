@@ -1,12 +1,12 @@
 # Kepware Configuration API SDK for Python
 
-[![PyPI version](https://badge.fury.io/py/kepconfig.svg)](https://badge.fury.io/py/kepconfig)
+[![Released Version](https://img.shields.io/pypi/v/kepconfig)](https://pypi.org/project/kepconfig) [![Supported Versions](https://img.shields.io/pypi/pyversions/kepconfig)](https://pypi.org/project/kepconfig) ![PyPI - Downloads](https://img.shields.io/pypi/dm/kepconfig) ![PyPI - License](https://img.shields.io/pypi/l/kepconfig)
 
-This is a package SDK to create Python modules to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP).
+This is a package to help create Python applications to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP).
 
 ## Prerequisites
 
-The client libraries are supported on Python 3.6 or later. All HTTP communication is handled by the [urllib](https://docs.python.org/3.6/library/urllib.html#module-urllib) Python standard library.
+Package supported and tested on Python 3.9 or later. Older versions support earlier Python 3 environments but have less functionality. All HTTP communication is handled by the [urllib](https://docs.python.org/3/library/urllib.html#module-urllib) Python standard library.
 
 ## Features
 
@@ -21,14 +21,17 @@ SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following 
 | **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
 | **Datalogger** <br /> *(Log Groups, Items, Mapping, Triggers, Reset Mapping Service)* | Y | Y |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y* | Y |
+| **Product Info and Health Status\*\*** | Y | Y |
 
-Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only
+- Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only
+- Note (**) - Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds
 
 Driver specific features:
 
 | Driver          | Features       |
 | :----------:  | :----------:  |
 |GE Ethernet Global Data|Exchanges, Ranges and Name Resolutions|
+|Universal Device Driver|Profile Library|
 
 Methods to read the following logs:
 
@@ -41,16 +44,19 @@ Configuration API *Services* implemented:
 
 | Services      | TKS/KEP       | TKE           |
 | :----------:  | :----------:  | :----------:  |
-| **TagGeneration** <br /> *(for supported drivers)* | Y | Y |
+| **TagGeneration**<br />*(for supported drivers)* | Y | Y |
 | **ReinitializeRuntime** | Y* | Y |
+| **ProjectLoad and ProjectSave**| Y | Y |
 
 Note (*) - Reinitialize service was implemented for Kepware Server v6.8+
 
-Generic REST methods are provided to use for functions not developed in SDK package. These are found in the Server Class in [connection.py](/kepconfig/connection.py)
+Filtering, sorting and pagination query options are added for any collections methods (ex: get_all_devices() or get_all_channel()).
+
+Generic REST methods are provided to use for functions not developed in SDK package. These are found in the Server Class in [connection.py](./kepconfig/connection.py)
 
 ## Known Limitations
 
-- Other property configuration for more complex drivers with objects besides channels, devices, tags and tag groups are not explicitly defined
+- Other property configuration for more complex drivers with objects besides channels, devices, tags and tag groups are not always explicitly defined
 - Other supported plug-ins (EFM Exporter, Scheduler, etc) are not defined
 - When using hostnames (not IP addresses) for connections, delays may occur under certain network configurations as the connection may attempt IPv6 connections first. IPv6 is not supported by Kepware servers at this time.
 
@@ -64,7 +70,7 @@ Package can be installed with `pip` using the following:
 
 ## Key Concepts
 
-NOTE: Samples can also be found in the [samples](samples) folder.
+NOTE: Detailed examples can also be found in the [examples](./examples/) folder.
 
 ### Create server connection
 
@@ -74,7 +80,7 @@ import kepconfig.connection
 server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
 
 # For HTTPS connections:
-server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '', https=True)
+server = connection.server(host = '127.0.0.1', port = 57512, user = 'Administrator', pw = '', https=True)
 
 ```
 
@@ -124,5 +130,4 @@ result = tag.add_tag(server, tag_path, tag_info))
 **Visit:**
 
 - [Kepware.com](https://www.kepware.com/)
-- [Configuration API Info](https://www.kepware.com/en-us/products/kepserverex/features/configuration-api/)
 - [PTC.com](https://www.ptc.com/)
