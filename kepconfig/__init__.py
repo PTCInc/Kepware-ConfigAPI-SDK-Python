@@ -17,7 +17,7 @@ See License.txt in the project root for
 license information.
 
 """
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 from . import connection, error
 from .utils import path_split
 
