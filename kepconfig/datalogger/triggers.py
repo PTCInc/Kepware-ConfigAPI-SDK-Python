@@ -28,26 +28,20 @@ def _create_url(trigger = None):
         return '{}/{}'.format(TRIGGERS_ROOT, trigger)
 
 
-def add_trigger(server, log_group, DATA) -> Union[bool, list]:
-    '''Add a "trigger" or multiple "trigger" objects to a log group in Kepware's Datalogger. It can 
+def add_trigger(server: server, log_group: str, DATA: dict | list) -> Union[bool, list]:
+    '''Add a `"trigger"` or multiple `"trigger"` objects to a log group in Kepware's Datalogger. It can 
     be used to pass a list of triggers to be added all at once.
 
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the trigger items
+    :param DATA: Dict or a list of the trigger items to add through Kepware Configuration API
 
-    "log_group" - name of log group that the triggers will be added
-
-    *DATA* - properly JSON object (dict) of the trigger expected by Kepware Configuration API
-
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware
-
-    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     triggers added that failed.
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_add(server.url + Log_Group._create_url(log_group) + _create_url(), DATA)
@@ -60,49 +54,37 @@ def add_trigger(server, log_group, DATA) -> Union[bool, list]:
         return errors 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_trigger(server, log_group, trigger) -> bool:
-    '''Delete a "trigger" object of a log group in Kepware's Datalogger.
+def del_trigger(server: server, log_group: str, trigger: str) -> bool:
+    '''Delete a `"trigger"` object of a log group in Kepware's Datalogger.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the trigger items
+    :param trigger: name of trigger to delete
 
-    "log_group" - name of log group that trigger exists
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    "trigger" - name of trigger to delete
-
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_del(server.url + Log_Group._create_url(log_group) + _create_url(trigger))
     if r.code == 200: return True
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_trigger(server, log_group, DATA, trigger = None, force = False)  -> bool:
-    '''Modify a trigger object and it's properties in Kepware. If a "trigger" is not provided as an input,
-    you need to identify the trigger in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
+def modify_trigger(server: server, log_group: str, DATA: dict, *, trigger: str = None, force: bool = False)  -> bool:
+    '''Modify a `"trigger"` object and it's properties in Kepware. If a `"trigger"` is not provided as an input,
+    you need to identify the trigger in the *'common.ALLTYPES_NAME'* property field in the `"DATA"`. It will 
     assume that is the trigger that is to be modified.
 
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the trigger items
+    :param DATA: Dict of the trigger properties to be modified.
+    :param trigger: *(optional)* name of trigger to modify in the log group. Only needed if not existing in `"DATA"`
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
 
-    "log_group" - name of log group that trigger exists
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    "DATA" - properly JSON object (dict) of the agent properties to be modified
-
-    "trigger" (optional) - trigger to modify in the log group. Only needed if not existing in "DATA"
-
-    "force" (optional) - if True, will force the configuration update to the Kepware server
-
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     
     trigger_data = server._force_update_check(force, DATA)
@@ -123,42 +105,37 @@ def modify_trigger(server, log_group, DATA, trigger = None, force = False)  -> b
         else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
 def get_trigger(server, log_group, trigger) -> dict:
-    '''Returns the properties of the trigger object. Returned object is JSON.
+    '''Returns the properties of the `"trigger"` object.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the trigger items
+    :param trigger: name of trigger to retrieve
 
-    "log_group" - name of log group that trigger exists
+    :return: Dict of properties for the trigger requested
 
-    "trigger" - name of trigger to retrieve properties for
-
-    RETURNS:
-    dict - data for the trigger requested
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url(trigger))
     return r.payload
 
 def get_all_triggers(server: server, log_group: str, *, options: dict = None) -> list:
-    '''Returns the properties of all trigger objects for a log group. Returned object is JSON list.
+    '''Returns the properties of all `"trigger"` objects for a log group.
     
-    INPUTS:
-    server - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the trigger items
 
-    log_group - name of log group
+    :return: Dict of properties for the trigger requested
 
-    options - (optional) Dict of parameters to filter, sort or pagenate the list of trigger items. Options are 'filter', 
-    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of triggers. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when exchange_name is not defined.
 
-    RETURNS:
-    list - data for the triggers requested
+    :return: list of properties for all triggers in the log group requested
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_get(f'{server.url}{Log_Group._create_url(log_group)}{_create_url()}', params= options)
     return r.payload

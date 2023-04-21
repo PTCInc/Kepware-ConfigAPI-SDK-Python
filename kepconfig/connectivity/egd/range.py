@@ -12,6 +12,7 @@ range objects in exchanges for EGD devices within the Kepware Configuration API
 from typing import Union
 from .. import egd as EGD
 from ...connection import server
+from ...error import KepError, KepHTTPError
 
 RANGES_ROOT = '/ranges'
 
@@ -28,39 +29,26 @@ def _create_url(device_path, ex_type, exchange_name, range = None):
     else:
         return '{}{}/{}'.format(exchange_root, RANGES_ROOT, range)
 
-def add_range(server, device_path, ex_type, exchange_name, DATA) -> Union[bool, list]:
-    '''Add a "range" or multiple "range" objects to Kepware. This allows you to 
+def add_range(server: server, device_path: str, ex_type: str, exchange_name: str, DATA: dict | list) -> Union[bool, list]:
+    '''Add a `"range"` or multiple `"range"` objects to Kepware. This allows you to 
     create a range or multiple ranges all in one function, if desired.
 
     When passing multiple ranges, they will be populated in the same order
     in the list sent. Ensure you provide the list in the order desired.
 
-    INPUTS:
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param ex_type: type of exchange, either `CONSUMER` or `PRODUCER`
+    :param exchange_name: name of exchange that range is located
+    :param DATA: Dict or List of Dicts of the range(s) to add
 
-    "server" - instance of the "server" class
-
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    "ex_type" - type of exchange either consumer or producer
-
-    "exchange_name" - name of exchange to add range to
-
-    "DATA" - properly JSON object (dict) of the range or ranges
-
-    RETURNS:
-
-    True - If a "HTTP 201 - Created" is received from Kepware
-    
-    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     ranges added that failed.
-
-    False - If a non-expected "2xx successful" code is returned
-
-    EXCEPTIONS:
-
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+        
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_add(server.url + _create_url(device_path, ex_type, exchange_name), DATA)
@@ -71,68 +59,46 @@ def add_range(server, device_path, ex_type, exchange_name, DATA) -> Union[bool, 
             if item['code'] != 201:
                 errors.append(item)
         return errors
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_range(server, device_path, ex_type, exchange_name, range_name) -> bool:
-    '''Delete a "range" object in Kepware.
+def del_range(server: server, device_path: str, ex_type: str, exchange_name: str, range_name: str) -> bool:
+    '''Delete a `"range"` object in Kepware.
     
-    INPUTS:
-
-    "server" - instance of the "server" class
-
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    "ex_type" - type of exchange either consumer or producer
-
-    "exchange_name" - name of exchange that range is located
-
-    "range_name" - name of range
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param ex_type: type of exchange, either `CONSUMER` or `PRODUCER`
+    :param exchange_name: name of exchange that range is located
+    :param range_name: name of range to delete
     
-    RETURNS:
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_del(server.url + _create_url(device_path, ex_type, exchange_name, range_name))
     if r.code == 200: return True 
-    else: return False
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_range(server, device_path, ex_type, exchange_name, DATA, range_name = None, force = False) -> bool:
-    '''Modify a range object and it's properties in Kepware. If a "range_name" is not provided as an input,
-    you need to identify the range in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
+def modify_range(server: server, device_path: str, ex_type: str, exchange_name: str, DATA: dict, *, range_name: str = None, force: bool = False) -> bool:
+    '''Modify a `"range"` object and it's properties in Kepware. If a `"range_name"` is not provided as an input,
+    you need to identify the range in the *'common.ALLTYPES_NAME'* property field in the `"DATA"`. It will 
     assume that is the range that is to be modified.
 
-    INPUTS:
-
-    "server" - instance of the "server" class
-
-    "device_path" - path to exchanges and their ranges. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    "ex_type" - type of exchange either consumer or producer
-
-    "exchange_name" - name of exchange that range is located
-
-    "DATA" - properly JSON object (dict) of the range properties to be modified.
-
-    "range_name" (optional) - name of range to modify. Only needed if not existing in  "DATA"
-
-    "force" (optional) - if True, will force the configuration update to the Kepware server
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param ex_type: type of exchange, either `CONSUMER` or `PRODUCER`
+    :param exchange_name: name of exchange that range is located
+    :param DATA: Dict of the range properties to be modified.
+    :param range_name: *(optional)* name of range to to modify. Only needed if not existing in `"DATA"`
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
     
-    RETURNS:
-    
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     
     range_data = server._force_update_check(force, DATA)
@@ -140,44 +106,32 @@ def modify_range(server, device_path, ex_type, exchange_name, DATA, range_name =
         try:
             r = server._config_update(server.url + _create_url(device_path, ex_type, exchange_name, range_data['common.ALLTYPES_NAME']), range_data)
             if r.code == 200: return True 
-            else: return False
+            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
         except KeyError as err:
-            print('Error: No range identified in DATA | Key Error: {}'.format(err))
-            return False
-        # except Exception as e:
-        #     return 'Error: Error with {}: {}'.format(inspect.currentframe().f_code.co_name, str(e))
+            err_msg = 'Error: No range identified in DATA | Key Error: {}'.format(err)
+            raise KepError(err_msg)
     else:
         r = server._config_update(server.url + _create_url(device_path, ex_type, exchange_name, range_name), range_data)
         if r.code == 200: return True 
-        else: return False
+        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
 def get_range(server: server, device_path: str, ex_type: str, exchange_name: str, range_name: str = None, *, options: dict = None) -> Union[dict, list]:
-    '''Returns the properties of the range object or a list of all ranges. Returned object is JSON.
+    '''Returns the properties of the `"range"` object or a list of all ranges.
     
-    INPUTS:
-
-    server - instance of the "server" class
-
-    device_path - path to exchanges and their ranges. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
-
-    ex_type - type of exchange either consumer or producer
-
-    exchange_name - name of exchange that range is located
-
-    range_name - name of range
-
-    options - (optional) Dict of parameters to filter, sort or pagenate the list of ranges. Options are 'filter', 
+    :param server: instance of the `server` class
+    :param device_path: path to EGD device. Standard Kepware address decimal 
+    notation string such as `"channel1.device1"`
+    :param ex_type: type of exchange, either `CONSUMER` or `PRODUCER`
+    :param exchange_name: name of exchange that range is located
+    :param DATA: Dict of the range properties to be modified.
+    :param range_name: *(optional)* name of range to retrieve. If not defined, get all ranges
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of exchanges. Options are 'filter', 
     'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when range_name is not defined.
     
-    RETURNS:
+    :return: Dict of properties for the range requested or a List of ranges and their properties
 
-    JSON - data for the range requested or a list of ranges and their properties
-
-    EXCEPTIONS:
-
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     if range_name == None:
         r = server._config_get(f'{server.url}{_create_url(device_path, ex_type, exchange_name)}', params= options)

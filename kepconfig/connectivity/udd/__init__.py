@@ -4,5 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
+r"""`udd` module provides support for Universal Device driver specific objects 
+within the Kepware Configuration API
+"""
 
 from . import profile

@@ -10,7 +10,7 @@ iot_items objects within the Kepware Configuration API
 """
 
 from typing import Union
-import kepconfig as helper
+from .. import utils
 from ..connection import server
 from .. import iot_gateway as IOT
 from ..error import KepError, KepHTTPError
@@ -26,33 +26,26 @@ def _create_url(tag = None):
     if tag == None:
         return IOT_ITEMS_ROOT
     else: 
-        normalized_tag = helper._address_dedecimal(tag)
+        normalized_tag = utils._address_dedecimal(tag)
         return '{}/{}'.format(IOT_ITEMS_ROOT,normalized_tag)
 
 
-def add_iot_item(server, DATA, agent, agent_type) -> Union[bool, list]:
-    '''Add a "iot item" or multiple "iot item" objects to Kepware's IoT Gateway agent. Additionally 
+def add_iot_item(server: server, DATA: dict | list, agent: str, agent_type: str) -> Union[bool, list]:
+    '''Add a `"iot item"` or multiple `"iot item"` objects to Kepware's IoT Gateway agent. Additionally 
     it can be used to pass a list of iot items to be added to an agent all at once.
 
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param DATA: Dict or List of Dicts of the iot item or list of items
+    expected by Kepware Configuration API
+    :param agent: name of IoT Agent
+    :param agent_type: agent type. Valid values are `MQTT Client`, `REST Client` or `REST Server`
 
-    "DATA" - properly JSON object (dict) of the iot item or list of items
-    expected by Kepware Configuration API.
-
-    "agent" - name of IoT Agent
-
-    "agent_type" - agent type
-
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware
-
-    List - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     iot items added that failed.
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_add(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(), DATA)
     if r.code == 201: return True
@@ -64,53 +57,39 @@ def add_iot_item(server, DATA, agent, agent_type) -> Union[bool, list]:
             return errors 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_iot_item(server, iot_item, agent, agent_type) -> bool:
-    '''Delete a "iot item" object in Kepware.
+def del_iot_item(server: server, iot_item: str, agent: str, agent_type: str) -> bool:
+    '''Delete an `"iot item"` object in Kepware.
 
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param iot_item: IoT item to delete
+    :param agent: name of IoT Agent
+    :param agent_type: agent type. Valid values are `MQTT Client`, `REST Client` or `REST Server`
 
-    "iot_item" - IoT item to delete
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    "agent" - name of IoT Agent
-
-    "agent_type" - agent type 
-
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_del(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item))
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_iot_item(server, DATA, agent, agent_type, iot_item = None, force = False) -> bool:
-    '''Modify a iot item object and it's properties in Kepware. If a "iot item" is not provided as an input,
-    you need to identify the iot item in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
+def modify_iot_item(server: server, DATA: dict, agent: str, agent_type: str, *, iot_item: str = None, force: bool = False) -> bool:
+    '''Modify an `"iot item"` object and it's properties in Kepware. If a `"iot item"` is not provided as an input,
+    you need to identify the iot item in the *'common.ALLTYPES_NAME'* property field in the `"DATA"`. It will 
     assume that is the iot item that is to be modified.
 
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param DATA: Dict of the iot item properties to be modified.
+    :param agent: name of IoT Agent
+    :param agent_type: agent type. Valid values are `MQTT Client`, `REST Client` or `REST Server`
+    :param iot_item: *(optional)* name of IoT item to modify. Only needed if not existing in `"DATA"`
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
+    
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    "DATA" - properly JSON object (dict) of the iot item properties to be modified.
-
-    "agent" - name of IoT Agent
-
-    "agent_type" - agent type 
-
-    "iot_item" (optional) - IoT item to modify
-
-    "force" (optional) - if True, will force the configuration update to the Kepware server
-
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     
     agent_data = server._force_update_check(force, DATA)
@@ -122,54 +101,41 @@ def modify_iot_item(server, DATA, agent, agent_type, iot_item = None, force = Fa
         except KeyError as err:
             err_msg = 'Error: No agent identified in DATA | Key Error: {}'.format(err)
             raise KepError(err_msg)
-        # except:
-        #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
         r = server._config_update(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item), agent_data)
         if r.code == 200: return True 
         else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_iot_item(server, iot_item, agent, agent_type)-> dict:
-    '''Returns the properties of the agent object. Returned object is JSON.
+def get_iot_item(server: server, iot_item: str, agent: str, agent_type: str)-> dict:
+    '''Returns the properties of the `"iot item"` object.
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "iot_item" - IoT item
+    :param server: instance of the `server` class
+    :param iot_item: name of IoT item to retrieve properties
+    :param agent: name of IoT Agent
+    :param agent_type: agent type. Valid values are `MQTT Client`, `REST Client` or `REST Server`
 
-    "agent" - name of IoT Agent
+    :return: Dict of properties for the iot item requested
 
-    "agent_type" - agent type
-
-    RETURNS:
-    dict - data for the IoT item requested
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_get(server.url + IOT.agent._create_url(agent_type, agent) + _create_url(iot_item))
     return r.payload
 
 def get_all_iot_items(server: server, agent: str, agent_type: str, *, options: dict = None) -> list:
-    '''Returns the properties of all iot item objects for an agent. Returned object is JSON list.
+    '''Returns the properties of all `"iot item"` objects for an agent.
     
-    INPUTS:
-    server - instance of the "server" class
+    :param server: instance of the `server` class
+    :param iot_item: name of IoT item to retrieve properties
+    :param agent: name of IoT Agent
+    :param agent_type: agent type. Valid values are `MQTT Client`, `REST Client` or `REST Server`
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of IoT items. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when exchange_name is not defined.
 
-    agent - name of IoT Agent
+    :return: list of properties for all IoT items
 
-    agent_type - agent type
-
-    options - (optional) Dict of parameters to filter, sort or pagenate the list of IoT items. Options are 'filter', 
-    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
-
-    RETURNS:
-    list - data for the IoT item requested
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_get(f'{server.url}{IOT.agent._create_url(agent_type, agent)}{_create_url()}', params= options)
     return r.payload

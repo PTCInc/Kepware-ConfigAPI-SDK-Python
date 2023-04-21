@@ -26,28 +26,21 @@ def _create_url(mapping = None):
     else:
         return '{}/{}'.format(MAPPING_ROOT, mapping)
 
-def modify_mapping(server, log_group, DATA, mapping = None, force = False) -> bool:
-    '''Modify a column mapping object and it's properties in Kepware. If a "mapping" is not provided as an input,
-    you need to identify the column mapping in the 'common.ALLTYPES_NAME' property field in the "DATA". It will 
+def modify_mapping(server: server, log_group: str, DATA: dict, *, mapping: str = None, force: bool = False) -> bool:
+    '''Modify a column `"mapping"` object and it's properties in Kepware. If a `"mapping"` is not provided as an input,
+    you need to identify the column mapping in the *'common.ALLTYPES_NAME'* property field in the `"DATA"`. It will 
     assume that is the column mapping that is to be modified.
 
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the mapping
+    :param DATA: Dict of the mapping properties to be modified.
+    :param mapping: *(optional)* column mapping to modify in the log group. Only needed if not existing in `"DATA"`
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
 
-    "log_group" - name of log group that mapping exists
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    "DATA" - properly JSON object (dict) of the agent properties to be modified
-
-    "mapping" (optional) - column mapping to modify in the log group. Only needed if not existing in "DATA"
-
-    "force" (optional) - if True, will force the configuration update to the Kepware server
-
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     
     mapping_data = server._force_update_check(force, DATA)
@@ -60,50 +53,38 @@ def modify_mapping(server, log_group, DATA, mapping = None, force = False) -> bo
         except KeyError as err:
             err_msg = 'Error: No column mapping identified in DATA | Key Error: {}'.format(err)
             raise KepError(err_msg)
-        # except:
-        #     return 'Error: Error with {}'.format(inspect.currentframe().f_code.co_name)
     else:
         r = server._config_update(server.url + Log_Group._create_url(log_group) + _create_url(mapping), mapping_data)
         if r.code == 200: return True 
         else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_mapping(server, log_group, mapping) -> dict:
-    '''Returns the properties of the mapping object. Returned object is JSON.
+def get_mapping(server: server, log_group: str, mapping: str) -> dict:
+    '''Returns the properties of the `"mapping"` object.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the mapping
+    :param mapping: name of column mapping to retrieve properties
+    
+    :return: Dict of properties for the mapping object requested
 
-    "log_group" - name of log group that mapping exists
-
-    "mapping" - name of column mapping to retrieve properties for
-
-    RETURNS:
-    dict - data for the column mapping requested
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_get(server.url + Log_Group._create_url(log_group) + _create_url(mapping))
     return r.payload
 
 def get_all_mappings(server: server, log_group: str, *, options: dict = None) -> list:
-    '''Returns the properties of all column mapping objects for a log group. Returned object is JSON list.
+    '''Returns the properties of all column `"mapping"` objects for a log group.
     
-    INPUTS:
-    server - instance of the "server" class
+    :param server: instance of the `server` class
+    :param log_group: name of log group for the mapping
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of mapping items. Options are 'filter', 
+    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'. Only used when exchange_name is not defined.
 
-    log_group - name of log group
+    :return: list of properties for all mapping items in the log group requested
 
-    options - (optional) Dict of parameters to filter, sort or pagenate the list of mapping items. Options are 'filter', 
-    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
-
-    RETURNS:
-    list - data for the column mappings requested
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = server._config_get(f'{server.url}{Log_Group._create_url(log_group)}{_create_url()}', params= options)
     return r.payload

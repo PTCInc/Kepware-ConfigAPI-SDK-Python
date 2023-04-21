@@ -10,7 +10,7 @@ the Kepware Administration through the Kepware Configuration API
 from .. import connection
 from typing import Union
 from ..error import KepHTTPError, KepError
-import inspect
+
 
 
 LLS_ROOT = '/admin'
@@ -28,15 +28,13 @@ class lls_config:
     '''A class to represent a admin properties for the Local License Server connection from an instance of Kepware. 
     This object is used to easily manage the LLS parameters for a Kepware instance. 
 
-    Properties:
-
-    "server_name" - Host name or IP address of the LLS server
-    "server_port" - HTTP/non-SSL port to target for the LLS server
-    "check_period" - Period that Kepware checks licensing status
-    "server_port_SSL" - HTTPS/SSL port to target for the LLS server
-    "allow_insecure_comms" - When True, use HTTP/non-SSL connection to LLS
-    "allow_self_signed_certs" - Allow for self signed certificates to be used during HTTPS/SSL connections to the LLS
-    "instance_alias_name" - Alias name for LLS to use as reference to this Kepware instance
+    :param server_name: Host name or IP address of the LLS server
+    :param server_port: HTTP/non-SSL port to target for the LLS server
+    :param check_period: Period that Kepware checks licensing status
+    :param server_port_SSL: HTTPS/SSL port to target for the LLS server
+    :param allow_insecure_comms: When True, use HTTP/non-SSL connection to LLS
+    :param allow_self_signed_certs: Allow for self signed certificates to be used during HTTPS/SSL connections to the LLS
+    :param instance_alias_name: Alias name for LLS to use as reference to this Kepware instance
     '''
 
     def __init__(self, config = {}):
@@ -63,35 +61,29 @@ class lls_config:
         return "{}".format(self._get_dict())
 
 def get_lls_config(server: connection.server) -> lls_config:
-    '''Returns the properties of the Local License server properties. Returned object is lls_config class object.
+    '''Returns the properties of the Local License server connection properties. Returned object is `lls_config` class object.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
     
-    RETURNS:
-    lls_config - class object with lls configuration
+    :return: `lls_config` class object with lls connection configuration
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_get(server.url + LLS_ROOT)
     return lls_config(r.payload)
 
 def update_lls_config(server: connection.server, config: lls_config) -> bool:
-    '''Updates the Local License Server admin properties for Kepware.
+    '''Updates the Local License Server connection properties for Kepware.
     
-    INPUTS:
-    "server" - instance of the "server" class
-    "config" - lls_config class object
+    :param server: instance of the `server` class
+    :param config: `lls_config` class object with lls connection configuration
     
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     DATA = config._get_dict()
@@ -102,15 +94,12 @@ def update_lls_config(server: connection.server, config: lls_config) -> bool:
 def enable_lls(server: connection.server) -> bool:
     '''Enables the Local License Server connection for Kepware.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
     
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_update(server.url + LLS_ROOT, {LICENSING_SERVER_ENABLE: True})
@@ -120,15 +109,12 @@ def enable_lls(server: connection.server) -> bool:
 def disable_lls(server: connection.server) -> bool:
     '''Disables the Local License Server connection for Kepware.
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
     
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     r = server._config_update(server.url + LLS_ROOT, {LICENSING_SERVER_ENABLE: False})
@@ -136,22 +122,17 @@ def disable_lls(server: connection.server) -> bool:
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
 def force_license_check(server: connection.server, job_ttl: int = None):
-    '''Executes a ForceLicenseCheck call to the Kepware instance. This triggers the server to verify the 
+    '''Executes a ForceLicenseCheck service call to the Kepware instance. This triggers the server to verify the 
     license state of the license received from the Local License Server.
 
-        INPUTS:
-        "server" - instance of the "server" class
-        
-        "job_ttl" (optional) - Determines the number of seconds a job instance will exist following completion.
+    :param server: instance of the `server` class
+    :param job_ttl: *(optional)* Determines the number of seconds a job instance will exist following completion.
 
-        RETURNS:
-        KepServiceResponse instance with job information
+    :return: `KepServiceResponse` instance with job information
 
-        EXCEPTIONS (If not HTTP 200 or 429 returned):
-        
-        KepHTTPError - If urllib provides an HTTPError
-        KepURLError - If urllib provides an URLError
-        '''
+    :raises KepHTTPError: If urllib provides an HTTPError (If not HTTP code 202 [Accepted] or 429 [Too Busy] returned)
+    :raises KepURLError: If urllib provides an URLError
+    '''
 
     url = f'{server.url}{FORCE_CHECK_URL}'
     job = server._kep_service_execute(url, None, job_ttl)

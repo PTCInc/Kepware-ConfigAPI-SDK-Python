@@ -41,28 +41,21 @@ def _create_tag_groups_url(tag_group = None):
     else: 
         return '{}/{}'.format(TAG_GRP_ROOT,tag_group)
 
-def add_tag(server, tag_path, DATA) -> Union[bool, list]:
-    '''Add "tag" objects to a specific path in Kepware. To be used to 
-    pass a list of tags to be added at one path location.
+def add_tag(server: server, tag_path: str, DATA: dict | list) -> Union[bool, list]:
+    '''Add `"tag"` or multiple `"tag"` objects to a specific path in Kepware. 
+    Can be used to pass a list of tags to be added at one path location.
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "tag_path" -  path identifying location to add tags. Standard Kepware address decimal 
-    notation string such as "channel1.device1.tag_group1"
-    
-    "DATA" - properly JSON object (dict) of the tags 
-    expected by Kepware Configuration API at the "tags" url
+    :param server: instance of the `server` class
+    :param device_path: path identifying where to add tag(s). Standard Kepware address decimal 
+    notation string that tags exists such as "channel1.device1.tag_group1" or "channel1.device1"
+    :param DATA: Dict or List of Dicts of the tag(s) to add
 
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware
-
-    List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     tags added that failed.
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     path_obj = kepconfig.path_split(tag_path)
@@ -88,29 +81,22 @@ def add_tag(server, tag_path, DATA) -> Union[bool, list]:
         return errors
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def add_tag_group(server, tag_group_path, DATA) -> Union[bool, list]:
-    '''Add "tag_group" objects to a specific path in Kepware. To be used to 
-    pass a list of tag_groups and children (tags or tag groups) to be added at one 
+def add_tag_group(server: server, tag_group_path: str, DATA: dict | list) -> Union[bool, list]:
+    '''Add `"tag_group"` or multiple `"tag_group"` objects to a specific path in Kepware. 
+    Can be used to pass a list of tag_groups and children (tags or tag groups) to be added at one 
     path location.
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "tag_group_path" - path identifying location to add tag groups. Standard Kepware address decimal 
-    notation string such as "channel1.device1.tag_group1"
-    
-    "DATA" - properly JSON object (dict) of the tag groups
-    and it's children expected by Kepware Configuration API at the "tag_groups" url
+    :param server: instance of the `server` class
+    :param tag_group_path: path identifying where to add tag group(s). Standard Kepware address decimal 
+    notation string that tag groups exists such as "channel1.device1.tag_group1" or "channel1.device1"
+    :param DATA: Dict or List of Dicts of the tag group(s) to add and it's children (tags or tag groups)
 
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware
-
-    List  - If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: If a "HTTP 207 - Multi-Status" is received from Kepware with a list of dict error responses for all 
     tag groups added that failed.
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     path_obj = kepconfig.path_split(tag_group_path)
@@ -136,35 +122,43 @@ def add_tag_group(server, tag_group_path, DATA) -> Union[bool, list]:
         return errors
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def add_all_tags(server, ch_dev_path, DATA) -> Union[bool, list]:
-    '''Add "tag" and "tag group" objects to a device in Kepware. To be used to 
+def add_all_tags(server: server, ch_dev_path: str, DATA: dict) -> Union[bool, list]:
+    '''Add `"tag"` and `"tag group"` objects to a device in Kepware. To be used to 
     pass a list of tags, tag groups and/or children of tag groups (tags and tag 
-    groups) to be added at once.
+    groups) to be added at once. See example below for required structure with 
+    "tags" and "tag_groups" as keys:
+
+    Example DATA:
+
+        {
+            'tags': [tag1_dict, tag2_dict,...],
+            'tag_groups':[
+                {
+                    tag_group1_properties,
+                    'tags': [tag1_dict, tag2_dict,...]
+                    'tag_groups':[sub_group1, subgroup2,...]
+                }, 
+                {
+                    tag_group2_properties,
+                    'tags': [tag1_dict, tag2_dict,...]
+                    'tag_groups':[sub_group1, subgroup2,...]
+                },...]
+        }
     
-    INPUTS:
-    "server" - instance of the "server" class
+    :param server: instance of the `server` class
+    :param ch_dev_path: device path identifying where to add tags and tag groups. Standard Kepware address decimal 
+    notation string that tag groups exists such as "channel1.device1"
+    :param DATA: Dict of the tags and tag groups to add and it's children (tags or tag groups). 
 
-    "ch_dev_path" - path to add tags and tag groups. Standard Kepware address decimal 
-    notation string such as "channel1.device1"
     
-    "DATA" - properly JSON object (dict) of the tags, 
-    tag groups and it's children expected by Kepware Configuration API.
-    
-    RETURNS:
-    True - If a "HTTP 201 - Created" is received from Kepware for all items
+    :return: True - If a "HTTP 201 - Created" is received from Kepware server
+    :return: List [tag failure list, tag group failure list] - If a "HTTP 207 - Multi-Status" is received from 
+    Kepware for either tags or tag groups, a list of dict error responses for all tags and/or tag groups added that failed.
+    :return: False - If tags or tag groups are not found in DATA
 
-    List  - [tag failure list, tag group failure list] -   If a "HTTP 207 - Multi-Status" is received from 
-    Kepware for either tags or tag groups, a list of dict error responses for all tags and/or tag groups added that failed. 
-
-    False - If tags or tag groups are not found in DATA
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
-######################################################
-# Need to Handle HTTP 207 from the tag/tag group calls
-######################################################
     
     tags_result = False
     tag_groups_result = False
@@ -190,25 +184,19 @@ def add_all_tags(server, ch_dev_path, DATA) -> Union[bool, list]:
         # mixed results from both tags and tag groups
         return [tags_result, tag_groups_result]
 
-def modify_tag(server, full_tag_path, DATA, force = False) -> bool:
-    '''Modify a "tag" object and it's properties in Kepware.
+def modify_tag(server: server, full_tag_path: str, DATA: dict, force: bool = False) -> bool:
+    '''Modify a `"tag"` object and it's properties in Kepware.
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "full_tag_path" - path identifying location and tag to modify. Standard Kepware address decimal 
+    :param server: instance of the `server` class
+    :param full_tag_path: path identifying location and tag to modify. Standard Kepware address decimal 
     notation string including the tag such as "channel1.device1.tag_group1.tag1"
+    :param DATA: Dict of the `tag` properties to be modified
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
 
-    "DATA" - properly JSON object (dict) of the tag properties to be modified.
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    "force" (optional) - if True, will force the configuration update to the Kepware server
-
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     tag_data = server._force_update_check(force, DATA)
@@ -229,23 +217,19 @@ def modify_tag(server, full_tag_path, DATA, force = False) -> bool:
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def modify_tag_group(server, tag_group_path, DATA, force = False) -> bool:
-    '''Modify a "tag group" object and it's properties in Kepware.
+def modify_tag_group(server: server, tag_group_path: str, DATA: dict, force: bool = False) -> bool:
+    '''Modify a `"tag group"` object and it's properties in Kepware.
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "tag_group_path" - path identifying location and tag group to modify. Standard Kepware address decimal 
-    notation string including the tag such as "channel1.device1.tag_group1"
+    :param server: instance of the `server` class
+    :param tag_group_path: path identifying location and tag group to modify. Standard Kepware address decimal 
+    notation string that tag groups exists such as "channel1.device1.tag_group1"
+    :param DATA: Dict of the `tag group` properties to be modified
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
 
-    "DATA" is required to be a properly JSON object (dict) of the tag properties to be modified.
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     tag_group_data = server._force_update_check(force, DATA)
@@ -265,21 +249,17 @@ def modify_tag_group(server, tag_group_path, DATA, force = False) -> bool:
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_tag(server, full_tag_path) -> bool:
-    '''Delete "tag" object at a specific path in Kepware.
+def del_tag(server: server, full_tag_path: str) -> bool:
+    '''Delete `"tag"` object at a specific path in Kepware.
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "full_tag_path" - path identifying location and tag to delete. Standard Kepware address decimal 
+    :param server: instance of the `server` class
+    :param full_tag_path: path identifying location and tag to delete. Standard Kepware address decimal 
     notation string including the tag such as "channel1.device1.tag_group1.tag1"
 
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     path_obj = kepconfig.path_split(full_tag_path)
@@ -298,21 +278,17 @@ def del_tag(server, full_tag_path) -> bool:
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def del_tag_group(server, tag_group_path) -> bool:
-    '''Delete "tag group" object at a specific path in Kepware.
+def del_tag_group(server: server, tag_group_path: str) -> bool:
+    '''Delete `"tag group"` object at a specific path in Kepware.
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "tag_group_path" - path identifying location and tag group to delete. Standard Kepware address decimal 
-    notation string such as "channel1.device1.tag_group1"
+    :param server: instance of the `server` class
+    :param tag_group_path: path identifying location and tag group to delete. Standard Kepware address decimal 
+    notation string that tag groups exists such as "channel1.device1.tag_group1"
 
-    RETURNS:
-    True - If a "HTTP 200 - OK" is received from Kepware
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     path_obj = kepconfig.path_split(tag_group_path)
@@ -330,22 +306,17 @@ def del_tag_group(server, tag_group_path) -> bool:
     if r.code == 200: return True 
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def get_tag(server, full_tag_path) -> dict:
-    '''Returns the properties of the "tag" object at a specific path in Kepware. 
-    Returned object is JSON. 
+def get_tag(server: server, full_tag_path: str) -> dict:
+    '''Returns the properties of the `"tag"` object at a specific path in Kepware. 
 
-    INPUTS:
-    "server" - instance of the "server" class
-    
-    "full_tag_path" - path identifying tag. Standard Kepware address decimal 
+    :param server: instance of the `server` class
+    :param full_tag_path: path identifying location and tag to delete. Standard Kepware address decimal 
     notation string including the tag such as "channel1.device1.tag_group1.tag1"
 
-    RETURNS:
-    dict - data for the tag requested
+    :return: Dict of data for the tag requested
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     path_obj = kepconfig.path_split(full_tag_path)
@@ -364,24 +335,18 @@ def get_tag(server, full_tag_path) -> dict:
     return r.payload
 
 def get_all_tags(server: server, full_tag_path: str, *, options: dict = None) -> list:
-    '''Returns the properties of all "tag" object at a specific path in Kepware. 
-    Returned object is JSON list.
+    '''Returns the properties of all `"tag"` object at a specific path in Kepware. 
 
-    INPUTS:
-    server - instance of the "server" class
+    :param server: instance of the `server` class
+    :param full_tag_path: path identifying location to retreive tag list. Standard Kepware address decimal 
+    notation string including the tag such as "channel1.device1.tag_group1.tag1"
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of tags. Options are `filter`, 
+        `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`
     
-    full_tag_path - path identifying location to retreive tag list. Standard Kepware address decimal 
-    notation string including the tag such as "channel1.device1.tag_group1"
+    :return: List of data for all tags
 
-    options - (optional) Dict of parameters to filter, sort or pagenate the list of tags. Options are 'filter', 
-    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
-    
-    RETURNS:
-    list - data for the tags requested
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
 
     path_obj = kepconfig.path_split(full_tag_path)
@@ -400,22 +365,18 @@ def get_all_tags(server: server, full_tag_path: str, *, options: dict = None) ->
     r = server._config_get(url, params= options)
     return r.payload
 
-def get_tag_group(server, tag_group_path) -> dict:
+def get_tag_group(server: server, tag_group_path: str) -> dict:
     '''Returns the properties of the "tag group" object at a specific 
     path in Kepware. Returned object is JSON.
 
-    INPUTS:
-    "server" - instance of the "server" class 
-    
-    "tag_group_path" - path identifying tag group. Standard Kepware address decimal 
-    notation string such as "channel1.device1.tag_group1"
+    :param server: instance of the `server` class
+    :param tag_group_path: path identifying location and tag group to retrieve properties. Standard Kepware address decimal 
+    notation string that tag groups exists such as "channel1.device1.tag_group1"
 
-    RETURNS:
-    dict - data for the tag group requested
+    :return: Dict of data for the tag group requested
 
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     path_obj = kepconfig.path_split(tag_group_path)
     try:
@@ -432,24 +393,19 @@ def get_tag_group(server, tag_group_path) -> dict:
     return r.payload
 
 def get_all_tag_groups(server:server, tag_group_path: str, *, options: dict = None) -> list:
-    '''Returns the properties of all "tag group" objects at a specific 
-    path in Kepware. Returned object is JSON list. 
+    '''Returns the properties of all `"tag group"` objects at a specific 
+    path in Kepware.
 
-    INPUTS:
-    server - instance of the "server" class
-    
-    tag_group_path - path identifying location to retreive tag group list. Standard Kepware address decimal 
-    notation string such as "channel1.device1.tag_group1"
+    :param server: instance of the `server` class
+    :param tag_group_path: path identifying location to retrieve tag group list and properties. Standard Kepware address decimal 
+    notation string that tag groups exists such as "channel1.device1.tag_group1"
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of devices. Options are `filter`, 
+        `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`
 
-    options - (optional) Dict of parameters to filter, sort or pagenate the list of tags. Options are 'filter', 
-    'sortOrder', 'sortProperty', 'pageNumber', and 'pageSize'
+    :return: List of data for all tag groups
 
-    RETURNS:
-    list - data for the tag groups requested
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     path_obj = kepconfig.path_split(tag_group_path)
     try:
@@ -467,52 +423,51 @@ def get_all_tag_groups(server:server, tag_group_path: str, *, options: dict = No
     r = server._config_get(url, params= options)
     return r.payload
 
-def get_full_tag_structure(server: server, path: str, *, recursive = False, options: dict = None) -> dict:
-    '''Returns the properties of all "tag" and "tag group" objects at a specific 
+def get_full_tag_structure(server: server, path: str, *, recursive: bool = False, options: dict = None) -> dict:
+    '''Returns the properties of all `"tag"` and `"tag group"` objects at a specific 
     path in Kepware. Returned object is a dict of tag list and tag group list.
 
-    Ex.
-    {
-        'tags': [tag1_dict, tag2_dict,...],
-        'tag_groups':[tag_group1_dict, tag_group2_dict,...]
-    } 
+    Example:
 
-    If recursive is TRUE, then the call will iterate through all tag groups and get the tags and 
+        {
+            'tags': [tag1_dict, tag2_dict,...],
+            'tag_groups':[tag_group1_dict, tag_group2_dict,...]
+        } 
+
+    If `recursive` is TRUE, then the call will iterate through all tag groups and get the tags and 
     tag groups of all tag group children.This would be the equivilant of asking for all tags and tag groups
-    that exist below the "path" location. The returned object would look like below, nested based on how many 
+    that exist below the `"path"` location. The returned object would look like below, nested based on how many 
     levels the tag_group namespace has tags or tag_groups:
 
-    Ex.
-    {
-        'tags': [tag1_dict, tag2_dict,...],
-        'tag_groups':[
-            {
-                tag_group1_properties,
-                'tags': [tag1_dict, tag2_dict,...]
-                'tag_groups':[sub_group1, subgroup2,...]
-            }, 
-            {
-                tag_group2_properties,
-                'tags': [tag1_dict, tag2_dict,...]
-                'tag_groups':[sub_group1, subgroup2,...]
-            },...]
-    } 
+    Example with Recursive True:
 
-    INPUTS:
-    server - instance of the "server" class
-    
-    path - path identifying location to retreive the tag structure. Standard Kepware address decimal 
+        {
+            'tags': [tag1_dict, tag2_dict,...],
+            'tag_groups':[
+                {
+                    tag_group1_properties,
+                    'tags': [tag1_dict, tag2_dict,...]
+                    'tag_groups':[sub_group1, subgroup2,...]
+                }, 
+                {
+                    tag_group2_properties,
+                    'tags': [tag1_dict, tag2_dict,...]
+                    'tag_groups':[sub_group1, subgroup2,...]
+                },...]
+        } 
+
+    :param server: instance of the `server` class
+    :param path: path identifying location to retreive the tag structure. Standard Kepware address decimal 
     notation string such as "channel1.device1.tag_group1" and must container at least the channel and device.
+    :param recursive: *(optional)* If True, returns structures within the tag groups found and all of their 
+    children. (default= False)
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of tags and tag groups. 
+    Options are 'filter', 'sortOrder', and 'sortProperty' only.
 
-    options - (optional) Dict of parameters to filter, sort or pagenate the list of tags and tag groups. Options are 'filter', 
-    'sortOrder', and 'sortProperty' only.
+    :return: Dict of data for the tag structure requested at "path" location
 
-    RETURNS:
-    dict - data for the tag structure requested at "path" location
-
-    EXCEPTIONS:
-    KepHTTPError - If urllib provides an HTTPError
-    KepURLError - If urllib provides an URLError
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
     '''
     r = {}
         

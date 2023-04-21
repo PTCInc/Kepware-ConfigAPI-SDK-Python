@@ -4,5 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
+r"""`datalogger` module provides support for Kepware's Datalogger plug-in specific objects 
+within the Kepware Configuration API
+"""
 from . import log_group, log_items, triggers, mapping
 
