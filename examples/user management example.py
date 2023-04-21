@@ -109,7 +109,7 @@ modify_group = {
 }
 
 try:
-    print("{} - {}".format("Modify User Group properties to prevent 'Writes'",user_groups.modify_user_group(server, modify_group, group1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Modify User Group properties to prevent 'Writes'",user_groups.modify_user_group(server, modify_group, user_group= group1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 
@@ -140,7 +140,7 @@ modify_pass = {
 }
 
 try:
-    print("{} - {}".format("Updated a user password", users.modify_user(server,modify_pass, user1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Updated a user password", users.modify_user(server,modify_pass, user= user1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 

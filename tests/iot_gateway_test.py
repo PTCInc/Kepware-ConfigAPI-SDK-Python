@@ -133,13 +133,26 @@ def test_agent_modify(server):
         # Modify Agent
         agent = {}
         agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
-        assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_name, agent_type)
+        assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent= agent_name, agent_type= agent_type)
+
+        # Modify Agent with name and type in data
+        agent = {}
+        agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
+        agent['common.ALLTYPES_NAME'] = agent_name
+        agent['iot_gateway.AGENTTYPES_TYPE'] = agent_type
+        assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent= agent_name, agent_type= agent_type)
 
         # Modify Agent without type (error)
         agent = {}
         agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
         with pytest.raises(KepError):
-            assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_name)
+            assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent= agent_name)
+        
+        # Modify Agent without name (error)
+        agent = {}
+        agent['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
+        with pytest.raises(KepError):
+            assert kepconfig.iot_gateway.agent.modify_iot_agent(server,agent, agent_type= agent_type)
         
 def test_agent_get(server):
     for agent_name, agent_type in agent_list:
@@ -201,7 +214,7 @@ def test_iot_item_modify(server):
         modify_iot_item = {
                 "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 2000,
         }
-        assert kepconfig.iot_gateway.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item_name, force = True)
+        assert kepconfig.iot_gateway.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item=iot_item_name, force = True)
 
 def test_iot_item_get(server):        
     for agent_name, agent_type in agent_list:

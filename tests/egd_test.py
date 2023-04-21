@@ -200,7 +200,7 @@ def get_exchange(server, exchange_type, exchanges):
 def modify_exchange(server, exchange_type, exchange_name):
 
     assert kepconfig.connectivity.egd.exchange.modify_exchange(server, ch_name + '.' + dev_name, exchange_type, 
-        {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2}, exchange_name)
+        {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2}, exchange_name= exchange_name)
     assert kepconfig.connectivity.egd.exchange.modify_exchange(server, ch_name + '.' + dev_name, exchange_type, 
         {"common.ALLTYPES_NAME": exchange_name,"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 3})
     assert kepconfig.connectivity.egd.exchange.modify_exchange(server, ch_name + '.' + dev_name, exchange_type, 
@@ -240,7 +240,7 @@ def get_range(server, exchange_type, exchange_name, ranges):
 def modify_range(server, exchange_type, exchange_name, range_name):
 
     assert kepconfig.connectivity.egd.range.modify_range(server, ch_name + '.' + dev_name, exchange_type, exchange_name,
-        {"ge_ethernet_global_data.RANGE_HIGH_POINT": 10}, range_name)
+        {"ge_ethernet_global_data.RANGE_HIGH_POINT": 10}, range_name= range_name)
     assert kepconfig.connectivity.egd.range.modify_range(server, ch_name + '.' + dev_name, exchange_type, exchange_name,
         {"common.ALLTYPES_NAME": range_name,"ge_ethernet_global_data.RANGE_HIGH_POINT": 11})
     assert kepconfig.connectivity.egd.range.modify_range(server, ch_name + '.' + dev_name, exchange_type, exchange_name,
@@ -280,7 +280,7 @@ def get_name(server, names):
 def modify_name(server, name):
 
     assert kepconfig.connectivity.egd.name.modify_name_resolution(server, ch_name + '.' + dev_name,
-        {"ge_ethernet_global_data.NAME_RESOLUTION_IP_ADDRESS": '192.168.1.50'}, name)
+        {"ge_ethernet_global_data.NAME_RESOLUTION_IP_ADDRESS": '192.168.1.50'}, name= name)
     assert kepconfig.connectivity.egd.name.modify_name_resolution(server, ch_name + '.' + dev_name,
         {"common.ALLTYPES_NAME": name,"ge_ethernet_global_data.NAME_RESOLUTION_IP_ADDRESS": '192.168.1.100'})
     assert kepconfig.connectivity.egd.name.modify_name_resolution(server, ch_name + '.' + dev_name,

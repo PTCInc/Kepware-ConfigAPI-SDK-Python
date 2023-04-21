@@ -94,7 +94,7 @@ except Exception as err:
 # Modify an Exchange
 try:
     print("{} - {}".format("Modify Consumer Exchange:", egd.exchange.modify_exchange(server, ch_name + '.' + dev_name, egd.CONSUMER_EXCHANGE, 
-        {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2}, consumer_exchange['common.ALLTYPES_NAME'])))
+        {"ge_ethernet_global_data.CONSUMER_EXCHANGE_NUMBER": 2},exchange_name= consumer_exchange['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 

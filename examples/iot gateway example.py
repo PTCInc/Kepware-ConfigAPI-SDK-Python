@@ -108,7 +108,7 @@ agent_data = {
 }
 agent_data['common.ALLTYPES_DESCRIPTION'] = 'This is the test agent created'
 try:
-    print("{} - {}".format("Modify property in the MQTT Agent", iot.agent.modify_iot_agent(server,agent_data, agent_name, agent_type)))
+    print("{} - {}".format("Modify property in the MQTT Agent", iot.agent.modify_iot_agent(server,agent_data, agent= agent_name, agent_type= agent_type)))
 except Exception as err:
     ErrorHandler(err)
 
@@ -161,7 +161,7 @@ modify_iot_item = {
         "iot_gateway.IOT_ITEM_SCAN_RATE_MS": 2000
 }
 try:
-    print("{} - {}".format("Modify the tag or IoT Item added again", iot.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item_name, force = True)))
+    print("{} - {}".format("Modify the tag or IoT Item added again", iot.iot_items.modify_iot_item(server, modify_iot_item, agent_name, agent_type, iot_item= iot_item_name, force = True)))
 except Exception as err:
     ErrorHandler(err)
 

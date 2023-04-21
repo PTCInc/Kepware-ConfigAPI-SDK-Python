@@ -132,7 +132,7 @@ log_group_mod_properties = {
     "datalogger.LOG_GROUP_UPDATE_RATE_MSEC": 1000
 }
 try:
-    print("{} - {}".format("Modify property in the Log Group", DL.log_group.modify_log_group(server,log_group_mod_properties,log_group1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Modify property in the Log Group", DL.log_group.modify_log_group(server,log_group_mod_properties,log_group= log_group1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 
@@ -174,7 +174,7 @@ modify_log_item = {
     "datalogger.LOG_ITEM_NUMERIC_ID": "0"
 }
 try:
-    print("{} - {}".format("Modify the tag or Log Item added", DL.log_items.modify_log_item(server, log_group1['common.ALLTYPES_NAME'], modify_log_item, log_item1['common.ALLTYPES_NAME'])))
+    print("{} - {}".format("Modify the tag or Log Item added", DL.log_items.modify_log_item(server, log_group1['common.ALLTYPES_NAME'], modify_log_item, log_item= log_item1['common.ALLTYPES_NAME'])))
 except Exception as err:
     ErrorHandler(err)
 

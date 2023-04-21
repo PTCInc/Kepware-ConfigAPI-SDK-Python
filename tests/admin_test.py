@@ -147,11 +147,11 @@ def test_user_groups(server):
 # Group 2 fails since it already exists
     assert type(admin.user_groups.add_user_group(server,[group2, group3])) == list
     
-    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False},
-            group1['common.ALLTYPES_NAME'])
+    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": False}, 
+                                               user_group= group1['common.ALLTYPES_NAME'])
     
-    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": True},
-            group1['common.ALLTYPES_NAME'])
+    assert admin.user_groups.modify_user_group(server,{"libadminsettings.USERMANAGER_GROUP_ENABLED": True}, 
+                                               user_group= group1['common.ALLTYPES_NAME'])
 
     # Bad Inputs
     with pytest.raises(KepError):
@@ -205,7 +205,7 @@ def test_users(server):
 # User 2 fails since it already exists
     assert type(admin.users.add_user(server,[user2, user3])) == list
     
-    assert admin.users.modify_user(server,{"libadminsettings.USERMANAGER_USER_ENABLED": False}, user1['common.ALLTYPES_NAME'])
+    assert admin.users.modify_user(server,{"libadminsettings.USERMANAGER_USER_ENABLED": False}, user= user1['common.ALLTYPES_NAME'])
     
     # Bad Inputs
     with pytest.raises(KepError):
