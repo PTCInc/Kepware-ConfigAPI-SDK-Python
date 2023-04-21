@@ -44,7 +44,7 @@ def release():
     if ans.lower() in ("y", "yes"):
         # os.system("rm -rf dist/*") #Linux
         os.system("RMDIR /S /Q dist") #Windows
-        os.system("python3.10 -m build")
+        os.system("python -m build")
     ans = input("Upload to pip?(Y/n)")
     if ans.lower() in ("y", "yes"):
         ans = input("Push to production?(Y=production pypi/n=test pypi)")
