@@ -27,7 +27,7 @@ def _create_url(log_item = None):
         return '{}/{}'.format(LOG_ITEMS_ROOT, log_item)
 
 
-def add_log_item(server: server, log_group: str, DATA: dict | list) -> Union[bool, list]:
+def add_log_item(server: server, log_group: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"log item"` or multiple `"log item"` objects to a log group in Kepware's Datalogger. It can 
     be used to pass a list of log items to be added all at once.
 

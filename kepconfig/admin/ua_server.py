@@ -26,7 +26,7 @@ def _create_url(endpoint = None):
     else:
         return '{}/{}'.format(UA_ROOT,endpoint)
 
-def add_endpoint(server: server, DATA: dict | list) -> Union[bool, list]:
+def add_endpoint(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add an `"endpoint"` or multiple `"endpoint"` objects to Kepware UA Server by passing a 
     list of endpoints to be added all at once.
 

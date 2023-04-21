@@ -30,7 +30,7 @@ def _create_url(channel = None):
     else:
         return '{}/{}'.format(CHANNEL_ROOT,channel)
 
-def add_channel(server: server, DATA: dict | list) -> Union[bool, list]:
+def add_channel(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"channel"` or multiple `"channel"` objects to Kepware. Can be used to pass children of a channel object 
     such as devices and tags/tag groups. This allows you to create a channel, it's devices and tags 
     all in one function, if desired.

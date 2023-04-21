@@ -27,7 +27,7 @@ def _create_url(log_group = None):
         return '{}/{}'.format(LOG_GROUP_ROOT, log_group)
 
 
-def add_log_group(server: server, DATA: dict | list) -> Union[bool, list]:
+def add_log_group(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"log group"` or multiple `"log groups"` objects to Kepware's DataLogger. It can be used 
     to pass a list of log groups to be added all at once.
 

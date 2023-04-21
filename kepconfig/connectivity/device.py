@@ -30,7 +30,7 @@ def _create_url(device = None):
     else:
         return '{}/{}'.format(DEVICE_ROOT,device)
 
-def add_device(server: server, channel_name: str, DATA: dict | list) -> Union[bool, list]:
+def add_device(server: server, channel_name: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"device"` or multiple `"device"` objects to a channel in Kepware. Can be used to pass children of a device object 
     such as tags and tag groups. This allows you to create a device and tags 
     all in one function, if desired.

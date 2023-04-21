@@ -28,7 +28,7 @@ def _create_url(trigger = None):
         return '{}/{}'.format(TRIGGERS_ROOT, trigger)
 
 
-def add_trigger(server: server, log_group: str, DATA: dict | list) -> Union[bool, list]:
+def add_trigger(server: server, log_group: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"trigger"` or multiple `"trigger"` objects to a log group in Kepware's Datalogger. It can 
     be used to pass a list of triggers to be added all at once.
 

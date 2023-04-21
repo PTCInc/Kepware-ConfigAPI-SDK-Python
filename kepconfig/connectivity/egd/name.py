@@ -31,7 +31,7 @@ def _create_url(device_path, name = None):
     else:
         return '{}/{}/{}'.format(device_root, NAMES_ROOT, name)
 
-def add_name_resolution(server: server, device_path: str, DATA: dict | list) -> Union[bool, list]:
+def add_name_resolution(server: server, device_path: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"name resolution"` or multiple `"name resolution"` objects to Kepware. This allows you to 
     create a name resolution or multiple name resolutions all in one function, if desired.
 

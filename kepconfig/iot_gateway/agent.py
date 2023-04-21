@@ -53,7 +53,7 @@ def _create_url(agent_type, agent = None):
             pass
 
 
-def add_iot_agent(server: server, DATA: dict | list, agent_type: str = None) -> Union[bool, list]:
+def add_iot_agent(server: server, DATA: Union[dict, list], agent_type: str = None) -> Union[bool, list]:
     '''Add a  `"agent"` or multiple `"agent"` objects of a specific type to Kepware's IoT Gateway. Can be used to pass children of an
     agent object such as iot items. This allows you to create an agent and iot items if desired. Multiple Agents need to be of the 
     same type.

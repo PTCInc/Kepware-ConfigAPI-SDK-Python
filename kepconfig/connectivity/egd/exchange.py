@@ -38,7 +38,7 @@ def _create_url(device_path, ex_type, exchange_name = None):
         else:
             return '{}{}/{}'.format(device_root,PRODUCER_ROOT,exchange_name)
 
-def add_exchange(server: server, device_path: str, ex_type: str, DATA: dict | list) -> Union[bool, list]:
+def add_exchange(server: server, device_path: str, ex_type: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"exchange"` or multiple `"exchange"` objects to Kepware. Can be used to pass children of a exchange object 
     such as ranges. This allows you to create a exchange and ranges for the exchange all in one function, if desired.
 

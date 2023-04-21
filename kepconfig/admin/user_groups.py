@@ -27,7 +27,7 @@ def _create_url(user_group = None):
     else:
         return '{}/{}'.format(USERGROUPS_ROOT,user_group)
 
-def add_user_group(server: server, DATA: dict | list) -> Union[bool, list]:
+def add_user_group(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"user group"` or multiple `"user group"` objects to Kepware User Manager by passing a 
     list of user groups to be added all at once.
 

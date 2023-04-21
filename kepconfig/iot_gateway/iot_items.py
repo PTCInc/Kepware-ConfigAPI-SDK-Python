@@ -30,7 +30,7 @@ def _create_url(tag = None):
         return '{}/{}'.format(IOT_ITEMS_ROOT,normalized_tag)
 
 
-def add_iot_item(server: server, DATA: dict | list, agent: str, agent_type: str) -> Union[bool, list]:
+def add_iot_item(server: server, DATA: Union[dict, list], agent: str, agent_type: str) -> Union[bool, list]:
     '''Add a `"iot item"` or multiple `"iot item"` objects to Kepware's IoT Gateway agent. Additionally 
     it can be used to pass a list of iot items to be added to an agent all at once.
 

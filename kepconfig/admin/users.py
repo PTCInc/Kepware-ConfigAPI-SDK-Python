@@ -27,7 +27,7 @@ def _create_url(user = None):
     else:
         return '{}/{}'.format(USERS_ROOT,user)
 
-def add_user(server: server, DATA: dict | list) -> Union[bool, list]:
+def add_user(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"user"` or multiple `"user"` objects to Kepware User Manager by passing a 
     list of users to be added all at once.
 

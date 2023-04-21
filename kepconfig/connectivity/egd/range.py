@@ -29,7 +29,7 @@ def _create_url(device_path, ex_type, exchange_name, range = None):
     else:
         return '{}{}/{}'.format(exchange_root, RANGES_ROOT, range)
 
-def add_range(server: server, device_path: str, ex_type: str, exchange_name: str, DATA: dict | list) -> Union[bool, list]:
+def add_range(server: server, device_path: str, ex_type: str, exchange_name: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"range"` or multiple `"range"` objects to Kepware. This allows you to 
     create a range or multiple ranges all in one function, if desired.
 

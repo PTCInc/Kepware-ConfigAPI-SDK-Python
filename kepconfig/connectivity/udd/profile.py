@@ -15,7 +15,7 @@ from typing import Union
 
 PROFILE_ROOT = '/project/_profile_library/profiles'
 
-def add_profile(server: server, DATA: dict | list) -> Union[bool, list]:
+def add_profile(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"profile"` or a list of `"profile"` objects to the UDD Profile Library plug-in for Kepware. 
 
     :param server: instance of the `server` class

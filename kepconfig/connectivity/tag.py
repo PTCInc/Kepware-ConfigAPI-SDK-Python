@@ -41,7 +41,7 @@ def _create_tag_groups_url(tag_group = None):
     else: 
         return '{}/{}'.format(TAG_GRP_ROOT,tag_group)
 
-def add_tag(server: server, tag_path: str, DATA: dict | list) -> Union[bool, list]:
+def add_tag(server: server, tag_path: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add `"tag"` or multiple `"tag"` objects to a specific path in Kepware. 
     Can be used to pass a list of tags to be added at one path location.
 
@@ -81,7 +81,7 @@ def add_tag(server: server, tag_path: str, DATA: dict | list) -> Union[bool, lis
         return errors
     else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-def add_tag_group(server: server, tag_group_path: str, DATA: dict | list) -> Union[bool, list]:
+def add_tag_group(server: server, tag_group_path: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add `"tag_group"` or multiple `"tag_group"` objects to a specific path in Kepware. 
     Can be used to pass a list of tag_groups and children (tags or tag groups) to be added at one 
     path location.
