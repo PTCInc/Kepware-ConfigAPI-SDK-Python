@@ -10,6 +10,7 @@ user groups within the Kepware Administration User Manager through the Kepware C
 from typing import Union
 from ..error import KepHTTPError, KepError
 from ..connection import server
+from ..utils import _url_parse_object
 
 
 USERGROUPS_ROOT = '/admin/server_usergroups'
@@ -25,7 +26,7 @@ def _create_url(user_group = None):
     if user_group == None:
         return USERGROUPS_ROOT
     else:
-        return '{}/{}'.format(USERGROUPS_ROOT,user_group)
+        return '{}/{}'.format(USERGROUPS_ROOT, _url_parse_object(user_group))
 
 def add_user_group(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"user group"` or multiple `"user group"` objects to Kepware User Manager by passing a 

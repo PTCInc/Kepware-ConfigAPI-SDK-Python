@@ -431,7 +431,9 @@ class server:
     # Fucntion used to ensure special characters are handled in the URL
     # Ex: Space will be turned to %20
     def __url_validate(self, url):
-        parsed_url = parse.urlparse(url)
+        # Configuration API does not use fragments in URL so ignore to allow # as a character
+        # Objects in Kepware can include # as part of the object names
+        parsed_url = parse.urlparse(url, allow_fragments= False)
         # Added % for scenarios where special characters have already been escaped with %
         updated_path = parse.quote(parsed_url.path, safe = '/%')
 

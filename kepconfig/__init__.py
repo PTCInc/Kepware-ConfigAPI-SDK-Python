@@ -18,7 +18,6 @@ r"""
 .. include:: ../README.md
 
 """
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 from . import connection, error
-from .utils import path_split
 

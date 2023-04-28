@@ -11,8 +11,8 @@ device objects within the Kepware Configuration API
 
 from ..connection import KepServiceResponse, server
 from ..error import KepHTTPError, KepError
+from ..utils import _url_parse_object, path_split
 from typing import Union
-import kepconfig
 from . import channel, tag
 import inspect
 
@@ -28,7 +28,7 @@ def _create_url(device = None):
     if device == None:
         return DEVICE_ROOT
     else:
-        return '{}/{}'.format(DEVICE_ROOT,device)
+        return '{}/{}'.format(DEVICE_ROOT,_url_parse_object(device))
 
 def add_device(server: server, channel_name: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"device"` or multiple `"device"` objects to a channel in Kepware. Can be used to pass children of a device object 
@@ -74,7 +74,7 @@ def del_device(server: server, device_path: str) -> bool:
     :raises KepURLError: If urllib provides an URLError
     '''
 
-    path_obj = kepconfig.path_split(device_path)
+    path_obj = path_split(device_path)
     try:
         r = server._config_del(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
         if r.code == 200: return True 
@@ -100,7 +100,7 @@ def modify_device(server: server, device_path: str, DATA: dict, *, force: bool =
 
     device_data = server._force_update_check(force, DATA)
 
-    path_obj = kepconfig.path_split(device_path)
+    path_obj = path_split(device_path)
     try:
         r = server._config_update(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']), device_data)
         if r.code == 200: return True 
@@ -122,7 +122,7 @@ def get_device(server: server, device_path: str) -> dict:
     :raises KepURLError: If urllib provides an URLError
     '''
 
-    path_obj = kepconfig.path_split(device_path)
+    path_obj = path_split(device_path)
     try:
         r = server._config_get(server.url + channel._create_url(path_obj['channel']) + _create_url(path_obj['device']))
         return r.payload
@@ -164,7 +164,7 @@ def auto_tag_gen(server: server, device_path: str, job_ttl: int = None) -> KepSe
     :raises KepURLError: If urllib provides an URLError
     '''
     
-    path_obj = kepconfig.path_split(device_path)
+    path_obj = path_split(device_path)
     try:
         url = server.url +channel._create_url(path_obj['channel']) + _create_url(path_obj['device']) + ATG_URL
         job = server._kep_service_execute(url, None, job_ttl)

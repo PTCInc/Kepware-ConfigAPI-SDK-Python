@@ -13,6 +13,7 @@ channel objects within the Kepware Configuration API
 import inspect
 from ..connection import server
 from ..error import KepHTTPError, KepError
+from ..utils import _url_parse_object
 from typing import Union
 from . import device
 
@@ -28,7 +29,7 @@ def _create_url(channel = None):
     if channel == None:
         return CHANNEL_ROOT
     else:
-        return '{}/{}'.format(CHANNEL_ROOT,channel)
+        return '{}/{}'.format(CHANNEL_ROOT,_url_parse_object(channel))
 
 def add_channel(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"channel"` or multiple `"channel"` objects to Kepware. Can be used to pass children of a channel object 
@@ -84,7 +85,7 @@ def modify_channel(server: server, DATA: dict, *, channel: str = None, force: bo
 
     :param server: instance of the `server` class
     :param DATA: Dict of the `channel` properties to be modified
-    :param channel: *(optional)* - name of channel to modify. Only needed if not existing in `"DATA"`
+    :param channel: *(optional)* name of channel to modify. Only needed if not existing in `"DATA"`
     :param force: *(optional)* if True, will force the configuration update to the Kepware server
     
     :return: True - If a "HTTP 200 - OK" is received from Kepware server

@@ -116,6 +116,26 @@ def test_agent_add(server):
         with pytest.raises(KepError):
             assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent)
 
+        # Add Agent with agent type in DATA
+        agent['common.ALLTYPES_NAME'] = agent_name + "2"
+        agent['iot_gateway.AGENTTYPES_TYPE'] = agent_type
+        
+        assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent)
+
+        # Add list of agents with agent type in DATA
+        agent = [
+            {
+            "common.ALLTYPES_NAME": agent_name + "3",
+            'iot_gateway.AGENTTYPES_TYPE': agent_type
+            },
+            {
+            "common.ALLTYPES_NAME": agent_name + "4",
+            'iot_gateway.AGENTTYPES_TYPE': agent_type
+            }
+        ]
+
+        assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent)
+
         # Add Agent with bad name (HTTP 207 return with list)
         agent = [
             {
@@ -127,6 +147,21 @@ def test_agent_add(server):
         ]
 
         assert type(kepconfig.iot_gateway.agent.add_iot_agent(server, agent, agent_type)) == list
+
+        # Add Agent list without agent type in Data (error)
+        agent = [
+            {
+            "common.ALLTYPES_NAME": agent_name + "1"
+            },
+            {
+            "common.ALLTYPES_NAME": "_" + agent_name
+            }
+        ]
+        with pytest.raises(KepError):
+            assert kepconfig.iot_gateway.agent.add_iot_agent(server, agent, agent_type)
+
+
+
 
 def test_agent_modify(server):
     for agent_name, agent_type in agent_list:

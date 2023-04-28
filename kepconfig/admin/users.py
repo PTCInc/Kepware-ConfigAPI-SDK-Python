@@ -10,6 +10,7 @@ users within the Kepware Administration User Management through the Kepware Conf
 from typing import Union
 from ..error import KepError, KepHTTPError
 from ..connection import server
+from ..utils import _url_parse_object
 
 
 USERS_ROOT = '/admin/server_users'
@@ -25,7 +26,7 @@ def _create_url(user = None):
     if user == None:
         return USERS_ROOT
     else:
-        return '{}/{}'.format(USERS_ROOT,user)
+        return '{}/{}'.format(USERS_ROOT, _url_parse_object(user))
 
 def add_user(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"user"` or multiple `"user"` objects to Kepware User Manager by passing a 

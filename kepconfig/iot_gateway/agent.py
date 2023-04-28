@@ -15,6 +15,7 @@ from ..connection import server
 from .. import iot_gateway as IOT
 from ..error import KepError, KepHTTPError
 import inspect
+from ..utils import _url_parse_object
 
 IOT_ROOT_URL = '/project/_iot_gateway'
 MQTT_CLIENT_URL = '/mqtt_clients'
@@ -42,13 +43,13 @@ def _create_url(agent_type, agent = None):
             pass
     else:
         if agent_type == IOT.MQTT_CLIENT_AGENT:
-            return '{}{}/{}'.format(IOT_ROOT_URL, MQTT_CLIENT_URL, agent)
+            return '{}{}/{}'.format(IOT_ROOT_URL, MQTT_CLIENT_URL, _url_parse_object(agent))
         elif agent_type == IOT.REST_CLIENT_AGENT:
-            return '{}{}/{}'.format(IOT_ROOT_URL, REST_CLIENT_URL, agent)
+            return '{}{}/{}'.format(IOT_ROOT_URL, REST_CLIENT_URL, _url_parse_object(agent))
         elif agent_type == IOT.REST_SERVER_AGENT:
-            return '{}{}/{}'.format(IOT_ROOT_URL, REST_SERVER_URL,agent)
+            return '{}{}/{}'.format(IOT_ROOT_URL, REST_SERVER_URL,_url_parse_object(agent))
         elif agent_type == IOT.THINGWORX_AGENT:
-            return '{}{}/{}'.format(IOT_ROOT_URL, THINGWORX_URL, agent)
+            return '{}{}/{}'.format(IOT_ROOT_URL, THINGWORX_URL, _url_parse_object(agent))
         else:
             pass
 
@@ -76,22 +77,22 @@ def add_iot_agent(server: server, DATA: Union[dict, list], agent_type: str = Non
     
     if agent_type == None:
         try:
-            r = server._config_update(server.url + _create_url(DATA['iot_gateway.AGENTTYPES_TYPE']), DATA)
-            if r.code == 201: return True 
-            else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
+            # If it's a list, use the first agents type
+            if isinstance(DATA, list): agent_type = DATA[0]['iot_gateway.AGENTTYPES_TYPE']
+            else: agent_type = DATA['iot_gateway.AGENTTYPES_TYPE']
         except KeyError as err:
             err_msg = 'Error: No agent identified in DATA | Key Error: {}'.format(err)
             raise KepError(err_msg)
-    else:
-        r = server._config_add(server.url + _create_url(agent_type), DATA)
-        if r.code == 201: return True 
-        elif r.code == 207:
-            errors = [] 
-            for item in r.payload:
-                if item['code'] != 201:
-                    errors.append(item)
-            return errors
-        else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
+    
+    r = server._config_add(server.url + _create_url(agent_type), DATA)
+    if r.code == 201: return True 
+    elif r.code == 207:
+        errors = [] 
+        for item in r.payload:
+            if item['code'] != 201:
+                errors.append(item)
+        return errors
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
 def del_iot_agent(server: server, agent: str, agent_type: str) -> bool:
     '''Delete a `"agent"` object in Kepware. This will delete all children as well

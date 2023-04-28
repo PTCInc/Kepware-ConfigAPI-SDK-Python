@@ -77,7 +77,7 @@ NOTE: Detailed examples can also be found in the [examples](./examples/) folder.
 ### Create server connection
 
 ```python
-import kepconfig.connection
+from kepconfig import connection
 
 server = connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '')
 
@@ -123,7 +123,7 @@ tag_info = [
     }
 ]
 tag_path = '{}.{}.{}'.format(ch_name, dev_name, tag_group_path)
-result = tag.add_tag(server, tag_path, tag_info))
+result = tag.add_tag(server, tag_path, tag_info)
 
 ```
 

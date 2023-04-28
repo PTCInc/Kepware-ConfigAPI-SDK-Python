@@ -10,6 +10,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 from typing import Union
 from ..error import KepHTTPError, KepError
 from ..connection import server
+from ..utils import _url_parse_object
 
 
 UA_ROOT = '/admin/ua_endpoints'
@@ -24,7 +25,7 @@ def _create_url(endpoint = None):
     if endpoint == None:
         return UA_ROOT
     else:
-        return '{}/{}'.format(UA_ROOT,endpoint)
+        return '{}/{}'.format(UA_ROOT, _url_parse_object(endpoint))
 
 def add_endpoint(server: server, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add an `"endpoint"` or multiple `"endpoint"` objects to Kepware UA Server by passing a 

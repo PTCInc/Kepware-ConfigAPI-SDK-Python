@@ -14,6 +14,7 @@ from .. import utils
 from ..connection import server
 from .. import iot_gateway as IOT
 from ..error import KepError, KepHTTPError
+from ..utils import _url_parse_object
 
 IOT_ITEMS_ROOT = '/iot_items'
 
@@ -27,7 +28,7 @@ def _create_url(tag = None):
         return IOT_ITEMS_ROOT
     else: 
         normalized_tag = utils._address_dedecimal(tag)
-        return '{}/{}'.format(IOT_ITEMS_ROOT,normalized_tag)
+        return '{}/{}'.format(IOT_ITEMS_ROOT, _url_parse_object(normalized_tag))
 
 
 def add_iot_item(server: server, DATA: Union[dict, list], agent: str, agent_type: str) -> Union[bool, list]:

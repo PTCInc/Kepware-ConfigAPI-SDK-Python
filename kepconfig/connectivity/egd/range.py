@@ -13,6 +13,7 @@ from typing import Union
 from .. import egd as EGD
 from ...connection import server
 from ...error import KepError, KepHTTPError
+from ...utils import _url_parse_object
 
 RANGES_ROOT = '/ranges'
 
@@ -27,7 +28,7 @@ def _create_url(device_path, ex_type, exchange_name, range = None):
     if range == None:
         return '{}{}'.format(exchange_root, RANGES_ROOT)
     else:
-        return '{}{}/{}'.format(exchange_root, RANGES_ROOT, range)
+        return '{}{}/{}'.format(exchange_root, RANGES_ROOT, _url_parse_object(range))
 
 def add_range(server: server, device_path: str, ex_type: str, exchange_name: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"range"` or multiple `"range"` objects to Kepware. This allows you to 
