@@ -10,6 +10,7 @@ log group objects in DataLogger within the Kepware Configuration API
 from typing import Union
 from ..connection import KepServiceResponse, server
 from ..error import KepError, KepHTTPError
+from ..utils import _url_parse_object
 
 ENABLE_PROPERTY = 'datalogger.LOG_GROUP_ENABLED'
 LOG_GROUP_ROOT = '/project/_datalogger/log_groups'
@@ -24,7 +25,7 @@ def _create_url(log_group = None):
     if log_group == None:
         return '{}'.format(LOG_GROUP_ROOT)
     else:
-        return '{}/{}'.format(LOG_GROUP_ROOT, log_group)
+        return '{}/{}'.format(LOG_GROUP_ROOT, _url_parse_object(log_group))
 
 
 def add_log_group(server: server, DATA: Union[dict, list]) -> Union[bool, list]:

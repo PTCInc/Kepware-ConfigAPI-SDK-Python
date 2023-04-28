@@ -11,6 +11,7 @@ column mapping objects in a Datalogger log group within the Kepware Configuratio
 from . import log_group as Log_Group
 from ..error import KepError, KepHTTPError
 from ..connection import server
+from ..utils import _url_parse_object
 
 MAPPING_ROOT = '/column_mappings'
 
@@ -24,7 +25,7 @@ def _create_url(mapping = None):
     if mapping == None:
         return '{}'.format(MAPPING_ROOT)
     else:
-        return '{}/{}'.format(MAPPING_ROOT, mapping)
+        return '{}/{}'.format(MAPPING_ROOT, _url_parse_object(mapping))
 
 def modify_mapping(server: server, log_group: str, DATA: dict, *, mapping: str = None, force: bool = False) -> bool:
     '''Modify a column `"mapping"` object and it's properties in Kepware. If a `"mapping"` is not provided as an input,

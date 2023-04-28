@@ -20,5 +20,4 @@ r"""
 """
 __version__ = "1.2.0"
 from . import connection, error
-from .utils import path_split
 

@@ -12,6 +12,7 @@ from typing import Union
 from . import log_group as Log_Group
 from ..error import KepError, KepHTTPError
 from ..connection import server
+from ..utils import _url_parse_object
 
 TRIGGERS_ROOT = '/triggers'
 
@@ -25,7 +26,7 @@ def _create_url(trigger = None):
     if trigger == None:
         return '{}'.format(TRIGGERS_ROOT)
     else:
-        return '{}/{}'.format(TRIGGERS_ROOT, trigger)
+        return '{}/{}'.format(TRIGGERS_ROOT, _url_parse_object(trigger))
 
 
 def add_trigger(server: server, log_group: str, DATA: Union[dict, list]) -> Union[bool, list]:

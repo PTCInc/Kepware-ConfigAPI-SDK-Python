@@ -9,7 +9,7 @@ r"""`names` exposes an API to allow modifications (add, delete, modify) to
 name resolution objects for EGD devices within the Kepware Configuration API
 """
 
-from ... import path_split
+from ...utils import _url_parse_object, path_split
 from ...connection import server
 from ...error import KepHTTPError, KepError
 from typing import Union
@@ -29,7 +29,7 @@ def _create_url(device_path, name = None):
     if name == None:
         return '{}/{}'.format(device_root, NAMES_ROOT)
     else:
-        return '{}/{}/{}'.format(device_root, NAMES_ROOT, name)
+        return '{}/{}/{}'.format(device_root, NAMES_ROOT, _url_parse_object(name))
 
 def add_name_resolution(server: server, device_path: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"name resolution"` or multiple `"name resolution"` objects to Kepware. This allows you to 

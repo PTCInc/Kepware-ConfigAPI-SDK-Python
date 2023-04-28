@@ -8,6 +8,8 @@ r"""`utils` provides general utilities to help manage
 various objects for Kepware's configuration
 """
 
+from urllib import parse
+
 def path_split(path: str):
     '''Used to split the standard Kepware address decimal notation into a dict that contains the 
     *channel*, *device* and *tag_path* keys.
@@ -36,7 +38,17 @@ def path_split(path: str):
     return path_obj
 
 def _address_dedecimal(tag_address):
+    '''Used to handle URL references where decimal notation isn't supported in object names, i.e. IoT Gateway items.
+    
+    Replaces `.` with `_` and removes leading `_` for system tag references'''
     if tag_address[0] == '_':
         tag_address = tag_address[1::]
     updated = tag_address.replace('.','_')
     return updated
+
+def _url_parse_object(object):
+    '''Common url parse to handle reserved characters. Used to convert object 
+    names when building URLs.
+    
+    Reserved character list that Kepware allows in object names: :/?#[]@!$&'()*+,;='''
+    return parse.quote(object, safe='')

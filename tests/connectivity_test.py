@@ -17,13 +17,16 @@ import pytest
 
 
 # Channel and Device name to be used
-ch_name = 'Channel1'
-dev_name = 'Device1'
+ch_name = 'Chan:/?#[]@!$&\'()*+,;=nel1' #Added special characters to ensure proper handling.
+dev_name = 'Dev:/?#[]@!$&\'()*+,;=ice1'
 mqtt_agent_name = 'MQTT'
 rest_agent_name = 'REST Client'
 rserver_agent_name = 'REST Server'
 twx_agent_name = 'Thingworx'
 iot_item_name ="System__Date"
+
+tagnm = "Te:/?#[]@!$&\'()*+,;=mp1"
+taggrpnm = 'AL:/?#[]@!$&\'()*+,;=ARM'
 
 def HTTPErrorHandler(err):
     if err.__class__ is error.KepHTTPError:
@@ -109,16 +112,17 @@ def test_device_add(server):
 
 def test_all_tag_tg_add(server):
     # Add a collection of Tags and Tag Group objects
+    
     all_tags_data = {
         "tags": [
             {
-                "common.ALLTYPES_NAME": "Temp1",
+                "common.ALLTYPES_NAME": tagnm,
                 "servermain.TAG_ADDRESS": "R0"
             }
         ],
         "tag_groups": [
             {
-                "common.ALLTYPES_NAME": "ALARM",
+                "common.ALLTYPES_NAME": taggrpnm,
                 "tags": [
                     {
                         "common.ALLTYPES_NAME": "ALARM_C_READY",
@@ -267,7 +271,7 @@ def test_tag_add(server):
                 "servermain.TAG_ADDRESS": "R1"
         }
     ]
-    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}.ALARM2')
     assert connectivity.tag.add_tag(server, tag_path, tag_info)
 
 
@@ -292,7 +296,7 @@ def test_tag_group_add(server):
                 "common.ALLTYPES_NAME": "NewGroup"
         }
     ]
-    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}')
     assert connectivity.tag.add_tag_group(server, tag_path, tag_group_info)
 
     # Add tag group to at device level (test for no "tag path")
@@ -349,11 +353,11 @@ def test_device_tag_all_get(server):
 
 def test_tag_get(server):
     # Get Tag
-    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}.ALARM2.temp')
     assert type(connectivity.tag.get_tag(server, tag_path)) == dict
 
     # Get All Tags
-    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}.ALARM2')
     assert type(connectivity.tag.get_all_tags(server, tag_path)) == list
     
     #
@@ -369,12 +373,12 @@ def test_tag_get(server):
 
 def test_tag_group_get(server):
     # Get Tag Group
-    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
+    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}.ALARM2')
     assert type(connectivity.tag.get_tag_group(server, tag_group_path)) == dict
 
 
     # Get All Tag Groups
-    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
+    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}')
     assert type(connectivity.tag.get_all_tag_groups(server,tag_group_path)) == list
 
     #
@@ -382,7 +386,7 @@ def test_tag_group_get(server):
     #
 
     # Get Tag Group
-    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM')
+    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}')
     assert type(connectivity.tag.get_tag_group(server, tag_group_path)) == dict
 
     # Get All Tag Groups
@@ -395,7 +399,7 @@ def test_tag_struct_get(server):
     # proj_id = props['PROJECT_ID']
     tag_path = '{}.{}'.format(ch_name, dev_name)
     assert type(connectivity.tag.get_full_tag_structure(server, tag_path, recursive=True)) == dict
-    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}.ALARM2')
     assert type(connectivity.tag.get_full_tag_structure(server, tag_path)) == dict
 
 
@@ -429,12 +433,12 @@ def test_auto_tag_gen(server):
 
 def test_tag_del(server):
     # Delete Tag
-    tag_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2.temp')
+    tag_path = '{}.{}.{}'.format(ch_name, dev_name, f'{taggrpnm}.ALARM2.temp')
     assert connectivity.tag.del_tag(server, tag_path)
 
 def test_tag_group_del(server):       
     # Delete Tag Group
-    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name, 'ALARM.ALARM2')
+    tag_group_path = '{}.{}.{}'.format(ch_name, dev_name,  f'{taggrpnm}.ALARM2')
     assert connectivity.tag.del_tag_group(server, tag_group_path)
 
 def test_device_del(server):

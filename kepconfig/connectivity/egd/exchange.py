@@ -9,9 +9,9 @@ r"""`exchange` exposes an API to allow modifications (add, delete, modify) to
 exchange objects for EGD devices within the Kepware Configuration API
 """
 
-from ... import path_split
 from ...connection import server
 from ...error import KepHTTPError, KepError
+from ...utils import _url_parse_object, path_split
 from typing import Union
 from .. import egd as EGD, channel, device
 
@@ -34,9 +34,9 @@ def _create_url(device_path, ex_type, exchange_name = None):
             return device_root + PRODUCER_ROOT
     else:
         if ex_type.upper() == EGD.CONSUMER_EXCHANGE:
-            return '{}{}/{}'.format(device_root,CONSUMER_ROOT,exchange_name)
+            return '{}{}/{}'.format(device_root,CONSUMER_ROOT,_url_parse_object(exchange_name))
         else:
-            return '{}{}/{}'.format(device_root,PRODUCER_ROOT,exchange_name)
+            return '{}{}/{}'.format(device_root,PRODUCER_ROOT,_url_parse_object(exchange_name))
 
 def add_exchange(server: server, device_path: str, ex_type: str, DATA: Union[dict, list]) -> Union[bool, list]:
     '''Add a `"exchange"` or multiple `"exchange"` objects to Kepware. Can be used to pass children of a exchange object 

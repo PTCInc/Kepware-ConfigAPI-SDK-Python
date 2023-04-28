@@ -11,6 +11,7 @@ from typing import Union
 from . import log_group as Log_Group
 from ..error import KepError, KepHTTPError
 from ..connection import server
+from ..utils import _url_parse_object
 
 LOG_ITEMS_ROOT = '/log_items'
 
@@ -24,7 +25,7 @@ def _create_url(log_item = None):
     if log_item == None:
         return '{}'.format(LOG_ITEMS_ROOT)
     else:
-        return '{}/{}'.format(LOG_ITEMS_ROOT, log_item)
+        return '{}/{}'.format(LOG_ITEMS_ROOT, _url_parse_object(log_item))
 
 
 def add_log_item(server: server, log_group: str, DATA: Union[dict, list]) -> Union[bool, list]:
