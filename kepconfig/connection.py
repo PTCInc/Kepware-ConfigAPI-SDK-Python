@@ -96,12 +96,15 @@ class server:
 
 
 
-    def __init__(self,  host = None, port = None, user = None, pw = None, https = False):
+    def __init__(self,  host = None, port = None, user = None, pw = None, https = False, *, tls= None):
         self.host = host
         self.port = port
         self.username = user
         self.password = pw
-        self.__ssl_context = ssl.create_default_context()
+        if tls == None:
+            self.__ssl_context = ssl.create_default_context()
+        else:
+            self.__ssl_context = ssl.SSLContext(protocol = tls)
         self.__SSL_on = https
     
     @property
