@@ -480,6 +480,6 @@ def get_full_tag_structure(server: server, path: str, *, recursive: bool = False
     r['tag_groups'] = get_all_tag_groups(server, path, options= options)
     if recursive:
         for group in r['tag_groups']:
-            res = get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME'], options= options)
+            res = get_full_tag_structure(server, path + '.' + group['common.ALLTYPES_NAME'], recursive= recursive, options= options)
             group.update(res)
     return r
