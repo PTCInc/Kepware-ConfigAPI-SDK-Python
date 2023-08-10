@@ -14,7 +14,7 @@ Package supported and tested on Python 3.9 or later. Older versions support earl
 
 - Supports both HTTP and HTTPS connections with certificate validation options
 
-SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware configuration objects:
+Package allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware configuration objects:
 
 | Features      | TKS/KEP       | TKE           |
 | :----------:  | :----------:  | :----------:  |
