@@ -22,11 +22,13 @@ Package allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the follow
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
 | **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
 | **Datalogger** <br /> *(Log Groups, Items, Mapping, Triggers, Reset Mapping Service)* | Y | Y |
+| **UA Gateway** <br /> *(Certificates, Server Endpoints, Client Connectins)* | Y*** | N |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y* | Y |
 | **Product Info and Health Status\*\*** | Y | Y |
 
 - Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only
 - Note (**) - Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds
+- Note (***) - TKS only
 
 Driver specific features:
 
@@ -46,7 +48,7 @@ Configuration API *Services* implemented:
 
 | Services      | TKS/KEP       | TKE           |
 | :----------:  | :----------:  | :----------:  |
-| **TagGeneration**<br />*(for supported drivers)* | Y | Y |
+| **TagGeneration** <br /> *(for supported drivers)* | Y | Y |
 | **ReinitializeRuntime** | Y* | Y |
 | **ProjectLoad and ProjectSave**| Y | Y |
 
