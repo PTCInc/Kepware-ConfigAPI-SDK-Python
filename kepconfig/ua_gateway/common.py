@@ -26,6 +26,7 @@ class _INTER_TYPE(Enum):
     CLIENT = 1
     CERTS = 2
 
+INSTANCE_CERTIFICATE = "Instance Certificate"
 
 def _create_url_cert(interface, certificate = None):
     '''Creates url object for the "certificate" branch of Kepware's UA Gateway. Used 
@@ -56,6 +57,12 @@ def _change_cert_trust(server: server, inter_type, certificate: str, trust: bool
 
     cert_data = server._force_update_check(True, DATA)
     r = server._config_update(server.url + _create_url_cert(inter_type, certificate), cert_data)
+    if r.code == 200: return True 
+    else: 
+        raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
+    
+def _delete_cert_truststore(server: server, inter_type, certificate: str):
+    r = server._config_del(server.url + _create_url_cert(inter_type, certificate))
     if r.code == 200: return True 
     else: 
         raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)

@@ -6,13 +6,14 @@
 
 r"""`server` exposes an API to allow modifications (add, delete, modify) to 
 UA Gateway plug-in server endpoint objects within the Kepware Configuration API. 
-Certificate read and trust functionality is also available for the server endpoints.
+Certificate store read, remove and trust functionality is also available for the 
+server endpoints.
 """
 
 from typing import Union
 from ..connection import server
 from ..error import KepError, KepHTTPError
-from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust, _create_url_cert, _create_url_server
+from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust, _create_url_cert, _create_url_server, _delete_cert_truststore
 
 
 def get_certificate(server: server, certificate: str) -> dict:
@@ -49,7 +50,7 @@ def get_all_certificates(server: server, *, options: dict = None) -> list:
     return r.payload
 
 def trust_certificate(server: server, certificate: str) -> bool:
-    '''Trusts the certificate in the UAG server endpoint certifcate store. This is updating the trust state of UA client instance 
+    '''Trusts the certificate in the UAG server endpoint certificate store. This is updating the trust state of UA client instance 
     certificates that are used by UAG server endpoints for trust purposes in the UA security model.
 
     :param server: instance of the `server` class
@@ -63,7 +64,7 @@ def trust_certificate(server: server, certificate: str) -> bool:
     return _change_cert_trust(server, _INTER_TYPE.SERVER, certificate, True)
 
 def reject_certificate(server: server, certificate: str) -> bool:
-    '''Rejects the certificate in the UAG server endpoint certifcate store.
+    '''Rejects the certificate in the UAG server endpoint certificate store.
 
     :param server: instance of the `server` class
     :param certificate: name of certificate
@@ -74,6 +75,19 @@ def reject_certificate(server: server, certificate: str) -> bool:
     :raises KepURLError: If urllib provides an URLError
     '''
     return _change_cert_trust(server, _INTER_TYPE.SERVER, certificate, False)
+
+def delete_certificate(server: server, certificate: str) -> bool:
+    '''Deletes the certificate in the UAG server endpoint certificate store.
+
+    :param server: instance of the `server` class
+    :param certificate: name of certificate
+    
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    return _delete_cert_truststore(server, _INTER_TYPE.SERVER, certificate)
 
 def get_ua_server_endpoint(server: server, ua_server_endpoint: str) -> dict:
     '''Returns the properties of the UAG server endpoint object.

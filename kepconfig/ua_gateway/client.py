@@ -6,13 +6,14 @@
 
 r"""`client` exposes an API to allow modifications (add, delete, modify) to 
 UA Gateway plug-in client connection objects within the Kepware Configuration API. 
-Certificate read and trust functionality is also available for the client connections.
+Certificate store read, remove and trust functionality is also available for the 
+client connections.
 """
 
 from typing import Union
 from ..connection import server
 from ..error import KepError, KepHTTPError
-from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust,  _create_url_cert, _create_url_client
+from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust,  _create_url_cert, _create_url_client, _delete_cert_truststore
 
 def get_certificate(server: server, certificate: str) -> dict:
     '''Returns the properties of the UAG client connection certificate object in the UAG client connection 
@@ -74,6 +75,19 @@ def reject_certificate(server: server, certificate: str) -> bool:
     '''
 
     return _change_cert_trust(server, _INTER_TYPE.CLIENT, certificate, False)
+
+def delete_certificate(server: server, certificate: str) -> bool:
+    '''Deletes the certificate in the UAG client endpoint certificate store.
+
+    :param server: instance of the `server` class
+    :param certificate: name of certificate
+    
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    return _delete_cert_truststore(server, _INTER_TYPE.CLIENT, certificate)
 
 def get_ua_client_connection(server: server, ua_client_connection: str) -> dict:
     '''Returns the properties of the UAG client connection object.
