@@ -9,21 +9,21 @@ UA Gateway plug-in instance certificate objects within the Kepware Configuration
 """
 
 from ..connection import server
-from ..ua_gateway.common import _INTER_TYPE, _create_url_cert
+from ..error import KepHTTPError
+from ..ua_gateway.common import _INTER_TYPE, _create_url_cert, INSTANCE_CERTIFICATE
 
-def get_certificate(server: server, certificate: str) -> dict:
+def get_instance_certificate(server: server) -> dict:
     '''Returns the properties of the UAG instance certificate object in the UAG certificate store. 
     These are UAG instance certificates that are used by UAG for trust purposes in the UA security model.
     
     :param server: instance of the `server` class
-    :param certificate: name of certificate
     
     :return: Dict of data for the certificate requested
 
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.CERTS, certificate))
+    r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.CERTS, INSTANCE_CERTIFICATE))
     return r.payload
 
 def get_all_certificates(server: server,  *, options: dict = None) -> list:
@@ -41,3 +41,19 @@ def get_all_certificates(server: server,  *, options: dict = None) -> list:
     '''
     r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.CERTS), params= options)
     return r.payload
+
+def reissue_instance_certificate(server: server) -> bool:
+    '''Deletes and reissues the UAG instance certificate object in the UAG certificate store. 
+    This is the UAG instance certificate that are used by UAG for trust purposes in the UA security model.
+    
+    :param server: instance of the `server` class
+    
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    r = server._config_del(server.url + _create_url_cert(_INTER_TYPE.CERTS, INSTANCE_CERTIFICATE))
+    if r.code == 200: return True 
+    else: 
+        raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
