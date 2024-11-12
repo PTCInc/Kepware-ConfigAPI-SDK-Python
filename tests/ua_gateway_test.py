@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2023 PTC Inc. All rights reserved.
+# Copyright (c) PTC Inc. All rights reserved.
 # See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
@@ -57,15 +57,30 @@ def server(kepware_server):
     yield server
     complete(server)
 
-def test_UAG_certificate_get(server: connection.server):
+def test_UAG_server_interface_properties_get(server: connection.server):
+    assert type(UAGServers.get_uag_server_interface_properties(server)) == dict
+
+def test_UAG_server_interface_properties_modify(server: connection.server):
+    propertychange = {
+        "ua_gateway.UA_SERVER_INTERFACE_USER_IDENTITY_POLICY_ANONYMOUS": True,
+    }
+
+    assert UAGServers.modify_uag_server_interface_properties(server, propertychange, force= False)
+
+def test_UAG_instance_certificate_get(server: connection.server):
     # Get all UAG instance certs
-    cert_list = certificates.get_all_certificates(server)
-    assert type(cert_list) == list
+    # TODO: Implement if/when multiple instance certificates can be configured.
+    # cert_list = certificates.get_all_certificates(server)
+    # assert type(cert_list) == list
 
     # Read a specific instance cert
-    assert type(certificates.get_certificate(server, cert_list[0]['common.ALLTYPES_NAME'])) == dict
+    assert type(certificates.get_instance_certificate(server)) == dict
 
     # TODO: Create test for filter
+
+def test_UAG_instance_certificate_reissue(server: connection.server):
+    # Get all UAG instance certs
+    assert certificates.reissue_self_signed_instance_certificate(server)
 
 def test_UAG_client_conn_add(server: connection.server):
     # Add one client
@@ -134,6 +149,17 @@ def test_UAG_client_conn_cert_get(server: connection.server):
         pytest.skip(f"No certs available to read. Certs list: {certs}")
     
     assert type(client.get_certificate(server, certs[0]["common.ALLTYPES_NAME"])) == dict
+
+def test_UAG_client_conn_cert_del(server: connection.server):
+    pytest.skip(f"Client connection cert deletion is disabled.")
+    # Get all certs for Client Connections
+    certs = client.get_all_certificates(server)
+    assert type(certs) == list
+
+    if not certs:
+        # No certs to test get specific cert with
+        pytest.skip(f"No certs available to read. Certs list: {certs}")
+    assert client.delete_certificate(server, certs[-1]["common.ALLTYPES_NAME"])
 
 def test_UAG_client_conn_cert_trust(server: connection.server):
     # Get first cert and reject then trust the certificate
@@ -213,6 +239,17 @@ def test_UAG_server_end_cert_get(server: connection.server):
         pytest.skip(f"No certs available to read. Certs list: {certs}")
     
     assert type(UAGServers.get_certificate(server, certs[0]["common.ALLTYPES_NAME"])) == dict
+
+def test_UAG_server_conn_cert_del(server: connection.server):
+    pytest.skip(f"Server connection cert deletion is disabled.")
+    # Get all certs for Server Connections
+    certs = UAGServers.get_all_certificates(server)
+    assert type(certs) == list
+
+    if not certs:
+        # No certs to test get specific cert with
+        pytest.skip(f"No certs available to read. Certs list: {certs}")
+    assert UAGServers.delete_certificate(server, certs[-1]["common.ALLTYPES_NAME"])
 
 def test_UAG_server_end_cert_trust(server: connection.server):
     # Get first cert and reject then trust the certificate
