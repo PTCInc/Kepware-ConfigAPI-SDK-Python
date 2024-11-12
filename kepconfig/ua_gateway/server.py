@@ -13,81 +13,39 @@ server endpoints.
 from typing import Union
 from ..connection import server
 from ..error import KepError, KepHTTPError
-from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust, _create_url_cert, _create_url_server, _delete_cert_truststore
+from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust, _create_url_cert, _create_url_server, _delete_cert_truststore, SERVER_ROOT
 
-
-def get_certificate(server: server, certificate: str) -> dict:
-    '''Returns the properties of the UAG server endpoint certificate object in the UAG client connection 
-    certificate store. These are UA client instance certificates that are used by UAG server endpoints for
-    trust purposes in the UA security model.
-    
-    :param server: instance of the `server` class
-    :param certificate: name of certificate
-    
-    :return: Dict of data for the certificate requested
+def get_uag_server_interface_properties(server: server) -> dict:
+    ''' Get the UAG Server Interface Properties of the Kepware instance. These properties expose User Identify
+    Policy, Security Policy and other Communication properties that are applied across all UAG server endpoints.
+        
+    :return: Dict of all the UAG Server Interface properties
 
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.SERVER, certificate))
+
+    r = server._config_get(server.url + SERVER_ROOT)
     return r.payload
 
-def get_all_certificates(server: server, *, options: dict = None) -> list:
-    '''Returns list of all UAG server endpoint certificate objects and their properties.This is updating the trust state of UA client instance 
-    certificates that are used by UAG server endpoints for trust purposes in the UA security model. These are UA client instance certificates 
-    that are used by UAG server endpoints for trust purposes in the UA security model.
-    
-    :param server: instance of the `server` class
-    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of certificates. Options are `filter`, 
-        `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`
-    
-    :return: List of data for all certificates in Kepware server UAG server endpoint certificate store
+def modify_uag_server_interface_properties(server: server, DATA: dict, force: bool = False) -> bool:
+    ''' Modify the UAG Server Interface Properties of the Kepware instance. These properties expose User Identify
+    Policy, Security Policy and other Communication properties that are applied across all UAG server endpoints.
 
-    :raises KepHTTPError: If urllib provides an HTTPError
-    :raises KepURLError: If urllib provides an URLError
-    '''
-    r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.SERVER), params= options)
-    return r.payload
-
-def trust_certificate(server: server, certificate: str) -> bool:
-    '''Trusts the certificate in the UAG server endpoint certificate store. This is updating the trust state of UA client instance 
-    certificates that are used by UAG server endpoints for trust purposes in the UA security model.
-
-    :param server: instance of the `server` class
-    :param certificate: name of certificate
+    :param DATA: Dict of the UAG Server Interface properties to be modified
+    :param force: *(optional)* if True, will force the configuration update to the Kepware server
     
     :return: True - If a "HTTP 200 - OK" is received from Kepware server
 
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    return _change_cert_trust(server, _INTER_TYPE.SERVER, certificate, True)
 
-def reject_certificate(server: server, certificate: str) -> bool:
-    '''Rejects the certificate in the UAG server endpoint certificate store.
+    prop_data = server._force_update_check(force, DATA)
+    r = server._config_update(server.url + SERVER_ROOT, prop_data)
+    if r.code == 200: return True 
+    else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
 
-    :param server: instance of the `server` class
-    :param certificate: name of certificate
-    
-    :return: True - If a "HTTP 200 - OK" is received from Kepware server
-
-    :raises KepHTTPError: If urllib provides an HTTPError
-    :raises KepURLError: If urllib provides an URLError
-    '''
-    return _change_cert_trust(server, _INTER_TYPE.SERVER, certificate, False)
-
-def delete_certificate(server: server, certificate: str) -> bool:
-    '''Deletes the certificate in the UAG server endpoint certificate store.
-
-    :param server: instance of the `server` class
-    :param certificate: name of certificate
-    
-    :return: True - If a "HTTP 200 - OK" is received from Kepware server
-
-    :raises KepHTTPError: If urllib provides an HTTPError
-    :raises KepURLError: If urllib provides an URLError
-    '''
-    return _delete_cert_truststore(server, _INTER_TYPE.SERVER, certificate)
 
 def get_ua_server_endpoint(server: server, ua_server_endpoint: str) -> dict:
     '''Returns the properties of the UAG server endpoint object.
@@ -194,3 +152,76 @@ def del_ua_server_endpoint(server: server, ua_server_endpoint: str) -> bool:
     if r.code == 200: return True 
     else: 
         raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
+
+def get_certificate(server: server, certificate: str) -> dict:
+    '''Returns the properties of the UAG server endpoint certificate object in the UAG client connection 
+    certificate store. These are UA client instance certificates that are used by UAG server endpoints for
+    trust purposes in the UA security model.
+    
+    :param server: instance of the `server` class
+    :param certificate: name of certificate
+    
+    :return: Dict of data for the certificate requested
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.SERVER, certificate))
+    return r.payload
+
+def get_all_certificates(server: server, *, options: dict = None) -> list:
+    '''Returns list of all UAG server endpoint certificate objects and their properties.This is updating the trust state of UA client instance 
+    certificates that are used by UAG server endpoints for trust purposes in the UA security model. These are UA client instance certificates 
+    that are used by UAG server endpoints for trust purposes in the UA security model.
+    
+    :param server: instance of the `server` class
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of certificates. Options are `filter`, 
+        `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`
+    
+    :return: List of data for all certificates in Kepware server UAG server endpoint certificate store
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.SERVER), params= options)
+    return r.payload
+
+def trust_certificate(server: server, certificate: str) -> bool:
+    '''Trusts the certificate in the UAG server endpoint certificate store. This is updating the trust state of UA client instance 
+    certificates that are used by UAG server endpoints for trust purposes in the UA security model.
+
+    :param server: instance of the `server` class
+    :param certificate: name of certificate
+    
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    return _change_cert_trust(server, _INTER_TYPE.SERVER, certificate, True)
+
+def reject_certificate(server: server, certificate: str) -> bool:
+    '''Rejects the certificate in the UAG server endpoint certificate store.
+
+    :param server: instance of the `server` class
+    :param certificate: name of certificate
+    
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    return _change_cert_trust(server, _INTER_TYPE.SERVER, certificate, False)
+
+def delete_certificate(server: server, certificate: str) -> bool:
+    '''Deletes the certificate in the UAG server endpoint certificate store.
+
+    :param server: instance of the `server` class
+    :param certificate: name of certificate
+    
+    :return: True - If a "HTTP 200 - OK" is received from Kepware server
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    return _delete_cert_truststore(server, _INTER_TYPE.SERVER, certificate)
