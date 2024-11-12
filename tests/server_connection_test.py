@@ -206,3 +206,30 @@ def test_get_status(server: kepconfig.connection.server):
 
 def test_get_info(server: kepconfig.connection.server):
     assert type(server.get_info()) == dict
+
+def test_export_project_config(server: kepconfig.connection.server):
+    assert type(server.export_project_configuration()) == dict
+    
+def test_import_project_config(server: kepconfig.connection.server):
+    project = server.export_project_configuration()
+    job = server.import_project_configuration(project)
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    time.sleep(1)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == kepconfig.connection.KepServiceStatus
+
+    job = server.import_empty_project()
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    time.sleep(1)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == kepconfig.connection.KepServiceStatus
