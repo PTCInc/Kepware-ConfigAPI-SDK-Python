@@ -70,7 +70,7 @@ kepconfig    </h1>
 
 <p><a href="https://pypi.org/project/kepconfig"><img src="https://img.shields.io/pypi/v/kepconfig" alt="Released Version" /></a> <a href="https://pypi.org/project/kepconfig"><img src="https://img.shields.io/pypi/pyversions/kepconfig" alt="Supported Versions" /></a> <img src="https://img.shields.io/pypi/dm/kepconfig" alt="PyPI - Downloads" /> <img src="https://img.shields.io/pypi/l/kepconfig" alt="PyPI - License" /></p>
 
-<p>This is a package to help create Python applications to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP).</p>
+<p>This is a package to help create Python applications to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP). For reference, Kepware Server in this documentation will refer to both TKS and KEP versions.</p>
 
 <p><strong>API reference documentation is available on <a href="https://ptcinc.github.io/Kepware-ConfigAPI-SDK-Python">Github Pages</a></strong></p>
 
@@ -116,7 +116,7 @@ kepconfig    </h1>
   <td style="text-align:center;">Y</td>
 </tr>
 <tr>
-  <td style="text-align:center;"><strong>UA Gateway</strong> <br /> <em>(Certificates, Server Endpoints, Client Connectins)</em></td>
+  <td style="text-align:center;"><strong>UA Gateway</strong> <br /> <em>(Certificates, Server Endpoints, Client Connections, Server Interface parameters)</em></td>
   <td style="text-align:center;">Y<em>*</em></td>
   <td style="text-align:center;">N</td>
 </tr>
@@ -130,13 +130,19 @@ kepconfig    </h1>
   <td style="text-align:center;">Y</td>
   <td style="text-align:center;">Y</td>
 </tr>
+<tr>
+  <td style="text-align:center;"><strong>Import Project (via JsonProjectLoad Service) / Export Project****</strong></td>
+  <td style="text-align:center;">Y</td>
+  <td style="text-align:center;">Y</td>
+</tr>
 </tbody>
 </table>
 
 <ul>
 <li>Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only</li>
 <li>Note (**) - Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds</li>
-<li>Note (<em>*</em>) - TKS only</li>
+<li>Note (<em>*</em>) - TKS only v6.16 and later</li>
+<li>Note (<em>*</em>*) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds</li>
 </ul>
 
 <p>Driver specific features:</p>
@@ -210,14 +216,21 @@ kepconfig    </h1>
   <td style="text-align:center;">Y</td>
   <td style="text-align:center;">Y</td>
 </tr>
+<tr>
+  <td style="text-align:center;"><strong>JsonProjectLoad**</strong> <br /> <em>(used for import project feature)</em></td>
+  <td style="text-align:center;">Y</td>
+  <td style="text-align:center;">Y</td>
+</tr>
 </tbody>
 </table>
 
 <p>Note (*) - Reinitialize service was implemented for Kepware Server v6.8+</p>
 
-<p>Filtering, sorting and pagination query options are added for any collections methods (ex: get_all_devices() or get_all_channel()).</p>
+<p>Note (**) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds</p>
 
-<p>Generic REST methods are provided to use for functions not developed in SDK package. These are found in the Server Class in <a href="./kepconfig/connection.py">connection.py</a></p>
+<p>Filtering, sorting and pagination query options are added for any collections methods (ex: <code>get_all_devices()</code> or <code>get_all_channel()</code>).</p>
+
+<p>Generic REST methods are provided to use for functions not developed in SDK package. These are found in the <code>Server</code> class in <a href="./kepconfig/connection.py">connection.py</a></p>
 
 <h2 id="known-limitations">Known Limitations</h2>
 
@@ -238,7 +251,7 @@ kepconfig    </h1>
 
 <p>NOTE: Detailed examples can also be found in the <a href="./examples/">examples</a> folder.</p>
 
-<h3 id="create-server-connection">Create server connection</h3>
+<h3 id="create-server-connection-instance">Create server connection instance</h3>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="kn">from</span> <span class="nn">kepconfig</span> <span class="kn">import</span> <span class="n">connection</span>
@@ -250,7 +263,7 @@ kepconfig    </h1>
 </code></pre>
 </div>
 
-<p>For certificate validation, the SDK uses the OS/systems trusted CA certificate store. The connection uses the "create_default_context()" function as part of urllib as described at the following links:</p>
+<p>For certificate validation, the SDK uses the OS/systems trusted certificate store. The connection uses the <code>create_default_context()</code> function as part of urllib as described at the following links:</p>
 
 <ul>
 <li><a href="https://docs.python.org/3/library/ssl.html#ssl.create_default_context">ssl.create_default_context</a></li>
@@ -258,7 +271,7 @@ kepconfig    </h1>
 <li><a href="https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_default_verify_paths">set_default_verify_paths</a></li>
 </ul>
 
-<p>For Windows OSes, the Kepware server's instance certificate can be loaded into the hosts "Trusted Root Certificate Authorities" store.</p>
+<p>For Windows OSes, the Kepware Server's instance certificate can be loaded into the hosts "Trusted Root Certificate Authorities" store.</p>
 
 <h3 id="create-an-object">Create an object</h3>
 
@@ -299,6 +312,7 @@ kepconfig    </h1>
 <p><strong>Visit:</strong></p>
 
 <ul>
+<li><a href="https://ptcinc.github.io/Kepware-ConfigAPI-SDK-Python">Kepconfig Package Documentation on Github Pages</a></li>
 <li><a href="https://www.kepware.com/">Kepware.com</a></li>
 <li><a href="https://www.ptc.com/">PTC.com</a></li>
 </ul>
