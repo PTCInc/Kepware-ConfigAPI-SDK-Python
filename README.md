@@ -2,7 +2,7 @@
 
 [![Released Version](https://img.shields.io/pypi/v/kepconfig)](https://pypi.org/project/kepconfig) [![Supported Versions](https://img.shields.io/pypi/pyversions/kepconfig)](https://pypi.org/project/kepconfig) ![PyPI - Downloads](https://img.shields.io/pypi/dm/kepconfig) ![PyPI - License](https://img.shields.io/pypi/l/kepconfig)
 
-This is a package to help create Python applications to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP).
+This is a package to help create Python applications to conduct operations with the Kepware Configuration API. This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP). For reference, Kepware Server in this documentation will refer to both TKS and KEP versions.
 
 **API reference documentation is available on [Github Pages](https://ptcinc.github.io/Kepware-ConfigAPI-SDK-Python)**
 
@@ -14,7 +14,7 @@ Package supported and tested on Python 3.9 or later. Older versions support earl
 
 - Supports both HTTP and HTTPS connections with certificate validation options
 
-SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware configuration objects:
+Package allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following Kepware configuration objects:
 
 | Features      | TKS/KEP       | TKE           |
 | :----------:  | :----------:  | :----------:  |
@@ -22,11 +22,15 @@ SDK allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the following 
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
 | **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
 | **Datalogger** <br /> *(Log Groups, Items, Mapping, Triggers, Reset Mapping Service)* | Y | Y |
+| **UA Gateway** <br /> *(Certificates, Server Endpoints, Client Connections, Server Interface parameters)* | Y*** | N |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y* | Y |
 | **Product Info and Health Status\*\*** | Y | Y |
+| **Import Project (via JsonProjectLoad Service) / Export Project\*\*\*\***| Y | Y |
 
 - Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only
 - Note (**) - Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds
+- Note (***) - TKS only v6.16 and later
+- Note (****) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds
 
 Driver specific features:
 
@@ -46,15 +50,18 @@ Configuration API *Services* implemented:
 
 | Services      | TKS/KEP       | TKE           |
 | :----------:  | :----------:  | :----------:  |
-| **TagGeneration**<br />*(for supported drivers)* | Y | Y |
+| **TagGeneration** <br /> *(for supported drivers)* | Y | Y |
 | **ReinitializeRuntime** | Y* | Y |
 | **ProjectLoad and ProjectSave**| Y | Y |
+| **JsonProjectLoad\*\*** <br /> *(used for import project feature)*| Y | Y |
 
 Note (*) - Reinitialize service was implemented for Kepware Server v6.8+
 
-Filtering, sorting and pagination query options are added for any collections methods (ex: get_all_devices() or get_all_channel()).
+Note (**) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds
 
-Generic REST methods are provided to use for functions not developed in SDK package. These are found in the Server Class in [connection.py](./kepconfig/connection.py)
+Filtering, sorting and pagination query options are added for any collections methods (ex: `get_all_devices()` or `get_all_channel()`).
+
+Generic REST methods are provided to use for functions not developed in SDK package. These are found in the `Server` class in [connection.py](./kepconfig/connection.py)
 
 ## Known Limitations
 
@@ -72,9 +79,9 @@ Package can be installed with `pip` using the following:
 
 ## Key Concepts
 
-NOTE: Detailed examples can also be found in the [examples](./examples/) folder.
+**NOTE:** Detailed examples can also be found in the [examples](./examples/) folder.
 
-### Create server connection
+### Create server connection instance
 
 ```python
 from kepconfig import connection
@@ -86,13 +93,13 @@ server = connection.server(host = '127.0.0.1', port = 57512, user = 'Administrat
 
 ```
 
-For certificate validation, the SDK uses the OS/systems trusted CA certificate store. The connection uses the "create_default_context()" function as part of urllib as described at the following links:
+For certificate validation, the SDK uses the OS/systems trusted certificate store. The connection uses the `create_default_context()` function as part of urllib as described at the following links:
 
 - [ssl.create_default_context](https://docs.python.org/3/library/ssl.html#ssl.create_default_context)
 - [ssl.SSLContext.load_default_certs](https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_default_certs)
 - [set_default_verify_paths](https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_default_verify_paths)
 
-For Windows OSes, the Kepware server's instance certificate can be loaded into the hosts "Trusted Root Certificate Authorities" store.
+For Windows OSes, the Kepware Server's instance certificate can be loaded into the hosts "Trusted Root Certificate Authorities" store.
 
 ### Create an object
 
@@ -131,5 +138,6 @@ result = tag.add_tag(server, tag_path, tag_info)
 
 **Visit:**
 
+- [Kepconfig Package Documentation on Github Pages](https://ptcinc.github.io/Kepware-ConfigAPI-SDK-Python)
 - [Kepware.com](https://www.kepware.com/)
 - [PTC.com](https://www.ptc.com/)

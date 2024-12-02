@@ -37,7 +37,7 @@ class KepServiceStatus:
     :param message: Error message if service job fails
     
     '''
-    def __init__(self, complete: str = '', status: str = '', message: str = ''):
+    def __init__(self, complete: bool = False, status: str = '', message: str = ''):
         self.status = status
         self.message = message
         self.complete = complete

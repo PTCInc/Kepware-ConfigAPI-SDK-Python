@@ -8,7 +8,8 @@
 #*.gitignore
 *.pem
 _notes
-.vscode
+.vscode*
+.devcontainer*
 
 _new*
 _test*

@@ -218,6 +218,50 @@ class server:
         if r.code == 200: return True 
         else: raise KepHTTPError(r.url, r.code, r.msg, r.hdrs, r.payload)
     
+    def import_empty_project(self) -> KepServiceResponse:
+        '''Executes JsonProjectLoad Service call to the Kepware instance with an empty project. This service 
+        imports an empty project configuration, acts like a FILE->NEW action and 
+        stop communications while the new project replaces the current project in the Kepware runtime. 
+
+        :return: `KepServiceResponse` instance with job information
+        
+        :raises KepHTTPError: If urllib provides an HTTPError (If not HTTP code 202 [Accepted] or 429 [Too Busy] returned)
+        :raises KepURLError: If urllib provides an URLError
+        '''
+        return self.import_project_configuration({"project":{}})
+
+
+    def import_project_configuration(self, DATA: dict) -> KepServiceResponse:
+        '''Executes JsonProjectLoad Service call to the Kepware instance. This service imports project configuration 
+        data, expecting a complete project file in JSON/dict format. This service acts like a FILE->OPEN action and 
+        stop communications while the new project replaces the current project in the Kepware runtime. 
+    
+        :param DATA: Complete project configuration data in JSON/dict format. 
+
+        :return: `KepServiceResponse` instance with job information
+        
+        :raises KepHTTPError: If urllib provides an HTTPError (If not HTTP code 202 [Accepted] or 429 [Too Busy] returned)
+        :raises KepURLError: If urllib provides an URLError
+        '''
+        url = self.url + self.__project_services_url + '/JsonProjectLoad'
+        try:
+            job = self._kep_service_execute(url, DATA)
+            return job
+        except Exception as err:
+            raise err
+        
+    def export_project_configuration(self) -> dict:
+        '''Get a complete copy of the project configuration in JSON format. This will include the same 
+        configuration that is stored when you save the project file manually.
+
+        :return: Dict of the complete project configuration
+
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
+        '''
+        r = self._config_get(self.url + '/project', params= {"content": "serialize"})
+        return r.payload
+    
     def save_project(self, filename: str, password: str = None, job_ttl: int = None) -> KepServiceResponse:
         '''Executes a ProjectSave Service call to the Kepware instance. This saves 
         a copy of the current project file to disk. The filename
