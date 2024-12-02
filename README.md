@@ -79,7 +79,7 @@ Package can be installed with `pip` using the following:
 
 ## Key Concepts
 
-NOTE: Detailed examples can also be found in the [examples](./examples/) folder.
+**NOTE:** Detailed examples can also be found in the [examples](./examples/) folder.
 
 ### Create server connection instance
 
