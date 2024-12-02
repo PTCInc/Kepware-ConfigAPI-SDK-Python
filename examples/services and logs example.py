@@ -110,3 +110,19 @@ try:
 except Exception as err:
     ErrorHandler(err)
 
+# Export the Project Configuration as JSON from the Kepware Server instance. Provides the same information as saving the 
+# project file as JSON in the Configuration UI locally.
+projectJson = server.export_project_configuration()
+try:
+    print("{} - {}".format("Here is the full Project Configuration as JSON", json.dumps(projectJson, indent=4)))
+except Exception as err:
+    ErrorHandler(err)
+
+# Import the Project Configuration from JSON. This service acts like a FILE->OPEN action and 
+# stop communications while the new project replaces the current project in the Kepware runtime.
+try:
+    r = server.import_project_configuration(projectJson)
+    print("{} - {}".format("Executing Project Import service", r))
+    print('{} - {}'.format("Read Service Status", server.service_status(r)))
+except Exception as err:
+    ErrorHandler(err)
