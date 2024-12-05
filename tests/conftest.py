@@ -14,6 +14,6 @@ import kepconfig
 def kepware_server():
     return [kepconfig.connection.server(host = '127.0.0.1', port = 57412, user = 'Administrator', pw = '', https = False), 'TKS']
     
-    # server = kepconfig.connection.server(host = '127.0.0.1', port = 57513, user = 'Administrator', pw = 'Kepware400400400', https = True)
+    # server = kepconfig.connection.server(host = '127.0.0.1', port = 57513, user = 'Administrator', pw = '', https = True)
     # server.SSL_trust_all_certs = True
     # return [server, 'TKE']
