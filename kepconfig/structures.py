@@ -7,6 +7,8 @@
 r"""`structures` provides general data structures to help manage 
 various objects for Kepware's configuration
 """
+from enum import Enum
+
 class KepServiceResponse:
     '''A class to represent a return object when calling a "service" API of Kepware. This is
     used to return the responses when a "service" is executed appropriately
@@ -50,3 +52,45 @@ class _HttpDataAbstract:
         self.payload = ''
         self.code = ''
         self.reason = ''
+
+class FilterModifierEnum(Enum):
+    '''Enum class to represent the various filter types that can be used in the Kepware API'''
+    EQUAL = "eq"
+    NOTEQUAL = "neq"
+    GREATERTHAN = "gt"
+    LESSTTHAN = "lt"
+    GREATERTHANEQUAL = "gte"
+    LESSTHANEQUAL = "lte"
+    CONTAINS = "contains"
+    NOTCONTAINS = "ncontains"
+    STARTSWITH = "starts_with"
+    NOTSTARTSWITH = "nstarts_with"
+    ENDSWITH = "ends_with"
+    NOTENDSWITH = "nends_with"
+
+class FilterFieldEnum(Enum):
+    ID = "id"
+    TIMESTAMP = "timestamp"
+    ACTION = "action"
+    USER = "user"
+    INTERFACE = "interface"
+    DETAILS = "details"
+    DATA = "data"
+
+class Filter:
+    '''A class to represent a filter object when calling the Kepware API. This is used to
+    filter the results of a GET request for Audit Logs.
+
+    :param name: Name of the object to filter on
+
+    :param type: Type of filter to apply
+
+    :param value: Value to filter on
+    '''
+    def __init__(self, field: FilterFieldEnum = FilterFieldEnum.ID, modifier: FilterModifierEnum = FilterModifierEnum.EQUAL, value: str = ''):
+        self.field = field
+        self.modifier = modifier
+        self.value = value
+    
+    def __str__(self):
+        return '{"field": %s, "modifier": %s, "value": %s}' % (self.field, self.modifier, self.value)

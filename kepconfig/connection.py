@@ -16,7 +16,7 @@ from base64 import b64encode
 from .error import KepError, KepHTTPError, KepURLError
 import socket
 import ssl
-from .structures import KepServiceResponse, KepServiceStatus, _HttpDataAbstract
+from .structures import KepServiceResponse, KepServiceStatus, _HttpDataAbstract, Filter
 
 
 class server:
@@ -43,17 +43,30 @@ class server:
 
     :meth:`get_event_log`: retrieve the Kepware Event Log
 
+    :meth:`get_audit_log`: retrieve the Kepware Audit Log
+
+    :meth:`get_info`: retrieve the Kepware product information
+    
+    :meth:`import_empty_project`: import an empty project to the Kepware server
+
     :meth:`get_project_properties`: retrieve the Kepware Project Properties
 
     :meth:`modify_project_properties` - modify the Kepware Project Properties
 
     :meth:`service_status` - retrive service job status
+
+    :meth:`export_project_configuration` - export the current project configuration in JSON format
+
+    :meth:`save_project` - save the current project to a file
+
+    :meth:`load_project` - load a project from a file
     '''
     __root_url = '/config'
     __version_url = '/v1'
     __project_services_url = '/project/services'
     __event_log_url = '/event_log'
     __trans_log_url = '/log'
+    __audit_log_url = '/audit_log'
 
 
 
@@ -186,6 +199,26 @@ class server:
         if options is not None:
             query = {**query, **options}
         url = f'{self.url}{self.__event_log_url}'
+        r = self._config_get(url, params= query)
+        return r.payload
+
+    def get_audit_log(self, limit: int = None, *, filters: list[Filter] = None, options: dict = None) -> list:
+        ''' Get the Audit Log from the Kepware instance.
+
+        :param limit: *(optional)* number of event log entries to request
+        :param filters: *(optional)* list of filters that are used to control results returned from the log
+        :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of transactions. Options are `sortOrder`, 
+        `sortProperty`, `pageNumber`, and `pageSize`
+
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
+        '''
+        query = self.__create_filter_query(filters)
+        if limit is not None:
+            query['limit'] = limit
+        if options is not None:
+            query = {**query, **options}
+        url = f'{self.url}{self.__audit_log_url}'
         r = self._config_get(url, params= query)
         return r.payload
     
@@ -510,4 +543,13 @@ class server:
             query['limit'] = limit
         return query
 
-
+    # Create filter query for log queries
+    def __create_filter_query(self, filters: list[Filter] = None):
+        query = {}
+        if filters is None:
+            return query
+        for f in filters:
+            # Ensure we use the value of the Enum, not the Enum object itself
+            key = f"filter[{f.field.value}][{f.modifier.value}]"
+            query[key] = f.value
+        return query

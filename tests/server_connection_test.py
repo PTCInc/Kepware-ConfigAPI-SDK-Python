@@ -13,6 +13,7 @@ import kepconfig
 import time
 import datetime
 import pytest
+from kepconfig.structures import Filter, FilterFieldEnum, FilterModifierEnum
 
 
 # Channel and Device name to be used
@@ -127,6 +128,43 @@ def test_transaction_log(server: kepconfig.connection.server):
     assert type(server.get_transaction_log(25, None, None)) == list
     
     assert type(server.get_transaction_log(None, datetime.datetime.fromisoformat('2022-02-21T14:23:23.000'), datetime.datetime.utcnow())) == list
+
+def test_audit_log(server: kepconfig.connection.server):
+    # Basic call without filters or options
+    assert type(server.get_audit_log(25)) == list
+
+    # Call with filter and options
+    
+    filters = [
+        Filter(
+            field=FilterFieldEnum.USER,
+            modifier=FilterModifierEnum.EQUAL,
+            value="Administrator"
+        )
+    ]
+    options = {'pageSize': '1'}
+    r = server.get_audit_log(None, filters=filters, options=options)
+    assert type(r) == list
+    # Length of >= 1 - 1 for pagination information at a minimum
+    assert len(r) >= 1
+
+    filters = [
+        Filter(
+            field=FilterFieldEnum.USER,
+            modifier=FilterModifierEnum.EQUAL,
+            value="Administrator"
+        ),
+        Filter(
+            field=FilterFieldEnum.ACTION,
+            modifier=FilterModifierEnum.EQUAL,
+            value="Project Edit"
+        )
+    ]
+    options = {'pageSize': '1'}
+    r = server.get_audit_log(None, filters=filters, options=options)
+    assert type(r) == list
+    # Length of >= 1 - 1 for pagination information at a minimum
+    assert len(r) >= 1
 
 def test_projectsave_service(server: kepconfig.connection.server):
     if server_type == 'TKE':
