@@ -27,10 +27,10 @@ Package allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the follow
 | **Product Info and Health Status\*\*** | Y | Y |
 | **Import Project (via JsonProjectLoad Service) / Export Project\*\*\*\***| Y | Y |
 
-- Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only
-- Note (**) - Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds
+- Note (*) - UA Endpoints and Local License Server supported for TKE only
+- Note (**) - Added to Kepware Server v6.13 / TKE v1.5 and later builds
 - Note (***) - TKS only v6.16 and later
-- Note (****) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds
+- Note (****) - Added to Kepware Server v6.17 / TKE v1.10 and later builds
 
 Driver specific features:
 
@@ -45,6 +45,9 @@ Methods to read the following logs:
 | :----------:  | :----------:  | :----------:  |
 | **Event Log** | Y | Y |
 | **API Transaction Log** | Y | Y |
+| **Audit Log*** | Y | Y |
+
+Note (*) - Implemented for Kepware Server v6.18+ and TKE 1.11+
 
 Configuration API *Services* implemented:
 
@@ -57,7 +60,7 @@ Configuration API *Services* implemented:
 
 Note (*) - Reinitialize service was implemented for Kepware Server v6.8+
 
-Note (**) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds
+Note (**) - Added to Kepware Server v6.17 / TKE v1.10 and later builds
 
 Filtering, sorting and pagination query options are added for any collections methods (ex: `get_all_devices()` or `get_all_channel()`).
 
