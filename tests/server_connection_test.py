@@ -269,5 +269,20 @@ def test_import_project_config(server: kepconfig.connection.server):
     while True:
         time.sleep(1)
         status = server.service_status(job)
-        if (status.complete == True): break
         assert type(status) == kepconfig.connection.KepServiceStatus
+        if (status.complete == True): break
+
+def test_backup_project(server: kepconfig.connection.server):
+    job = server.backup_project()
+    assert type(job) == kepconfig.connection.KepServiceResponse
+    time.sleep(1)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        assert type(status) == kepconfig.connection.KepServiceStatus
+        if (status.complete == True): break
+
+def test_get_project_backup_info(server: kepconfig.connection.server):
+    assert type(server.get_project_backup_info()) == list

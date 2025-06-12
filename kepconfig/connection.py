@@ -354,7 +354,36 @@ class server:
         except Exception as err:
             raise err
 
+    def get_project_backup_info(self) -> dict:
+        ''' Get the Project Backup Information of the Kepware instance.
+        
+        :return: List of all the backup projects and their properties.
 
+        :raises KepHTTPError: If urllib provides an HTTPError
+        :raises KepURLError: If urllib provides an URLError
+        '''
+
+        r = self._config_get(self.url + '/project/backups')
+        return r.payload
+
+    def backup_project(self, job_ttl: int = None) -> KepServiceResponse:
+        '''Executes a CreateBackup Service call to the Kepware instance. This saves 
+        a copy of the current project file to disk as a backup that can be retrieved.
+
+        :param job_ttl: *(optional)* Determines the number of seconds a job instance will exist following completion.
+
+        :return: `KepServiceResponse` instance with job information
+
+        :raises KepHTTPError: If urllib provides an HTTPError (If not HTTP code 202 [Accepted] or 429 [Too Busy] returned)
+        :raises KepURLError: If urllib provides an URLError
+        '''
+        url = self.url + self.__project_services_url + '/CreateBackup'
+        try:
+            job = self._kep_service_execute(url, TTL= job_ttl)
+            return job
+        except Exception as err:
+            raise err
+        
     def service_status(self, resp: KepServiceResponse):
         '''Returns the status of a service job. Used to verify if a service call
         has completed or not.
