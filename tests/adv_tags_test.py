@@ -12,10 +12,35 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from kepconfig import adv_tags, error, connection
 import pytest
 
+adv_tag_list_avail  = []
+
 # Names to be used for testing
 adv_tag_group_name = 'AdvTagGroup1'
 adv_tag_group_child = 'AdvTagGroupChild'
 adv_tag_child_group_path = f'_advancedtags.{adv_tag_group_name}.{adv_tag_group_child}'
+
+avg_tag_name = 'AvgTag1'
+avg_tag_data = [
+        {
+            "common.ALLTYPES_NAME": avg_tag_name,
+            "common.ALLTYPES_DESCRIPTION": "",
+            "advanced_tags.ENABLED": True,
+            "advanced_tags.AVERAGE_TAG": "_System._Time_Hour",
+            "advanced_tags.DATATYPE": 9,
+            "advanced_tags.RUN_TAG": "_System._Time_Second"
+        }
+    ]
+
+derived_tag_name = 'DerivedTag1'
+derived_tag_data = [
+    {
+        "common.ALLTYPES_NAME": derived_tag_name,
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.DERIVED_EXPRESSION": "20.00 + 100.00",
+        "advanced_tags.DATATYPE": 9,
+    }
+]
 
 def HTTPErrorHandler(err):
     if err.__class__ is error.KepHTTPError:
@@ -37,6 +62,17 @@ def initialize(server: connection.server):
         pytest.skip("Advanced Tags is not installed", allow_module_level=True)
 
 def complete(server: connection.server):
+    # Remove advanced tag group and all tags created during the test
+    children = server._config_get(server.url +"/project/_advancedtags?content=children").payload
+    for key, obj_list in children.items():
+        if key == 'average_tags':
+            for obj in obj_list:
+                avg_tag_path = f'_advancedtags.{obj["name"]}'
+                adv_tags.average_tags.del_average_tag(server, avg_tag_path)
+        elif key == 'derived_tags':
+            for obj in obj_list:
+                derived_tag_path = f'_advancedtags.{obj["name"]}'
+                adv_tags.derived_tags.del_derived_tag(server, derived_tag_path)
     pass
 
 @pytest.fixture(scope="module")
@@ -86,6 +122,91 @@ def test_adv_tag_group_modify(server):
     }
     assert adv_tags.adv_tag_group.modify_tag_group(server, adv_tag_child_group_path, tag_group_data, force=True)
 
+def test_average_tag_add(server):
+    # Add an average tag to the root advanced tag plug-in
+    assert adv_tags.average_tags.add_average_tag(server, f'_advancedtags', avg_tag_data)
+    testTag = {
+            "common.ALLTYPES_NAME": "newAvgTag",
+            "common.ALLTYPES_DESCRIPTION": "",
+            "advanced_tags.ENABLED": True,
+            "advanced_tags.AVERAGE_TAG": "_System._Time_Hour",
+            "advanced_tags.DATATYPE": 9,
+            "advanced_tags.RUN_TAG": "_System._Time_Second"
+        }
+    avg_tag_data.append(testTag)
+
+    # Add an average tag to the advanced tag group
+    assert adv_tags.average_tags.add_average_tag(server, f'_advancedtags.{adv_tag_group_name}', avg_tag_data)
+
+def test_average_tag_get(server):
+    # Get the average tag
+    avg_tag_path = f'_advancedtags.{adv_tag_group_name}.{avg_tag_name}'
+    result = adv_tags.average_tags.get_average_tag(server, avg_tag_path)
+    assert type(result) == dict
+    assert result.get("common.ALLTYPES_NAME") == avg_tag_name
+
+def test_average_tag_modify(server):
+    # Modify the average tag
+    avg_tag_path = f'_advancedtags.{adv_tag_group_name}.{avg_tag_name}'
+    avg_tag_data = {
+        "common.ALLTYPES_DESCRIPTION": "Modified average tag"
+    }
+    assert adv_tags.average_tags.modify_average_tag(server, avg_tag_path, avg_tag_data, force=True)
+
+def test_average_tag_get_all(server):
+    # Get all average tags under the group
+    result = adv_tags.average_tags.get_all_average_tags(server, f'_advancedtags.{adv_tag_group_name}')
+    assert type(result) == list
+    assert any(tag.get("common.ALLTYPES_NAME") == avg_tag_name for tag in result)
+
+def test_average_tag_del(server):
+    # Delete the average tag
+    avg_tag_path = f'_advancedtags.{adv_tag_group_name}.{avg_tag_name}'
+    assert adv_tags.average_tags.del_average_tag(server, avg_tag_path)
+
+def test_derived_tag_add(server):
+    # Add a derived tag to the root advanced tag plug-in
+    assert adv_tags.derived_tags.add_derived_tag(server, f'_advancedtags', derived_tag_data)
+
+    testTag = {
+        "common.ALLTYPES_NAME": "newDerivedTag",
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.DERIVED_EXPRESSION": "20.00 + 100.00",
+        "advanced_tags.DATATYPE": 9,
+    }
+    derived_tag_data.append(testTag)
+    # Add a derived tag to the advanced tag group
+    assert adv_tags.derived_tags.add_derived_tag(server, f'_advancedtags.{adv_tag_group_name}', derived_tag_data)
+
+def test_derived_tag_get(server):
+    # Get the derived tag
+    derived_tag_path = f'_advancedtags.{adv_tag_group_name}.{derived_tag_name}'
+    result = adv_tags.derived_tags.get_derived_tag(server, derived_tag_path)
+    assert type(result) == dict
+    assert result.get("common.ALLTYPES_NAME") == derived_tag_name
+
+def test_derived_tag_modify(server):
+    # Modify the derived tag
+    derived_tag_path = f'_advancedtags.{adv_tag_group_name}.{derived_tag_name}'
+    tag_data = {
+        "common.ALLTYPES_DESCRIPTION": "Modified derived tag"
+    }
+    assert adv_tags.derived_tags.modify_derived_tag(server, derived_tag_path, tag_data, force=True)
+
+def test_derived_tag_get_all(server):
+    # Get all derived tags under the group
+    result = adv_tags.derived_tags.get_all_derived_tags(server, f'_advancedtags.{adv_tag_group_name}')
+    assert type(result) == list
+    assert any(tag.get("common.ALLTYPES_NAME") == derived_tag_name for tag in result)
+
+def test_derived_tag_del(server):
+    # Delete the derived tag
+    derived_tag_path = f'_advancedtags.{adv_tag_group_name}.{derived_tag_name}'
+    assert adv_tags.derived_tags.del_derived_tag(server, derived_tag_path)
+
+
 def test_adv_tag_group_del(server):
     # Delete parent advanced tag group
     assert adv_tags.adv_tag_group.del_tag_group(server, f'_advancedtags.{adv_tag_group_name}')
+
