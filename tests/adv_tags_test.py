@@ -42,6 +42,15 @@ derived_tag_data = [
     }
 ]
 
+complex_tag_name = 'ComplexTag1'
+complex_tag_data = [
+    {
+        "common.ALLTYPES_NAME": complex_tag_name,
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+    }
+]
+
 def HTTPErrorHandler(err):
     if err.__class__ is error.KepHTTPError:
         print(err.code)
@@ -73,6 +82,10 @@ def complete(server: connection.server):
             for obj in obj_list:
                 derived_tag_path = f'_advancedtags.{obj["name"]}'
                 adv_tags.derived_tags.del_derived_tag(server, derived_tag_path)
+        elif key == 'complex_tags':
+            for obj in obj_list:
+                complex_tag_path = f'_advancedtags.{obj["name"]}'
+                adv_tags.complex_tags.del_complex_tag(server, complex_tag_path)
     pass
 
 @pytest.fixture(scope="module")
@@ -204,6 +217,45 @@ def test_derived_tag_del(server):
     # Delete the derived tag
     derived_tag_path = f'_advancedtags.{adv_tag_group_name}.{derived_tag_name}'
     assert adv_tags.derived_tags.del_derived_tag(server, derived_tag_path)
+
+def test_complex_tag_add(server):
+    # Add a complex tag to the root advanced tag plug-in
+    assert adv_tags.complex_tags.add_complex_tag(server, f'_advancedtags', complex_tag_data)
+
+    testTag = {
+        "common.ALLTYPES_NAME": "newComplexTag",
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+    }
+    complex_tag_data.append(testTag)
+    # Add a complex tag to the advanced tag group
+    assert adv_tags.complex_tags.add_complex_tag(server, f'_advancedtags.{adv_tag_group_name}', complex_tag_data)
+
+def test_complex_tag_get(server):
+    # Get the complex tag
+    complex_tag_path = f'_advancedtags.{adv_tag_group_name}.{complex_tag_name}'
+    result = adv_tags.complex_tags.get_complex_tag(server, complex_tag_path)
+    assert type(result) == dict
+    assert result.get("common.ALLTYPES_NAME") == complex_tag_name
+
+def test_complex_tag_modify(server):
+    # Modify the complex tag
+    complex_tag_path = f'_advancedtags.{adv_tag_group_name}.{complex_tag_name}'
+    tag_data = {
+        "common.ALLTYPES_DESCRIPTION": "Modified complex tag"
+    }
+    assert adv_tags.complex_tags.modify_complex_tag(server, complex_tag_path, tag_data, force=True)
+
+def test_complex_tag_get_all(server):
+    # Get all complex tags under the group
+    result = adv_tags.complex_tags.get_all_complex_tags(server, f'_advancedtags.{adv_tag_group_name}')
+    assert type(result) == list
+    assert any(tag.get("common.ALLTYPES_NAME") == complex_tag_name for tag in result)
+
+def test_complex_tag_del(server):
+    # Delete the complex tag
+    complex_tag_path = f'_advancedtags.{adv_tag_group_name}.{complex_tag_name}'
+    assert adv_tags.complex_tags.del_complex_tag(server, complex_tag_path)
 
 
 def test_adv_tag_group_del(server):
