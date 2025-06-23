@@ -51,6 +51,16 @@ complex_tag_data = [
     }
 ]
 
+cumulative_tag_name = 'CumulativeTag1'
+cumulative_tag_data = [
+    {
+        "common.ALLTYPES_NAME": cumulative_tag_name,
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.CUMULATIVE_TAG": "_System._Time_Hour",
+    }
+]
+
 def HTTPErrorHandler(err):
     if err.__class__ is error.KepHTTPError:
         print(err.code)
@@ -257,6 +267,45 @@ def test_complex_tag_del(server):
     complex_tag_path = f'_advancedtags.{adv_tag_group_name}.{complex_tag_name}'
     assert adv_tags.complex_tags.del_complex_tag(server, complex_tag_path)
 
+def test_cumulative_tag_add(server):
+    # Add a cumulative tag to the root advanced tag plug-in
+    assert adv_tags.cumulative_tags.add_cumulative_tag(server, f'_advancedtags', cumulative_tag_data)
+
+    testTag = {
+        "common.ALLTYPES_NAME": "newCumulativeTag",
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.CUMULATIVE_TAG": "_System._Time_Hour",
+    }
+    cumulative_tag_data.append(testTag)
+    # Add a cumulative tag to the advanced tag group
+    assert adv_tags.cumulative_tags.add_cumulative_tag(server, f'_advancedtags.{adv_tag_group_name}', cumulative_tag_data)
+
+def test_cumulative_tag_get(server):
+    # Get the cumulative tag
+    cumulative_tag_path = f'_advancedtags.{adv_tag_group_name}.{cumulative_tag_name}'
+    result = adv_tags.cumulative_tags.get_cumulative_tag(server, cumulative_tag_path)
+    assert type(result) == dict
+    assert result.get("common.ALLTYPES_NAME") == cumulative_tag_name
+
+def test_cumulative_tag_modify(server):
+    # Modify the cumulative tag
+    cumulative_tag_path = f'_advancedtags.{adv_tag_group_name}.{cumulative_tag_name}'
+    tag_data = {
+        "common.ALLTYPES_DESCRIPTION": "Modified cumulative tag"
+    }
+    assert adv_tags.cumulative_tags.modify_cumulative_tag(server, cumulative_tag_path, tag_data, force=True)
+
+def test_cumulative_tag_get_all(server):
+    # Get all cumulative tags under the group
+    result = adv_tags.cumulative_tags.get_all_cumulative_tags(server, f'_advancedtags.{adv_tag_group_name}')
+    assert type(result) == list
+    assert any(tag.get("common.ALLTYPES_NAME") == cumulative_tag_name for tag in result)
+
+def test_cumulative_tag_del(server):
+    # Delete the cumulative tag
+    cumulative_tag_path = f'_advancedtags.{adv_tag_group_name}.{cumulative_tag_name}'
+    assert adv_tags.cumulative_tags.del_cumulative_tag(server, cumulative_tag_path)
 
 def test_adv_tag_group_del(server):
     # Delete parent advanced tag group
