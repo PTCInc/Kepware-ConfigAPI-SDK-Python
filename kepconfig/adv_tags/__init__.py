@@ -8,10 +8,10 @@ r"""`adv_tags` module provides support for Kepware's Advanced Tags plug-in
 specific objects within the Kepware Configuration API
 """
 
-from . import adv_tag_group
+from . import adv_tag_group, average_tags, derived_tags
 ADV_TAGS_ROOT = '/project/_advancedtags'
 
-def adv_tag_path_split(path: str):
+def adv_tag_path_split(path: str, *, isItem=False) -> dict:
     '''Used to split the standard Kepware address decimal notation into a dict that contains the 
     advanced tag path components.
 
@@ -33,7 +33,20 @@ def adv_tag_path_split(path: str):
         if x == 0:
             path_obj['adv_tag_root'] = path_list[0]
         elif x == 1:
-            path_obj['tag_path'] = path_list[1:]
-    if 'tag_path' not in path_obj:
-        path_obj['tag_path'] = []
+            if isItem:
+                path_obj['tag_path'] = path_list[1:-1]
+                path_obj['item'] = path_list[-1]
+            else:
+                path_obj['tag_path'] = path_list[1:]
     return path_obj
+
+def _create_adv_tags_base_url(base_url, path_obj):
+    '''Creates url object for the "path_obj" which provides the adv tags tag group structure of Kepware's project tree. Used 
+    to build a part of Kepware Configuration API URL structure
+    
+    Returns the advanced tag group specific url when a value is passed as the tag group name.
+    '''
+    url = base_url + ADV_TAGS_ROOT
+    url += adv_tag_group._create_adv_tags_group_url(path_obj)
+
+    return url
