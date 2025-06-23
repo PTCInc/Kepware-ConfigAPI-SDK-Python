@@ -9,7 +9,7 @@
 
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from kepconfig import adv_tags, error, connection
+from kepconfig import adv_tags, error, connection, connectivity
 import pytest
 
 adv_tag_list_avail  = []
@@ -18,6 +18,10 @@ adv_tag_list_avail  = []
 adv_tag_group_name = 'AdvTagGroup1'
 adv_tag_group_child = 'AdvTagGroupChild'
 adv_tag_child_group_path = f'_advancedtags.{adv_tag_group_name}.{adv_tag_group_child}'
+
+sim_ch_name = 'SimulatedDevice'
+sim_dev_name = 'SimulatedDevice'
+sim_tag_name = 'tag1'
 
 avg_tag_name = 'AvgTag1'
 avg_tag_data = [
@@ -83,6 +87,17 @@ maximum_tag_data = [
     }
 ]
 
+link_tag_name = 'LinkTag1'
+link_tag_data = [
+    {
+        "common.ALLTYPES_NAME": link_tag_name,
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.LINK_INPUT_TAG": "_System._Time_Hour",
+        "advanced_tags.LINK_OUTPUT_TAG": f"{sim_ch_name}.{sim_dev_name}.{sim_tag_name}",
+    }
+]
+
 def HTTPErrorHandler(err):
     if err.__class__ is error.KepHTTPError:
         print(err.code)
@@ -101,6 +116,31 @@ def initialize(server: connection.server):
         server._config_get(server.url +"/project/_advancedtags")
     except Exception as err:
         pytest.skip("Advanced Tags is not installed", allow_module_level=True)
+    
+    # Create simulated device for testing
+    sim_device = {
+        "common.ALLTYPES_NAME": sim_ch_name,
+        "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator",
+        "devices": [
+            {
+                "common.ALLTYPES_NAME": sim_dev_name,
+                "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator",
+                "tags": [
+                    {
+                        "common.ALLTYPES_NAME": sim_tag_name,
+                        "servermain.TAG_ADDRESS": "K0"
+                    }
+                ],
+            }
+        ]
+    }
+    try:
+        connectivity.channel.add_channel(server, sim_device)
+    except Exception as err:
+        HTTPErrorHandler(err)
+        return False
+    return True
+
 
 def complete(server: connection.server):
     # Remove advanced tag group and all tags created during the test
@@ -126,8 +166,22 @@ def complete(server: connection.server):
             for obj in obj_list:
                 minimum_tag_path = f'_advancedtags.{obj["name"]}'
                 adv_tags.min_tags.del_minimum_tag(server, minimum_tag_path)
-        
-    pass
+        elif key == 'maximum_tags':
+            for obj in obj_list:
+                maximum_tag_path = f'_advancedtags.{obj["name"]}'
+                adv_tags.max_tags.del_maximum_tag(server, maximum_tag_path)
+        elif key == 'link_tags':
+            for obj in obj_list:
+                link_tag_path = f'_advancedtags.{obj["name"]}'
+                adv_tags.link_tags.del_link_tag(server, link_tag_path)
+    
+    # Delete all Channels
+    try:
+        ch_left = connectivity.channel.get_all_channels(server)
+        for x in ch_left:
+            print(connectivity.channel.del_channel(server,x['common.ALLTYPES_NAME']))
+    except Exception as err:
+        HTTPErrorHandler(err)
 
 @pytest.fixture(scope="module")
 def server(kepware_server):
@@ -136,7 +190,8 @@ def server(kepware_server):
     server_type = kepware_server[1]
     
     # Initialize any configuration before testing in module
-    initialize(server)
+    if not initialize(server):
+        pytest.fail("Simulation Device creation failed")
 
     # Everything below yield is run after module tests are completed
     yield server
@@ -419,6 +474,47 @@ def test_maximum_tag_del(server):
     # Delete the maximum tag
     maximum_tag_path = f'_advancedtags.{adv_tag_group_name}.{maximum_tag_name}'
     assert adv_tags.max_tags.del_maximum_tag(server, maximum_tag_path)
+
+def test_link_tag_add(server):
+    # Add a link tag to the root advanced tag plug-in
+    assert adv_tags.link_tags.add_link_tag(server, f'_advancedtags', link_tag_data)
+
+    testTag = {
+        "common.ALLTYPES_NAME": "newLinkTag",
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.LINK_INPUT_TAG": "_System._Time_Hour",
+        "advanced_tags.LINK_OUTPUT_TAG": f"{sim_ch_name}.{sim_dev_name}.{sim_tag_name}",
+    }
+    link_tag_data.append(testTag)
+    # Add a link tag to the advanced tag group
+    assert adv_tags.link_tags.add_link_tag(server, f'_advancedtags.{adv_tag_group_name}', link_tag_data)
+
+def test_link_tag_get(server):
+    # Get the link tag
+    link_tag_path = f'_advancedtags.{adv_tag_group_name}.{link_tag_name}'
+    result = adv_tags.link_tags.get_link_tag(server, link_tag_path)
+    assert type(result) == dict
+    assert result.get("common.ALLTYPES_NAME") == link_tag_name
+
+def test_link_tag_modify(server):
+    # Modify the link tag
+    link_tag_path = f'_advancedtags.{adv_tag_group_name}.{link_tag_name}'
+    tag_data = {
+        "common.ALLTYPES_DESCRIPTION": "Modified link tag"
+    }
+    assert adv_tags.link_tags.modify_link_tag(server, link_tag_path, tag_data, force=True)
+
+def test_link_tag_get_all(server):
+    # Get all link tags under the group
+    result = adv_tags.link_tags.get_all_link_tags(server, f'_advancedtags.{adv_tag_group_name}')
+    assert type(result) == list
+    assert any(tag.get("common.ALLTYPES_NAME") == link_tag_name for tag in result)
+
+def test_link_tag_del(server):
+    # Delete the link tag
+    link_tag_path = f'_advancedtags.{adv_tag_group_name}.{link_tag_name}'
+    assert adv_tags.link_tags.del_link_tag(server, link_tag_path)
 
 def test_adv_tag_group_del(server):
     # Delete parent advanced tag group
