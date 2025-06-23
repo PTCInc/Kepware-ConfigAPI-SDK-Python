@@ -72,6 +72,17 @@ minimum_tag_data = [
     }
 ]
 
+maximum_tag_name = 'MaximumTag1'
+maximum_tag_data = [
+    {
+        "common.ALLTYPES_NAME": maximum_tag_name,
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.MAXIMUM_TAG": "_System._Time_Hour",
+        "advanced_tags.RUN_TAG": "_System._Time_Second"
+    }
+]
+
 def HTTPErrorHandler(err):
     if err.__class__ is error.KepHTTPError:
         print(err.code)
@@ -367,6 +378,47 @@ def test_minimum_tag_del(server):
     # Delete the minimum tag
     minimum_tag_path = f'_advancedtags.{adv_tag_group_name}.{minimum_tag_name}'
     assert adv_tags.min_tags.del_minimum_tag(server, minimum_tag_path)
+
+def test_maximum_tag_add(server):
+    # Add a maximum tag to the root advanced tag plug-in
+    assert adv_tags.max_tags.add_maximum_tag(server, f'_advancedtags', maximum_tag_data)
+
+    testTag = {
+        "common.ALLTYPES_NAME": "newMaximumTag",
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.MAXIMUM_TAG": "_System._Time_Hour",
+        "advanced_tags.RUN_TAG": "_System._Time_Second"
+    }
+    maximum_tag_data.append(testTag)
+    # Add a maximum tag to the advanced tag group
+    assert adv_tags.max_tags.add_maximum_tag(server, f'_advancedtags.{adv_tag_group_name}', maximum_tag_data)
+
+def test_maximum_tag_get(server):
+    # Get the maximum tag
+    maximum_tag_path = f'_advancedtags.{adv_tag_group_name}.{maximum_tag_name}'
+    result = adv_tags.max_tags.get_maximum_tag(server, maximum_tag_path)
+    assert type(result) == dict
+    assert result.get("common.ALLTYPES_NAME") == maximum_tag_name
+
+def test_maximum_tag_modify(server):
+    # Modify the maximum tag
+    maximum_tag_path = f'_advancedtags.{adv_tag_group_name}.{maximum_tag_name}'
+    tag_data = {
+        "common.ALLTYPES_DESCRIPTION": "Modified maximum tag"
+    }
+    assert adv_tags.max_tags.modify_maximum_tag(server, maximum_tag_path, tag_data, force=True)
+
+def test_maximum_tag_get_all(server):
+    # Get all maximum tags under the group
+    result = adv_tags.max_tags.get_all_maximum_tags(server, f'_advancedtags.{adv_tag_group_name}')
+    assert type(result) == list
+    assert any(tag.get("common.ALLTYPES_NAME") == maximum_tag_name for tag in result)
+
+def test_maximum_tag_del(server):
+    # Delete the maximum tag
+    maximum_tag_path = f'_advancedtags.{adv_tag_group_name}.{maximum_tag_name}'
+    assert adv_tags.max_tags.del_maximum_tag(server, maximum_tag_path)
 
 def test_adv_tag_group_del(server):
     # Delete parent advanced tag group
