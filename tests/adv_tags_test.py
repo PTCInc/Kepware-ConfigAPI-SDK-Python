@@ -61,6 +61,17 @@ cumulative_tag_data = [
     }
 ]
 
+minimum_tag_name = 'MinimumTag1'
+minimum_tag_data = [
+    {
+        "common.ALLTYPES_NAME": minimum_tag_name,
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.MINIMUM_TAG": "_System._Time_Hour",
+        "advanced_tags.RUN_TAG": "_System._Time_Second"
+    }
+]
+
 def HTTPErrorHandler(err):
     if err.__class__ is error.KepHTTPError:
         print(err.code)
@@ -96,6 +107,15 @@ def complete(server: connection.server):
             for obj in obj_list:
                 complex_tag_path = f'_advancedtags.{obj["name"]}'
                 adv_tags.complex_tags.del_complex_tag(server, complex_tag_path)
+        elif key == 'cumulative_tags':
+            for obj in obj_list:
+                cumulative_tag_path = f'_advancedtags.{obj["name"]}'
+                adv_tags.cumulative_tags.del_cumulative_tag(server, cumulative_tag_path)
+        elif key == 'minimum_tags':
+            for obj in obj_list:
+                minimum_tag_path = f'_advancedtags.{obj["name"]}'
+                adv_tags.min_tags.del_minimum_tag(server, minimum_tag_path)
+        
     pass
 
 @pytest.fixture(scope="module")
@@ -306,6 +326,47 @@ def test_cumulative_tag_del(server):
     # Delete the cumulative tag
     cumulative_tag_path = f'_advancedtags.{adv_tag_group_name}.{cumulative_tag_name}'
     assert adv_tags.cumulative_tags.del_cumulative_tag(server, cumulative_tag_path)
+
+def test_minimum_tag_add(server):
+    # Add a minimum tag to the root advanced tag plug-in
+    assert adv_tags.min_tags.add_minimum_tag(server, f'_advancedtags', minimum_tag_data)
+
+    testTag = {
+        "common.ALLTYPES_NAME": "newMinimumTag",
+        "common.ALLTYPES_DESCRIPTION": "",
+        "advanced_tags.ENABLED": True,
+        "advanced_tags.MINIMUM_TAG": "_System._Time_Hour",
+        "advanced_tags.RUN_TAG": "_System._Time_Second"
+    }
+    minimum_tag_data.append(testTag)
+    # Add a minimum tag to the advanced tag group
+    assert adv_tags.min_tags.add_minimum_tag(server, f'_advancedtags.{adv_tag_group_name}', minimum_tag_data)
+
+def test_minimum_tag_get(server):
+    # Get the minimum tag
+    minimum_tag_path = f'_advancedtags.{adv_tag_group_name}.{minimum_tag_name}'
+    result = adv_tags.min_tags.get_minimum_tag(server, minimum_tag_path)
+    assert type(result) == dict
+    assert result.get("common.ALLTYPES_NAME") == minimum_tag_name
+
+def test_minimum_tag_modify(server):
+    # Modify the minimum tag
+    minimum_tag_path = f'_advancedtags.{adv_tag_group_name}.{minimum_tag_name}'
+    tag_data = {
+        "common.ALLTYPES_DESCRIPTION": "Modified minimum tag"
+    }
+    assert adv_tags.min_tags.modify_minimum_tag(server, minimum_tag_path, tag_data, force=True)
+
+def test_minimum_tag_get_all(server):
+    # Get all minimum tags under the group
+    result = adv_tags.min_tags.get_all_minimum_tags(server, f'_advancedtags.{adv_tag_group_name}')
+    assert type(result) == list
+    assert any(tag.get("common.ALLTYPES_NAME") == minimum_tag_name for tag in result)
+
+def test_minimum_tag_del(server):
+    # Delete the minimum tag
+    minimum_tag_path = f'_advancedtags.{adv_tag_group_name}.{minimum_tag_name}'
+    assert adv_tags.min_tags.del_minimum_tag(server, minimum_tag_path)
 
 def test_adv_tag_group_del(server):
     # Delete parent advanced tag group

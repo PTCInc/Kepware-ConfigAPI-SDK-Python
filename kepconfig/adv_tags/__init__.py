@@ -8,7 +8,7 @@ r"""`adv_tags` module provides support for Kepware's Advanced Tags plug-in
 specific objects within the Kepware Configuration API
 """
 
-from . import adv_tag_group, average_tags, derived_tags, complex_tags, cumulative_tags
+from . import adv_tag_group, average_tags, derived_tags, complex_tags, cumulative_tags, min_tags
 ADV_TAGS_ROOT = '/project/_advancedtags'
 
 def adv_tag_path_split(path: str, *, isItem=False) -> dict:
