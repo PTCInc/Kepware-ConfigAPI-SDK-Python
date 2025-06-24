@@ -4,6 +4,9 @@
 # license information.
 # --------------------------------------------------------------------------
 
+# Note: The code within this file was created in total or in part
+#  with the use of AI tools.
+
 # Advanced Tag Groups Test - Test to execute various calls for advanced tags plugin
 # parts of the Kepware configuration API
 

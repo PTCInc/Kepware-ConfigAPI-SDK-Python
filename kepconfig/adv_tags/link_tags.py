@@ -4,6 +4,9 @@
 # license information.
 # --------------------------------------------------------------------------
 
+# Note: The code within this file was created in total or in part
+#  with the use of AI tools.
+
 r"""`link_tags` exposes an API to allow modifications (add, delete, modify) to 
 link tag objects within the Kepware Configuration API
 """

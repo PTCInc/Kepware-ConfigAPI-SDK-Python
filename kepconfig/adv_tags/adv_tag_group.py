@@ -5,6 +5,9 @@
 # license information.
 # --------------------------------------------------------------------------
 
+# Note: The code within this file was created in total or in part
+#  with the use of AI tools.
+
 
 r"""`adv_tag_group` exposes an API to allow modifications (add, delete, modify) to 
 tag group objects within the Kepware Configuration API
