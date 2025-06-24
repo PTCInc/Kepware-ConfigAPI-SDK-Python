@@ -11,7 +11,7 @@ specific objects within the Kepware Configuration API
 from . import adv_tag_group, average_tags, derived_tags, complex_tags, cumulative_tags, min_tags, max_tags, link_tags
 ADV_TAGS_ROOT = '/project/_advancedtags'
 
-def adv_tag_path_split(path: str, *, isItem=False) -> dict:
+def _adv_tag_path_split(path: str, *, isItem=False) -> dict:
     '''Used to split the standard Kepware address decimal notation into a dict that contains the 
     advanced tag path components.
 

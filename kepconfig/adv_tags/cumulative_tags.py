@@ -45,7 +45,7 @@ def add_cumulative_tag(server: server, adv_tag_group_path: str, DATA: Union[dict
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags.adv_tag_path_split(adv_tag_group_path, isItem=False)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=False)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _get_cumulative_tags_url()
 
     r = server._config_add(url, DATA)
@@ -72,7 +72,7 @@ def modify_cumulative_tag(server: server, cumulative_tag_path: str, DATA: dict, 
     :raises KepURLError: If urllib provides an URLError
     '''
     cum_tag_data = server._force_update_check(force, DATA)
-    path_obj = adv_tags.adv_tag_path_split(cumulative_tag_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(cumulative_tag_path, isItem=True)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _get_cumulative_tags_url(path_obj['item'])
 
     r = server._config_update(url, cum_tag_data)
@@ -93,7 +93,7 @@ def del_cumulative_tag(server: server, cumulative_tag_path: str) -> bool:
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags.adv_tag_path_split(cumulative_tag_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(cumulative_tag_path, isItem=True)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _get_cumulative_tags_url(path_obj['item'])
 
     r = server._config_del(url)
@@ -114,7 +114,7 @@ def get_cumulative_tag(server: server, cumulative_tag_path: str) -> dict:
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags.adv_tag_path_split(cumulative_tag_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(cumulative_tag_path, isItem=True)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _get_cumulative_tags_url(path_obj['item'])
 
     r = server._config_get(url)
@@ -134,7 +134,7 @@ def get_all_cumulative_tags(server: server, adv_tag_group_path: str, *, options:
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags.adv_tag_path_split(adv_tag_group_path, isItem=False)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=False)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _get_cumulative_tags_url()
 
     r = server._config_get(url, params=options)

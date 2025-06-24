@@ -75,7 +75,7 @@ def add_tag_group(server: server, adv_tag_group_path: str, DATA: Union[dict, lis
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags.adv_tag_path_split(adv_tag_group_path, isItem=False)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=False)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _create_url()
     
     r = server._config_add(url, DATA)
@@ -103,7 +103,7 @@ def del_tag_group(server: server, adv_tag_group_path: str) -> bool:
     '''
 
     # url = _create_url(server.url, adv_tag_group_path, isItem=True)
-    path_obj = adv_tags.adv_tag_path_split(adv_tag_group_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=True)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _create_url(path_obj['item'])
     r = server._config_del(url)
     if r.code == 200: return True
@@ -125,7 +125,7 @@ def modify_tag_group(server: server, adv_tag_group_path: str, DATA: dict, force:
     '''
 
     tag_group_data = server._force_update_check(force, DATA)
-    path_obj = adv_tags.adv_tag_path_split(adv_tag_group_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=True)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _create_url(path_obj['item'])
 
     r = server._config_update(url, tag_group_data)
@@ -144,7 +144,7 @@ def get_tag_group(server: server, adv_tag_group_path: str) -> dict:
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags.adv_tag_path_split(adv_tag_group_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=True)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _create_url(path_obj['item'])
     r = server._config_get(url)
     return r.payload
@@ -161,7 +161,7 @@ def get_all_tag_groups(server: server, adv_tag_group_path: str, *, options: dict
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags.adv_tag_path_split(adv_tag_group_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=True)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _create_url()
     r = server._config_get(url, params=options)
     return r.payload
