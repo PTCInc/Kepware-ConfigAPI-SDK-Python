@@ -23,14 +23,17 @@ Package allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the follow
 | **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
 | **Datalogger** <br /> *(Log Groups, Items, Mapping, Triggers, Reset Mapping Service)* | Y | Y |
 | **UA Gateway** <br /> *(Certificates, Server Endpoints, Client Connections, Server Interface parameters)* | Y*** | N |
+| **Advanced Tags** <br /> *(All tag types and tag groups)*| Y****** | N |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y* | Y |
 | **Product Info and Health Status\*\*** | Y | Y |
 | **Import Project (via JsonProjectLoad Service) / Export Project\*\*\*\***| Y | Y |
+| **Backup Project (via CreateBackup Service) / Export Project\*\*\*\*\***| Y | Y |
 
-- Note (*) - UA Endpoints and Local License Server supported for Kepware Edge only
-- Note (**) - Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds
+- Note (*) - UA Endpoints and Local License Server supported for TKE only
+- Note (**) - Added to Kepware Server v6.13 / TKE v1.5 and later builds
 - Note (***) - TKS only v6.16 and later
-- Note (****) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds
+- Note (****) - Added to Kepware Server v6.17 / TKE v1.10 and later builds
+- Note (*****) - Added to Kepware Server v6.18 / TKE v1.11 and later builds
 
 Driver specific features:
 
@@ -45,6 +48,9 @@ Methods to read the following logs:
 | :----------:  | :----------:  | :----------:  |
 | **Event Log** | Y | Y |
 | **API Transaction Log** | Y | Y |
+| **Audit Log*** | Y | Y |
+
+- Note (*) - Implemented for Kepware Server v6.18+ and TKE 1.11+
 
 Configuration API *Services* implemented:
 
@@ -54,10 +60,11 @@ Configuration API *Services* implemented:
 | **ReinitializeRuntime** | Y* | Y |
 | **ProjectLoad and ProjectSave**| Y | Y |
 | **JsonProjectLoad\*\*** <br /> *(used for import project feature)*| Y | Y |
+| **CreateBackup\*\*\***| Y | Y |
 
-Note (*) - Reinitialize service was implemented for Kepware Server v6.8+
-
-Note (**) - Added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds
+- Note (*) - Reinitialize service was implemented for Kepware Server v6.8+
+- Note (**) - Added to Kepware Server v6.17 / TKE v1.10 and later builds
+- Note (***) - Added to Kepware Server v6.18 / TKE v1.11 and later builds
 
 Filtering, sorting and pagination query options are added for any collections methods (ex: `get_all_devices()` or `get_all_channel()`).
 

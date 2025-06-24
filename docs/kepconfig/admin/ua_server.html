@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 14.0.0"/>
+    <meta name="generator" content="pdoc 13.1.0"/>
     <title>kepconfig.admin.ua_server API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -30,9 +30,6 @@
 
             <h2>API Documentation</h2>
                 <ul class="memberlist">
-            <li>
-                    <a class="variable" href="#UA_ROOT">UA_ROOT</a>
-            </li>
             <li>
                     <a class="function" href="#add_endpoint">add_endpoint</a>
             </li>
@@ -90,7 +87,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="n">UA_ROOT</span> <span class="o">=</span> <span class="s1">&#39;/admin/ua_endpoints&#39;</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="k">def</span> <span class="nf">_create_url</span><span class="p">(</span><span class="n">endpoint</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Creates url object for the &quot;server_users&quot; branch of Kepware&#39;s project tree. Used </span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>    <span class="sd">&#39;&#39;&#39;Creates url object for the &quot;server_users&quot; branch of Kepware&#39;s project tree. Used </span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">    to build a part of Kepware Configuration API URL structure</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">    Returns the user specific url when a value is passed as the user name.</span>
@@ -102,7 +99,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">UA_ROOT</span><span class="p">,</span> <span class="n">_url_parse_object</span><span class="p">(</span><span class="n">endpoint</span><span class="p">))</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="k">def</span> <span class="nf">add_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">DATA</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Add an `&quot;endpoint&quot;` or multiple `&quot;endpoint&quot;` objects to Kepware UA Server by passing a </span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="sd">&#39;&#39;&#39;Add an `&quot;endpoint&quot;` or multiple `&quot;endpoint&quot;` objects to Kepware UA Server by passing a </span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="sd">    list of endpoints to be added all at once.</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    :param server: instance of the `server` class</span>
@@ -127,7 +124,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="n">KepHTTPError</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="k">def</span> <span class="nf">del_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Delete an `&quot;endpoint&quot;` object in Kepware UA Server</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="sd">&#39;&#39;&#39;Delete an `&quot;endpoint&quot;` object in Kepware UA Server</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">    </span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">    :param endpoint: name of endpoint to delete</span>
@@ -143,7 +140,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="n">KepHTTPError</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="k">def</span> <span class="nf">modify_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">DATA</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Modify a `&quot;endpoint&quot;` object and it&#39;s properties in Kepware UA Server. If a `&quot;endpoint&quot;` is not provided as an input,</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="sd">&#39;&#39;&#39;Modify a `&quot;endpoint&quot;` object and it&#39;s properties in Kepware UA Server. If a `&quot;endpoint&quot;` is not provided as an input,</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">    you need to identify the endpoint in the *&#39;common.ALLTYPES_NAME&#39;* property field in the `&quot;DATA&quot;`. It will </span>
 </span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">    assume that is the endpoint that is to be modified.</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
@@ -171,7 +168,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="n">KepHTTPError</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns the properties of the `&quot;endpoint&quot;` object.</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="sd">&#39;&#39;&#39;Returns the properties of the `&quot;endpoint&quot;` object.</span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">    </span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    :param endpoint: name of endpoint to retrieve</span>
@@ -186,7 +183,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="k">def</span> <span class="nf">get_all_endpoints</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns list of all `&quot;endpoint&quot;` objects and their properties.</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="sd">&#39;&#39;&#39;Returns list of all `&quot;endpoint&quot;` objects and their properties.</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">    </span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of UA endpoints. Options are &#39;filter&#39;, </span>
@@ -204,18 +201,6 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
 
 
             </section>
-                <section id="UA_ROOT">
-                    <div class="attr variable">
-            <span class="name">UA_ROOT</span>        =
-<span class="default_value">&#39;/admin/ua_endpoints&#39;</span>
-
-        
-    </div>
-    <a class="headerlink" href="#UA_ROOT"></a>
-    
-    
-
-                </section>
                 <section id="add_endpoint">
                             <input id="add_endpoint-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -228,7 +213,7 @@ OPC UA Server endpoints within the Kepware Administration through the Kepware Co
     </div>
     <a class="headerlink" href="#add_endpoint"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="add_endpoint-31"><a href="#add_endpoint-31"><span class="linenos">31</span></a><span class="k">def</span> <span class="nf">add_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">DATA</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
-</span><span id="add_endpoint-32"><a href="#add_endpoint-32"><span class="linenos">32</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Add an `&quot;endpoint&quot;` or multiple `&quot;endpoint&quot;` objects to Kepware UA Server by passing a </span>
+</span><span id="add_endpoint-32"><a href="#add_endpoint-32"><span class="linenos">32</span></a>    <span class="sd">&#39;&#39;&#39;Add an `&quot;endpoint&quot;` or multiple `&quot;endpoint&quot;` objects to Kepware UA Server by passing a </span>
 </span><span id="add_endpoint-33"><a href="#add_endpoint-33"><span class="linenos">33</span></a><span class="sd">    list of endpoints to be added all at once.</span>
 </span><span id="add_endpoint-34"><a href="#add_endpoint-34"><span class="linenos">34</span></a>
 </span><span id="add_endpoint-35"><a href="#add_endpoint-35"><span class="linenos">35</span></a><span class="sd">    :param server: instance of the `server` class</span>
@@ -299,7 +284,7 @@ list of endpoints to be added all at once.</p>
     </div>
     <a class="headerlink" href="#del_endpoint"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="del_endpoint-56"><a href="#del_endpoint-56"><span class="linenos">56</span></a><span class="k">def</span> <span class="nf">del_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="del_endpoint-57"><a href="#del_endpoint-57"><span class="linenos">57</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Delete an `&quot;endpoint&quot;` object in Kepware UA Server</span>
+</span><span id="del_endpoint-57"><a href="#del_endpoint-57"><span class="linenos">57</span></a>    <span class="sd">&#39;&#39;&#39;Delete an `&quot;endpoint&quot;` object in Kepware UA Server</span>
 </span><span id="del_endpoint-58"><a href="#del_endpoint-58"><span class="linenos">58</span></a><span class="sd">    </span>
 </span><span id="del_endpoint-59"><a href="#del_endpoint-59"><span class="linenos">59</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="del_endpoint-60"><a href="#del_endpoint-60"><span class="linenos">60</span></a><span class="sd">    :param endpoint: name of endpoint to delete</span>
@@ -353,7 +338,7 @@ list of endpoints to be added all at once.</p>
     </div>
     <a class="headerlink" href="#modify_endpoint"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="modify_endpoint-72"><a href="#modify_endpoint-72"><span class="linenos">72</span></a><span class="k">def</span> <span class="nf">modify_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">DATA</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="modify_endpoint-73"><a href="#modify_endpoint-73"><span class="linenos">73</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Modify a `&quot;endpoint&quot;` object and it&#39;s properties in Kepware UA Server. If a `&quot;endpoint&quot;` is not provided as an input,</span>
+</span><span id="modify_endpoint-73"><a href="#modify_endpoint-73"><span class="linenos">73</span></a>    <span class="sd">&#39;&#39;&#39;Modify a `&quot;endpoint&quot;` object and it&#39;s properties in Kepware UA Server. If a `&quot;endpoint&quot;` is not provided as an input,</span>
 </span><span id="modify_endpoint-74"><a href="#modify_endpoint-74"><span class="linenos">74</span></a><span class="sd">    you need to identify the endpoint in the *&#39;common.ALLTYPES_NAME&#39;* property field in the `&quot;DATA&quot;`. It will </span>
 </span><span id="modify_endpoint-75"><a href="#modify_endpoint-75"><span class="linenos">75</span></a><span class="sd">    assume that is the endpoint that is to be modified.</span>
 </span><span id="modify_endpoint-76"><a href="#modify_endpoint-76"><span class="linenos">76</span></a>
@@ -422,7 +407,7 @@ assume that is the endpoint that is to be modified.</p>
     </div>
     <a class="headerlink" href="#get_endpoint"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_endpoint-100"><a href="#get_endpoint-100"><span class="linenos">100</span></a><span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="get_endpoint-101"><a href="#get_endpoint-101"><span class="linenos">101</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns the properties of the `&quot;endpoint&quot;` object.</span>
+</span><span id="get_endpoint-101"><a href="#get_endpoint-101"><span class="linenos">101</span></a>    <span class="sd">&#39;&#39;&#39;Returns the properties of the `&quot;endpoint&quot;` object.</span>
 </span><span id="get_endpoint-102"><a href="#get_endpoint-102"><span class="linenos">102</span></a><span class="sd">    </span>
 </span><span id="get_endpoint-103"><a href="#get_endpoint-103"><span class="linenos">103</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="get_endpoint-104"><a href="#get_endpoint-104"><span class="linenos">104</span></a><span class="sd">    :param endpoint: name of endpoint to retrieve</span>
@@ -475,7 +460,7 @@ assume that is the endpoint that is to be modified.</p>
     </div>
     <a class="headerlink" href="#get_all_endpoints"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_all_endpoints-115"><a href="#get_all_endpoints-115"><span class="linenos">115</span></a><span class="k">def</span> <span class="nf">get_all_endpoints</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-</span><span id="get_all_endpoints-116"><a href="#get_all_endpoints-116"><span class="linenos">116</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns list of all `&quot;endpoint&quot;` objects and their properties.</span>
+</span><span id="get_all_endpoints-116"><a href="#get_all_endpoints-116"><span class="linenos">116</span></a>    <span class="sd">&#39;&#39;&#39;Returns list of all `&quot;endpoint&quot;` objects and their properties.</span>
 </span><span id="get_all_endpoints-117"><a href="#get_all_endpoints-117"><span class="linenos">117</span></a><span class="sd">    </span>
 </span><span id="get_all_endpoints-118"><a href="#get_all_endpoints-118"><span class="linenos">118</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="get_all_endpoints-119"><a href="#get_all_endpoints-119"><span class="linenos">119</span></a><span class="sd">    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of UA endpoints. Options are &#39;filter&#39;, </span>
