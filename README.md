@@ -21,7 +21,7 @@ Package allows for *GET*, *ADD*, *DELETE*, and *MODIFY* functions for the follow
 | **Project Properties** <br /> *(Get and Modify Only)* | Y | Y |
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
 | **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
-| **Datalogger** <br /> *(Log Groups, Items, Mapping, Triggers, Reset Mapping Service)* | Y | Y |
+| **Datalogger** <br /> *(Log Groups, Items, Mapping, Triggers, Reset Mapping Service)* | Y | N |
 | **UA Gateway** <br /> *(Certificates, Server Endpoints, Client Connections, Server Interface parameters)* | Y*** | N |
 | **Advanced Tags** <br /> *(All tag types and tag groups)*| Y****** | N |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y* | Y |
