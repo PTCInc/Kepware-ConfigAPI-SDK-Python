@@ -12,8 +12,20 @@ from ..connection import server
 from ..error import KepHTTPError
 from ..ua_gateway.common import _INTER_TYPE, _create_url_cert, INSTANCE_CERTIFICATE
 
+import warnings
+from ..helpers.deprecation_utils import _deprecated
+
+
+# Enable DeprecationWarnings to be visible
+warnings.simplefilter('always', DeprecationWarning)
+
+@_deprecated("This function is deprecated and will be removed in a future release. Use `get_instance_certificate()` in UAG client or server module instead.")
 def get_instance_certificate(server: server) -> dict:
-    '''Returns the properties of the UAG instance certificate object in the UAG certificate store. 
+    '''
+    DEPRECATED: This function is deprecated and will be removed in a future release. Use `get_instance_certificate()` 
+    in UAG client or server module instead for Kepware 6.18+.
+
+    Returns the properties of the UAG instance certificate object in the UAG certificate store. 
     These are UAG instance certificates that are used by UAG for trust purposes in the UA security model.
     
     :param server: instance of the `server` class
@@ -26,25 +38,13 @@ def get_instance_certificate(server: server) -> dict:
     r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.CERTS, INSTANCE_CERTIFICATE))
     return r.payload
 
-# def get_all_certificates(server: server,  *, options: dict = None) -> list:
-#     TODO: Implement if/when multiple instance certificates can be configured.
-#     '''Returns list of all UAG instance certificate objects and their properties in the UAG certificate store. 
-#     These are UAG instance certificates that are used by UAG for trust purposes in the UA security model.
-    
-#     :param server: instance of the `server` class
-#     :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of certificates. Options are `filter`, 
-#         `sortOrder`, `sortProperty`, `pageNumber`, and `pageSize`
-    
-#     :return: List of data for all certificates in Kepware server UAG server endpoint certificate store
-
-#     :raises KepHTTPError: If urllib provides an HTTPError
-#     :raises KepURLError: If urllib provides an URLError
-#     '''
-#     r = server._config_get(server.url + _create_url_cert(_INTER_TYPE.CERTS), params= options)
-#     return r.payload
-
+@_deprecated("This function is deprecated and will be removed in a future release. Use `TBD` instead.")
 def reissue_self_signed_instance_certificate(server: server) -> bool:
-    '''Deletes and reissues a self-signed UAG instance certificate object in the UAG certificate store. 
+    '''
+    DEPRECATED: This function is deprecated and will be removed in a future release. Use `get_instance_certificate()` 
+    in UAG client or server module instead for Kepware 6.18+.
+    
+    Deletes and reissues a self-signed UAG instance certificate object in the UAG certificate store. 
     This is the UAG instance certificate that are used by UAG for trust purposes in the UA security model.
     
     :param server: instance of the `server` class
