@@ -1,4 +1,3 @@
-# filepath: c:\Users\rlabbe\OneDrive - PTC\Documents\GitHub\Kepware-ConfigAPI-SDK-Python\kepconfig\connectivity\adv_tag_group.py
 # -------------------------------------------------------------------------
 # Copyright (c) PTC Inc. and/or all its affiliates. All rights reserved.
 # See License.txt in the project root for
