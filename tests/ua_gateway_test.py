@@ -8,6 +8,7 @@
 # features
 
 import os, sys
+import time
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from kepconfig import error, connection
 from kepconfig.ua_gateway import common, certificates, client, server as UAGServers
@@ -68,6 +69,7 @@ def test_UAG_server_interface_properties_modify(server: connection.server):
     assert UAGServers.modify_uag_server_interface_properties(server, propertychange, force= False)
 
 def test_UAG_instance_certificate_get(server: connection.server):
+    pytest.skip("Skipping Deprecated Method Test", allow_module_level=True)
     # Get all UAG instance certs
     # TODO: Implement if/when multiple instance certificates can be configured.
     # cert_list = certificates.get_all_certificates(server)
@@ -78,9 +80,51 @@ def test_UAG_instance_certificate_get(server: connection.server):
 
     # TODO: Create test for filter
 
-def test_UAG_instance_certificate_reissue(server: connection.server):
+def test_UAG_server_instance_certificate_get(server: connection.server):
     # Get all UAG instance certs
+    # TODO: Implement if/when multiple instance certificates can be configured.
+    # cert_list = certificates.get_all_certificates(server)
+    # assert type(cert_list) == list
+
+    # Read a specific instance cert
+    assert type(UAGServers.get_instance_certificate(server)) == dict
+
+def test_UAG_client_instance_certificate_get(server: connection.server):
+    # Get all UAG instance certs
+    # TODO: Implement if/when multiple instance certificates can be configured.
+    # cert_list = certificates.get_all_certificates(server)
+    # assert type(cert_list) == list
+
+    # Read a specific instance cert
+    assert type(client.get_instance_certificate(server)) == dict
+
+def test_UAG_instance_certificate_reissue(server: connection.server):
+    pytest.skip("Skipping Deprecated Method Test", allow_module_level=True)
     assert certificates.reissue_self_signed_instance_certificate(server)
+
+def test_UAG_server_instance_certificate_reissue(server: connection.server):
+    job = UAGServers.reissue_self_signed_instance_certificate(server)
+    assert type(job) == connection.KepServiceResponse
+    time.sleep(1)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == connection.KepServiceStatus
+
+def test_UAG_client_instance_certificate_reissue(server: connection.server):
+    job = client.reissue_self_signed_instance_certificate(server)
+    assert type(job) == connection.KepServiceResponse
+    time.sleep(1)
+
+    # Wait for service to be completed
+    while True:
+        time.sleep(1)
+        status = server.service_status(job)
+        if (status.complete == True): break
+        assert type(status) == connection.KepServiceStatus
 
 def test_UAG_client_conn_add(server: connection.server):
     # Add one client

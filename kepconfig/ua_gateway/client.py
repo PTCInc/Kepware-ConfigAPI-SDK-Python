@@ -11,9 +11,13 @@ client connections.
 """
 
 from typing import Union
+
+from kepconfig.structures import KepServiceResponse
 from ..connection import server
 from ..error import KepError, KepHTTPError
-from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust,  _create_url_cert, _create_url_client, _delete_cert_truststore
+from ..ua_gateway.common import _INTER_TYPE, _change_cert_trust,  _create_url_cert, _create_url_client, _delete_cert_truststore, _create_url_inst_cert
+
+CLIENT_INSTANCE_CERTIFICATE = "Client Instance Certificate"
 
 def get_ua_client_connection(server: server, ua_client_connection: str) -> dict:
     '''Returns the properties of the UAG client connection object.
@@ -193,3 +197,36 @@ def delete_certificate(server: server, certificate: str) -> bool:
     :raises KepURLError: If urllib provides an URLError
     '''
     return _delete_cert_truststore(server, _INTER_TYPE.CLIENT, certificate)
+
+def get_instance_certificate(server: server) -> dict:
+    '''Returns the properties of the UAG client instance certificate object in the UAG certificate store. 
+    These are UAG instance certificates that are used by UAG for trust purposes in the UA security model.
+    
+    :param server: instance of the `server` class
+    
+    :return: Dict of properties for the certificate requested
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    r = server._config_get(server.url + _create_url_inst_cert(_INTER_TYPE.CLIENT, CLIENT_INSTANCE_CERTIFICATE))
+    return r.payload
+
+def reissue_self_signed_instance_certificate(server: server, job_ttl: int = None) -> KepServiceResponse:
+    '''Deletes and reissues a self-signed UAG server instance certificate object in the UAG certificate store. 
+    This is the UAG instance certificate that are used by UAG for trust purposes in the UA security model.
+    
+    :param server: instance of the `server` class
+    :param job_ttl: *(optional)* Determines the number of seconds a job instance will exist following completion.
+
+    :return: `KepServiceResponse` instance with job information
+
+    :raises KepHTTPError: If urllib provides an HTTPError
+    :raises KepURLError: If urllib provides an URLError
+    '''
+    url = server.url + _create_url_inst_cert(_INTER_TYPE.CLIENT, CLIENT_INSTANCE_CERTIFICATE) + '/services/ReIssueInstanceCertificate'
+    try:
+        job = server._kep_service_execute(url, TTL= job_ttl)
+        return job
+    except Exception as err:
+        raise err
