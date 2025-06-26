@@ -16,9 +16,11 @@ CERT_ROOT = f'{UA_GATEWAY_ROOT}/certificates'
 CLIENT_ROOT = f'{UA_GATEWAY_ROOT}/ua_client_interfaces/Client Interface'
 CONN_ROOT = f'{CLIENT_ROOT}/ua_client_connections'
 CLIENT_CERT_ROOT = f'{CLIENT_ROOT}/certificates'
+CLIENT_INST_CERT_ROOT = f'{CLIENT_ROOT}/client_instance_certificates'
 SERVER_ROOT = f'{UA_GATEWAY_ROOT}/ua_server_interfaces/Server Interface'
 ENDPOINT_ROOT = f'{SERVER_ROOT}/ua_server_endpoints'
 SERVER_CERT_ROOT = f'{SERVER_ROOT}/certificates'
+SERVER_INST_CERT_ROOT = f'{SERVER_ROOT}/server_instance_certificates'
 
 
 class _INTER_TYPE(Enum):
@@ -26,13 +28,12 @@ class _INTER_TYPE(Enum):
     CLIENT = 1
     CERTS = 2
 
+# TODO: DEPRECATED: This constant is deprecated and will be removed in a future release.
 INSTANCE_CERTIFICATE = "Instance Certificate"
 
 def _create_url_cert(interface, certificate = None):
     '''Creates url object for the "certificate" branch of Kepware's UA Gateway. Used 
     to build a part of Kepware Configuration API URL structure
-
-    Returns the UA Gateway client interfaces specific certificate url when a value is passed as the certificate name.
     '''
     if interface == _INTER_TYPE.SERVER:
         if certificate == None:
@@ -44,6 +45,27 @@ def _create_url_cert(interface, certificate = None):
             return CLIENT_CERT_ROOT
         else:
             return f'{CLIENT_CERT_ROOT}/{_url_parse_object(certificate)}'
+    # TODO: DEPRECATED: This interface type is deprecated and will be removed in a future release.
+    else:
+        if certificate == None:
+            return CERT_ROOT
+        else:
+            return '{}/{}'.format(CERT_ROOT,_url_parse_object(certificate))
+
+def _create_url_inst_cert(interface, certificate = None):
+    '''Creates url object for the "instance certificate" branch of Kepware's UA Gateway interfaces. Used 
+    to build a part of Kepware Configuration API URL structure
+    '''
+    if interface == _INTER_TYPE.SERVER:
+        if certificate == None:
+            return SERVER_INST_CERT_ROOT
+        else:
+            return f'{SERVER_INST_CERT_ROOT}/{_url_parse_object(certificate)}'
+    elif interface == _INTER_TYPE.CLIENT:
+        if certificate == None:
+            return CLIENT_INST_CERT_ROOT
+        else:
+            return f'{CLIENT_INST_CERT_ROOT}/{_url_parse_object(certificate)}'
     else:
         if certificate == None:
             return CERT_ROOT
