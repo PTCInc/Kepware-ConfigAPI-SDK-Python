@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 13.1.0"/>
+    <meta name="generator" content="pdoc 14.0.0"/>
     <title>kepconfig.admin.lls API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -31,10 +31,61 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
+                    <a class="variable" href="#LLS_ROOT">LLS_ROOT</a>
+            </li>
+            <li>
+                    <a class="variable" href="#FORCE_CHECK_URL">FORCE_CHECK_URL</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_SERVER_PORT">LICENSING_SERVER_PORT</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_SERVER_NAME">LICENSING_SERVER_NAME</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_SERVER_ENABLE">LICENSING_SERVER_ENABLE</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_CHECK_PERIOD_MINS">LICENSING_CHECK_PERIOD_MINS</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_SERVER_SSL_PORT">LICENSING_SERVER_SSL_PORT</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_SERVER_ALLOW_INSECURE_COMMS">LICENSING_SERVER_ALLOW_INSECURE_COMMS</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS">LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS</a>
+            </li>
+            <li>
+                    <a class="variable" href="#LICENSING_CLIENT_ALIAS">LICENSING_CLIENT_ALIAS</a>
+            </li>
+            <li>
                     <a class="class" href="#lls_config">lls_config</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#lls_config.__init__">lls_config</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#lls_config.server_name">server_name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#lls_config.server_port">server_port</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#lls_config.check_period">check_period</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#lls_config.server_port_SSL">server_port_SSL</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#lls_config.allow_insecure_comms">allow_insecure_comms</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#lls_config.allow_self_signed_certs">allow_self_signed_certs</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#lls_config.instance_alias_name">instance_alias_name</a>
                         </li>
                 </ul>
 
@@ -105,7 +156,7 @@ the Kepware Administration through the Kepware Configuration API</p>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="n">LICENSING_CLIENT_ALIAS</span> <span class="o">=</span> <span class="s2">&quot;libadminsettings.LICENSING_CLIENT_ALIAS&quot;</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="k">class</span> <span class="nc">lls_config</span><span class="p">:</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>    <span class="sd">&#39;&#39;&#39;A class to represent a admin properties for the Local License Server connection from an instance of Kepware. </span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;A class to represent a admin properties for the Local License Server connection from an instance of Kepware. </span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">    This object is used to easily manage the LLS parameters for a Kepware instance. </span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="sd">    :param server_name: Host name or IP address of the LLS server</span>
@@ -141,7 +192,7 @@ the Kepware Administration through the Kepware Configuration API</p>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dict</span><span class="p">())</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="k">def</span> <span class="nf">get_lls_config</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lls_config</span><span class="p">:</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="sd">&#39;&#39;&#39;Returns the properties of the Local License server connection properties. Returned object is `lls_config` class object.</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns the properties of the Local License server connection properties. Returned object is `lls_config` class object.</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    </span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    </span>
@@ -155,7 +206,7 @@ the Kepware Administration through the Kepware Configuration API</p>
 </span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="k">return</span> <span class="n">lls_config</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="k">def</span> <span class="nf">update_lls_config</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">lls_config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="sd">&#39;&#39;&#39;Updates the Local License Server connection properties for Kepware.</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Updates the Local License Server connection properties for Kepware.</span>
 </span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">    </span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">    :param config: `lls_config` class object with lls connection configuration</span>
@@ -172,7 +223,7 @@ the Kepware Administration through the Kepware Configuration API</p>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="n">KepHTTPError</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">def</span> <span class="nf">enable_lls</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="sd">&#39;&#39;&#39;Enables the Local License Server connection for Kepware.</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Enables the Local License Server connection for Kepware.</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    </span>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">    </span>
@@ -187,7 +238,7 @@ the Kepware Administration through the Kepware Configuration API</p>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="n">KepHTTPError</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="k">def</span> <span class="nf">disable_lls</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="sd">&#39;&#39;&#39;Disables the Local License Server connection for Kepware.</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Disables the Local License Server connection for Kepware.</span>
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">    </span>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">    </span>
@@ -202,7 +253,7 @@ the Kepware Administration through the Kepware Configuration API</p>
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="n">KepHTTPError</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="k">def</span> <span class="nf">force_license_check</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">job_ttl</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="sd">&#39;&#39;&#39;Executes a ForceLicenseCheck service call to the Kepware instance. This triggers the server to verify the </span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Executes a ForceLicenseCheck service call to the Kepware instance. This triggers the server to verify the </span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">    license state of the license received from the Local License Server.</span>
 </span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    :param server: instance of the `server` class</span>
@@ -221,6 +272,126 @@ the Kepware Administration through the Kepware Configuration API</p>
 
 
             </section>
+                <section id="LLS_ROOT">
+                    <div class="attr variable">
+            <span class="name">LLS_ROOT</span>        =
+<span class="default_value">&#39;/admin&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LLS_ROOT"></a>
+    
+    
+
+                </section>
+                <section id="FORCE_CHECK_URL">
+                    <div class="attr variable">
+            <span class="name">FORCE_CHECK_URL</span>        =
+<span class="default_value">&#39;/project/services/ForceLicenseCheck&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#FORCE_CHECK_URL"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_SERVER_PORT">
+                    <div class="attr variable">
+            <span class="name">LICENSING_SERVER_PORT</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_SERVER_PORT&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_SERVER_PORT"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_SERVER_NAME">
+                    <div class="attr variable">
+            <span class="name">LICENSING_SERVER_NAME</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_SERVER_NAME&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_SERVER_NAME"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_SERVER_ENABLE">
+                    <div class="attr variable">
+            <span class="name">LICENSING_SERVER_ENABLE</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_SERVER_ENABLE&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_SERVER_ENABLE"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_CHECK_PERIOD_MINS">
+                    <div class="attr variable">
+            <span class="name">LICENSING_CHECK_PERIOD_MINS</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_CHECK_PERIOD_MINS&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_CHECK_PERIOD_MINS"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_SERVER_SSL_PORT">
+                    <div class="attr variable">
+            <span class="name">LICENSING_SERVER_SSL_PORT</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_SERVER_SSL_PORT&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_SERVER_SSL_PORT"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_SERVER_ALLOW_INSECURE_COMMS">
+                    <div class="attr variable">
+            <span class="name">LICENSING_SERVER_ALLOW_INSECURE_COMMS</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_SERVER_ALLOW_INSECURE_COMMS&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_SERVER_ALLOW_INSECURE_COMMS"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS">
+                    <div class="attr variable">
+            <span class="name">LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_SERVER_ALLOW_SELF_SIGNED_CERTS"></a>
+    
+    
+
+                </section>
+                <section id="LICENSING_CLIENT_ALIAS">
+                    <div class="attr variable">
+            <span class="name">LICENSING_CLIENT_ALIAS</span>        =
+<span class="default_value">&#39;libadminsettings.LICENSING_CLIENT_ALIAS&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#LICENSING_CLIENT_ALIAS"></a>
+    
+    
+
+                </section>
                 <section id="lls_config">
                             <input id="lls_config-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
@@ -233,7 +404,7 @@ the Kepware Administration through the Kepware Configuration API</p>
     </div>
     <a class="headerlink" href="#lls_config"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="lls_config-28"><a href="#lls_config-28"><span class="linenos">28</span></a><span class="k">class</span> <span class="nc">lls_config</span><span class="p">:</span>
-</span><span id="lls_config-29"><a href="#lls_config-29"><span class="linenos">29</span></a>    <span class="sd">&#39;&#39;&#39;A class to represent a admin properties for the Local License Server connection from an instance of Kepware. </span>
+</span><span id="lls_config-29"><a href="#lls_config-29"><span class="linenos">29</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;A class to represent a admin properties for the Local License Server connection from an instance of Kepware. </span>
 </span><span id="lls_config-30"><a href="#lls_config-30"><span class="linenos">30</span></a><span class="sd">    This object is used to easily manage the LLS parameters for a Kepware instance. </span>
 </span><span id="lls_config-31"><a href="#lls_config-31"><span class="linenos">31</span></a>
 </span><span id="lls_config-32"><a href="#lls_config-32"><span class="linenos">32</span></a><span class="sd">    :param server_name: Host name or IP address of the LLS server</span>
@@ -311,6 +482,83 @@ This object is used to easily manage the LLS parameters for a Kepware instance. 
     
 
                             </div>
+                            <div id="lls_config.server_name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">server_name</span>
+
+        
+    </div>
+    <a class="headerlink" href="#lls_config.server_name"></a>
+    
+    
+
+                            </div>
+                            <div id="lls_config.server_port" class="classattr">
+                                <div class="attr variable">
+            <span class="name">server_port</span>
+
+        
+    </div>
+    <a class="headerlink" href="#lls_config.server_port"></a>
+    
+    
+
+                            </div>
+                            <div id="lls_config.check_period" class="classattr">
+                                <div class="attr variable">
+            <span class="name">check_period</span>
+
+        
+    </div>
+    <a class="headerlink" href="#lls_config.check_period"></a>
+    
+    
+
+                            </div>
+                            <div id="lls_config.server_port_SSL" class="classattr">
+                                <div class="attr variable">
+            <span class="name">server_port_SSL</span>
+
+        
+    </div>
+    <a class="headerlink" href="#lls_config.server_port_SSL"></a>
+    
+    
+
+                            </div>
+                            <div id="lls_config.allow_insecure_comms" class="classattr">
+                                <div class="attr variable">
+            <span class="name">allow_insecure_comms</span>
+
+        
+    </div>
+    <a class="headerlink" href="#lls_config.allow_insecure_comms"></a>
+    
+    
+
+                            </div>
+                            <div id="lls_config.allow_self_signed_certs" class="classattr">
+                                <div class="attr variable">
+            <span class="name">allow_self_signed_certs</span>
+
+        
+    </div>
+    <a class="headerlink" href="#lls_config.allow_self_signed_certs"></a>
+    
+    
+
+                            </div>
+                            <div id="lls_config.instance_alias_name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">instance_alias_name</span>
+
+        
+    </div>
+    <a class="headerlink" href="#lls_config.instance_alias_name"></a>
+    
+    
+
+                            </div>
                 </section>
                 <section id="get_lls_config">
                             <input id="get_lls_config-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -324,7 +572,7 @@ This object is used to easily manage the LLS parameters for a Kepware instance. 
     </div>
     <a class="headerlink" href="#get_lls_config"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_lls_config-64"><a href="#get_lls_config-64"><span class="linenos">64</span></a><span class="k">def</span> <span class="nf">get_lls_config</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lls_config</span><span class="p">:</span>
-</span><span id="get_lls_config-65"><a href="#get_lls_config-65"><span class="linenos">65</span></a>    <span class="sd">&#39;&#39;&#39;Returns the properties of the Local License server connection properties. Returned object is `lls_config` class object.</span>
+</span><span id="get_lls_config-65"><a href="#get_lls_config-65"><span class="linenos">65</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns the properties of the Local License server connection properties. Returned object is `lls_config` class object.</span>
 </span><span id="get_lls_config-66"><a href="#get_lls_config-66"><span class="linenos">66</span></a><span class="sd">    </span>
 </span><span id="get_lls_config-67"><a href="#get_lls_config-67"><span class="linenos">67</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="get_lls_config-68"><a href="#get_lls_config-68"><span class="linenos">68</span></a><span class="sd">    </span>
@@ -375,7 +623,7 @@ This object is used to easily manage the LLS parameters for a Kepware instance. 
     </div>
     <a class="headerlink" href="#update_lls_config"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="update_lls_config-78"><a href="#update_lls_config-78"><span class="linenos">78</span></a><span class="k">def</span> <span class="nf">update_lls_config</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">lls_config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="update_lls_config-79"><a href="#update_lls_config-79"><span class="linenos">79</span></a>    <span class="sd">&#39;&#39;&#39;Updates the Local License Server connection properties for Kepware.</span>
+</span><span id="update_lls_config-79"><a href="#update_lls_config-79"><span class="linenos">79</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Updates the Local License Server connection properties for Kepware.</span>
 </span><span id="update_lls_config-80"><a href="#update_lls_config-80"><span class="linenos">80</span></a><span class="sd">    </span>
 </span><span id="update_lls_config-81"><a href="#update_lls_config-81"><span class="linenos">81</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="update_lls_config-82"><a href="#update_lls_config-82"><span class="linenos">82</span></a><span class="sd">    :param config: `lls_config` class object with lls connection configuration</span>
@@ -430,7 +678,7 @@ This object is used to easily manage the LLS parameters for a Kepware instance. 
     </div>
     <a class="headerlink" href="#enable_lls"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="enable_lls-95"><a href="#enable_lls-95"><span class="linenos"> 95</span></a><span class="k">def</span> <span class="nf">enable_lls</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="enable_lls-96"><a href="#enable_lls-96"><span class="linenos"> 96</span></a>    <span class="sd">&#39;&#39;&#39;Enables the Local License Server connection for Kepware.</span>
+</span><span id="enable_lls-96"><a href="#enable_lls-96"><span class="linenos"> 96</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Enables the Local License Server connection for Kepware.</span>
 </span><span id="enable_lls-97"><a href="#enable_lls-97"><span class="linenos"> 97</span></a><span class="sd">    </span>
 </span><span id="enable_lls-98"><a href="#enable_lls-98"><span class="linenos"> 98</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="enable_lls-99"><a href="#enable_lls-99"><span class="linenos"> 99</span></a><span class="sd">    </span>
@@ -482,7 +730,7 @@ This object is used to easily manage the LLS parameters for a Kepware instance. 
     </div>
     <a class="headerlink" href="#disable_lls"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="disable_lls-110"><a href="#disable_lls-110"><span class="linenos">110</span></a><span class="k">def</span> <span class="nf">disable_lls</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="disable_lls-111"><a href="#disable_lls-111"><span class="linenos">111</span></a>    <span class="sd">&#39;&#39;&#39;Disables the Local License Server connection for Kepware.</span>
+</span><span id="disable_lls-111"><a href="#disable_lls-111"><span class="linenos">111</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Disables the Local License Server connection for Kepware.</span>
 </span><span id="disable_lls-112"><a href="#disable_lls-112"><span class="linenos">112</span></a><span class="sd">    </span>
 </span><span id="disable_lls-113"><a href="#disable_lls-113"><span class="linenos">113</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="disable_lls-114"><a href="#disable_lls-114"><span class="linenos">114</span></a><span class="sd">    </span>
@@ -534,7 +782,7 @@ This object is used to easily manage the LLS parameters for a Kepware instance. 
     </div>
     <a class="headerlink" href="#force_license_check"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="force_license_check-125"><a href="#force_license_check-125"><span class="linenos">125</span></a><span class="k">def</span> <span class="nf">force_license_check</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">connection</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">job_ttl</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="force_license_check-126"><a href="#force_license_check-126"><span class="linenos">126</span></a>    <span class="sd">&#39;&#39;&#39;Executes a ForceLicenseCheck service call to the Kepware instance. This triggers the server to verify the </span>
+</span><span id="force_license_check-126"><a href="#force_license_check-126"><span class="linenos">126</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Executes a ForceLicenseCheck service call to the Kepware instance. This triggers the server to verify the </span>
 </span><span id="force_license_check-127"><a href="#force_license_check-127"><span class="linenos">127</span></a><span class="sd">    license state of the license received from the Local License Server.</span>
 </span><span id="force_license_check-128"><a href="#force_license_check-128"><span class="linenos">128</span></a>
 </span><span id="force_license_check-129"><a href="#force_license_check-129"><span class="linenos">129</span></a><span class="sd">    :param server: instance of the `server` class</span>
