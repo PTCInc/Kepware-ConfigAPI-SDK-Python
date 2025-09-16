@@ -154,13 +154,15 @@ def get_all_tag_groups(server: server, adv_tag_group_path: str, *, options: dict
     :param server: instance of the `server` class
     :param adv_tag_group_path: path identifying the advanced tag group collection to retrieve. Standard Kepware address decimal
     notation string such as "_advancedtags.AdvTagGroup1" or "_advancedtags.AdvTagGroup1.AdvTagGroupChild"
+    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of tags and tag groups. 
+    Options are 'filter', 'sortOrder', and 'sortProperty' only.
 
     :return: List of data for all tag groups within the tag group
 
     :raises KepHTTPError: If urllib provides an HTTPError
     :raises KepURLError: If urllib provides an URLError
     '''
-    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=True)
+    path_obj = adv_tags._adv_tag_path_split(adv_tag_group_path, isItem=False)
     url = adv_tags._create_adv_tags_base_url(server.url, path_obj) + _create_url()
     r = server._config_get(url, params=options)
     return r.payload
