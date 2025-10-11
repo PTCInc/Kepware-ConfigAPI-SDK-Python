@@ -8,6 +8,7 @@ r"""`adv_tags` module provides support for Kepware's Advanced Tags plug-in
 specific objects within the Kepware Configuration API
 """
 
+from ..error import KepError
 from . import adv_tag_group, average_tags, derived_tags, complex_tags, cumulative_tags, min_tags, max_tags, link_tags
 ADV_TAGS_ROOT = '/project/_advancedtags'
 
@@ -28,6 +29,9 @@ def _adv_tag_path_split(path: str, *, isItem=False) -> dict:
     return = {'adv_tag_root': '_advancedtags', 'tag_path': ['ch1','dev1']}
     '''
     path_list = path.split('.', 2)
+    if path_list[0] != '_advancedtags':
+        raise KepError('Error: Invalid advanced tag path - Must start with "_advancedtags"')
+     
     path_obj = {}
     for x in range(0, len(path_list)):
         if x == 0:
