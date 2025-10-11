@@ -222,7 +222,7 @@ def test_adv_tag_group_get(server):
     assert type(adv_tags.adv_tag_group.get_tag_group(server, adv_tag_child_group_path)) == dict
 
     # Get all advanced tag groups at root
-    assert type(adv_tags.adv_tag_group.get_all_tag_groups(server, '')) == list
+    assert type(adv_tags.adv_tag_group.get_all_tag_groups(server, '_advancedtags')) == list
 
     # Get all advanced tag groups under a parent
     result = adv_tags.adv_tag_group.get_all_tag_groups(server, f'_advancedtags.{adv_tag_group_name}')
@@ -231,6 +231,11 @@ def test_adv_tag_group_get(server):
     result = adv_tags.adv_tag_group.get_all_tag_groups(server, adv_tag_child_group_path)
     assert type(result) == list
     assert len(result) == 0
+
+def test_adv_tag_bad_root_in_path(server):
+    # Test bad advanced tag path
+    with pytest.raises(error.KepError):
+        adv_tags.adv_tag_group.get_tag_group(server, '_wrongroot.AdvTagGroup1')
 
 def test_adv_tag_group_modify(server):
     # Modify advanced tag group
