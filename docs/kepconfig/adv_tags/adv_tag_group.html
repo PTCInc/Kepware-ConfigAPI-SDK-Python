@@ -228,16 +228,18 @@ tag group objects within the Kepware Configuration API</p>
 </span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="sd">    :param adv_tag_group_path: path identifying the advanced tag group collection to retrieve. Standard Kepware address decimal</span>
 </span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="sd">    notation string such as &quot;_advancedtags.AdvTagGroup1&quot; or &quot;_advancedtags.AdvTagGroup1.AdvTagGroupChild&quot;</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">    :return: List of data for all tag groups within the tag group</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="sd">    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of tags and tag groups. </span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">    Options are &#39;filter&#39;, &#39;sortOrder&#39;, and &#39;sortProperty&#39; only.</span>
 </span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">    :raises KepHTTPError: If urllib provides an HTTPError</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">    :raises KepURLError: If urllib provides an URLError</span>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>    <span class="n">path_obj</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_adv_tag_path_split</span><span class="p">(</span><span class="n">adv_tag_group_path</span><span class="p">,</span> <span class="n">isItem</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_create_adv_tags_base_url</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">path_obj</span><span class="p">)</span> <span class="o">+</span> <span class="n">_create_url</span><span class="p">()</span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">_config_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">    :return: List of data for all tag groups within the tag group</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">    :raises KepHTTPError: If urllib provides an HTTPError</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="sd">    :raises KepURLError: If urllib provides an URLError</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="n">path_obj</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_adv_tag_path_split</span><span class="p">(</span><span class="n">adv_tag_group_path</span><span class="p">,</span> <span class="n">isItem</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_create_adv_tags_base_url</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">path_obj</span><span class="p">)</span> <span class="o">+</span> <span class="n">_create_url</span><span class="p">()</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">_config_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span>
 </span></pre></div>
 
 
@@ -538,16 +540,18 @@ notation string such as "_advancedtags.AdvTagGroup1" or "_advancedtags.AdvTagGro
 </span><span id="get_all_tag_groups-155"><a href="#get_all_tag_groups-155"><span class="linenos">155</span></a><span class="sd">    :param server: instance of the `server` class</span>
 </span><span id="get_all_tag_groups-156"><a href="#get_all_tag_groups-156"><span class="linenos">156</span></a><span class="sd">    :param adv_tag_group_path: path identifying the advanced tag group collection to retrieve. Standard Kepware address decimal</span>
 </span><span id="get_all_tag_groups-157"><a href="#get_all_tag_groups-157"><span class="linenos">157</span></a><span class="sd">    notation string such as &quot;_advancedtags.AdvTagGroup1&quot; or &quot;_advancedtags.AdvTagGroup1.AdvTagGroupChild&quot;</span>
-</span><span id="get_all_tag_groups-158"><a href="#get_all_tag_groups-158"><span class="linenos">158</span></a>
-</span><span id="get_all_tag_groups-159"><a href="#get_all_tag_groups-159"><span class="linenos">159</span></a><span class="sd">    :return: List of data for all tag groups within the tag group</span>
+</span><span id="get_all_tag_groups-158"><a href="#get_all_tag_groups-158"><span class="linenos">158</span></a><span class="sd">    :param options: *(optional)* Dict of parameters to filter, sort or pagenate the list of tags and tag groups. </span>
+</span><span id="get_all_tag_groups-159"><a href="#get_all_tag_groups-159"><span class="linenos">159</span></a><span class="sd">    Options are &#39;filter&#39;, &#39;sortOrder&#39;, and &#39;sortProperty&#39; only.</span>
 </span><span id="get_all_tag_groups-160"><a href="#get_all_tag_groups-160"><span class="linenos">160</span></a>
-</span><span id="get_all_tag_groups-161"><a href="#get_all_tag_groups-161"><span class="linenos">161</span></a><span class="sd">    :raises KepHTTPError: If urllib provides an HTTPError</span>
-</span><span id="get_all_tag_groups-162"><a href="#get_all_tag_groups-162"><span class="linenos">162</span></a><span class="sd">    :raises KepURLError: If urllib provides an URLError</span>
-</span><span id="get_all_tag_groups-163"><a href="#get_all_tag_groups-163"><span class="linenos">163</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="get_all_tag_groups-164"><a href="#get_all_tag_groups-164"><span class="linenos">164</span></a>    <span class="n">path_obj</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_adv_tag_path_split</span><span class="p">(</span><span class="n">adv_tag_group_path</span><span class="p">,</span> <span class="n">isItem</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="get_all_tag_groups-165"><a href="#get_all_tag_groups-165"><span class="linenos">165</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_create_adv_tags_base_url</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">path_obj</span><span class="p">)</span> <span class="o">+</span> <span class="n">_create_url</span><span class="p">()</span>
-</span><span id="get_all_tag_groups-166"><a href="#get_all_tag_groups-166"><span class="linenos">166</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">_config_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
-</span><span id="get_all_tag_groups-167"><a href="#get_all_tag_groups-167"><span class="linenos">167</span></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span>
+</span><span id="get_all_tag_groups-161"><a href="#get_all_tag_groups-161"><span class="linenos">161</span></a><span class="sd">    :return: List of data for all tag groups within the tag group</span>
+</span><span id="get_all_tag_groups-162"><a href="#get_all_tag_groups-162"><span class="linenos">162</span></a>
+</span><span id="get_all_tag_groups-163"><a href="#get_all_tag_groups-163"><span class="linenos">163</span></a><span class="sd">    :raises KepHTTPError: If urllib provides an HTTPError</span>
+</span><span id="get_all_tag_groups-164"><a href="#get_all_tag_groups-164"><span class="linenos">164</span></a><span class="sd">    :raises KepURLError: If urllib provides an URLError</span>
+</span><span id="get_all_tag_groups-165"><a href="#get_all_tag_groups-165"><span class="linenos">165</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="get_all_tag_groups-166"><a href="#get_all_tag_groups-166"><span class="linenos">166</span></a>    <span class="n">path_obj</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_adv_tag_path_split</span><span class="p">(</span><span class="n">adv_tag_group_path</span><span class="p">,</span> <span class="n">isItem</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="get_all_tag_groups-167"><a href="#get_all_tag_groups-167"><span class="linenos">167</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">adv_tags</span><span class="o">.</span><span class="n">_create_adv_tags_base_url</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">path_obj</span><span class="p">)</span> <span class="o">+</span> <span class="n">_create_url</span><span class="p">()</span>
+</span><span id="get_all_tag_groups-168"><a href="#get_all_tag_groups-168"><span class="linenos">168</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">_config_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+</span><span id="get_all_tag_groups-169"><a href="#get_all_tag_groups-169"><span class="linenos">169</span></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">payload</span>
 </span></pre></div>
 
 
@@ -559,6 +563,8 @@ notation string such as "_advancedtags.AdvTagGroup1" or "_advancedtags.AdvTagGro
 <li><strong>server</strong>:  instance of the <code>server</code> class</li>
 <li><strong>adv_tag_group_path</strong>:  path identifying the advanced tag group collection to retrieve. Standard Kepware address decimal
 notation string such as "_advancedtags.AdvTagGroup1" or "_advancedtags.AdvTagGroup1.AdvTagGroupChild"</li>
+<li><strong>options</strong>:  <em>(optional)</em> Dict of parameters to filter, sort or pagenate the list of tags and tag groups. 
+Options are 'filter', 'sortOrder', and 'sortProperty' only.</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
